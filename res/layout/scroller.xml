@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.codeslap.dateslider.ScrollLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="@drawable/slider_no_snap"
+        android:paddingLeft="7dp"
+        android:paddingRight="7dp"/>

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/relativeLayout1"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@android:color/black"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/colorblind_choose_colors"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:paddingBottom="5dp"
+         />
+    
+    <com.rareventure.gps2.reviewer.TimeColorOvalView
+        android:id="@+id/colorView"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_below="@id/textView1"
+        />
+
+    <LinearLayout
+        android:id="@+id/checkBoxes1"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/colorView"
+        android:orientation="horizontal" >
+
+        <include layout="@layout/color_chooser_checkbox" >
+        </include>
+
+        <include layout="@layout/color_chooser_checkbox" >
+        </include>
+
+        <include layout="@layout/color_chooser_checkbox" >
+        </include>
+
+        <include layout="@layout/color_chooser_checkbox" >
+        </include>
+
+        <include layout="@layout/color_chooser_checkbox" >
+        </include>
+
+        <include layout="@layout/color_chooser_checkbox" >
+        </include>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/checkBoxes2"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_below="@id/checkBoxes1"
+        android:orientation="horizontal" >
+
+        <include layout="@layout/color_chooser_checkbox" >
+        </include>
+
+        <include layout="@layout/color_chooser_checkbox" />
+
+        <include layout="@layout/color_chooser_checkbox" >
+        </include>
+
+        <include layout="@layout/color_chooser_checkbox" >
+        </include>
+
+        <include layout="@layout/color_chooser_checkbox" >
+        </include>
+
+        <include layout="@layout/color_chooser_checkbox" >
+        </include>
+
+    </LinearLayout>
+    
+<Button
+    android:id="@+id/ok"
+    android:layout_width="96dp"
+    android:layout_height="wrap_content"
+    android:layout_alignParentBottom="true"
+    android:layout_alignParentLeft="true"
+    android:layout_margin="10dp"
+    android:onClick="onOk"
+    android:text="@android:string/ok" />
+
+</RelativeLayout>

@@ -1,0 +1,581 @@
+	public void setChildAreaPanelFk(int childFk, int index) {
+		int insertIndex = CHILDREN.pos + getNumChildren() * (Integer.SIZE >> 3);
+		insertInt(insertIndex, childFk);
+
+		int numChildren = getNumChildren();
+		
+		setInt(NUM_CHILDREN.pos, numChildren+1);
+	}
+	
+
+
+			Point lp = new Point();
+
+			toPixels(lp, pd.getStartCenterLatm(), pd.getStartCenterLonm(), stBox, drawingBitmap.getWidth(), 
+					drawingBitmap.getHeight());
+
+//			if(lp.x >= 0 && lp.x <= drawingBitmap.getWidth() && lp.y >= 0 && lp.y < drawingBitmap.getHeight() ||
+//					p.x >= 0 && p.x <= drawingBitmap.getWidth() && p.y >= 0 && p.y < drawingBitmap.getHeight())
+//				Log.d(GpsTrailer.TAG, "lp.x="+lp.x+", lp.y="+lp.y+", p.x="+p.x+", p.y="+p.y+" "+row);
+
+			if(drawShadow)
+				drawingCanvas.drawLine(lp.x, lp.y, p.x, p.y, shadowColor);
+			else
+				//we do averaging this wacky way to avoid integer overflow
+				drawingCanvas.drawLine(lp.x, lp.y, p.x, p.y, paint[figurePaintIndex((row.getEndTimeSec() 
+						- row.getStartTimeSec()) / 2 + row.getStartTimeSec())]);
+		//TODO 2: handle changes to bubble sizes in different zoom areas. Maybe the speed mps should bubble up the tree????
+		
+		Log.d(GpsTrailer.TAG, "numPoints="+points+" time = "+(System.currentTimeMillis()-time));
+		
+		if(turnOnMethodTracing)
+		{
+			Debug.stopMethodTracing();
+			turnOnMethodTracing = false;
+		}
+		
+		//TODO 2: We should only allow tapping at a certain zoom level
+		
+		//TODO 2: make tapping work again
+		//if the user tapped a point and we found at least one near gps point for it to represent
+		if(bestNearClickRowPointDiamond != null)
+		{
+			/**
+			 * The last location gps was calculated. Since the click from the user 
+			 * dabbing their finger is kind of sloppy, we sort of guess what
+			 * the user really meant to do when creating a new point
+			 */
+			lastCalculatedGpsLatM = (int) Math.round(bestNearClickRowPointDiamond.getEndCenterLatm());
+			lastCalculatedGpsLonM = (int) Math.round(bestNearClickRowPointDiamond.getEndCenterLonm());
+			
+			
+			//TODO 2: check for security purposes all log messages. Don't print out sensitive stuff
+			Log.d(GpsTrailer.TAG, "tapped on row "+bestNearClickRowPoint);
+			
+			float [] results = new float[1];
+			
+			//TODO 2: if there is only one point in the area, what are we going to do?
+			Location.
+				distanceBetween(
+						bestNearClickRowPointDiamond.getStartCenterLatm(),
+						bestNearClickRowPointDiamond.getStartCenterLonm(),
+						bestNearClickRowPointDiamond.getEndCenterLatm(),
+						bestNearClickRowPointDiamond.getEndCenterLonm(),
+						results);
+			 
+			lastCalculatedRadius = results[0];
+			
+			//create the user location bubble in the main thread
+			myHandler.sendEmptyMessage(0);
+		}
+		
+		//reset last tap point since we dealed with it
+		overlay.lastTapGeoPoint = null;
+		
+		//hack to draw area panels
+		if(!drawShadow)
+		{
+			for(AreaPanel ap : GTG.apCache.areaPanelsHack)
+			{
+				Point p1 = new Point();
+				Point p2 = new Point();
+				toPixels(p1, ap.getMinLatm(), ap.getMinLonm(), stBox, drawingBitmap.getWidth(), 
+						drawingBitmap.getHeight());
+				toPixels(p2, ap.getMinLatm() + ap.getLatmHeight(), ap.getMinLonm() + ap.getLonmWidth(), stBox, 
+						drawingBitmap.getWidth(), drawingBitmap.getHeight());
+				
+				drawingCanvas.drawLine(p1.x, p1.y, p1.x, p2.y, paint[paint.length-1]);
+				drawingCanvas.drawLine(p1.x, p2.y, p2.x, p2.y, paint[paint.length-1]);
+				drawingCanvas.drawLine(p2.x, p2.y, p2.x, p1.y, paint[paint.length-1]);
+				drawingCanvas.drawLine(p2.x, p1.y, p1.x, p1.y, paint[paint.length-1]);
+				
+			}
+		}
+
+
+		this.tableName = tableName;
+		this.encColumns = columns;
+		
+		this.insertStatementStr = insertStatementStr;
+		this.updateStatementStr = updateStatementStr;
+
+
+	public static final int TOP_ROW_ID = 1; //we assume... it is... 1
+
+	public T getTopRow() {
+		if(topRow != null)
+			return topRow;
+		
+		topRow = allocateRow();
+		Cursor c = topRow.query(GTG.db, "_id = ?", null, String.valueOf(TOP_ROW_ID));
+		
+		try {
+			if(!c.moveToNext())
+			{
+				topRow = null;
+				return null; //there is no top row
+			}
+			
+			topRow.readRow(c);
+			
+			return topRow;
+		}
+		finally {
+			DbUtil.closeCursors(c);
+		}
+	}
+	
+
+
+		while(fromVersion != DATABASE_VERSION)
+		{
+			if(fromVersion < 2)
+			{
+	            db.execSQL("DROP TABLE IF EXISTS LOCATION");
+	
+	            db.execSQL("CREATE TABLE LOCATION (_ID INTEGER PRIMARY KEY," +
+	            		"TIME LONG NOT NULL," +
+	            		"LAT DOUBLE NOT NULL," +
+	            		"LON DOUBLE NOT NULL," +
+	            		"ALT DOUBLE NOT NULL," +
+	            		"TYPE BYTE NOT NULL"
+	                    + ");");
+	            
+	            db.execSQL("CREATE INDEX LAT_INDEX ON LOCATION ( LAT );");
+	            db.execSQL("CREATE INDEX LON_INDEX ON LOCATION ( LON );");
+	            db.execSQL("CREATE INDEX TIME_INDEX ON LOCATION ( TIME );");
+
+	            db.execSQL("DROP TABLE IF EXISTS COMPASS");
+	           
+	            db.execSQL("CREATE TABLE COMPASS (_ID INTEGER PRIMARY KEY,BEGIN_TIME LONG NOT NULL,END_TIME LONG NOT NULL,DIRECTION FLOAT NOT NULL"
+	                    + ");");
+	            
+	            db.execSQL("CREATE INDEX COMPASS_BEGIN_TIME_INDEX ON COMPASS ( BEGIN_TIME );");
+	            db.execSQL("CREATE INDEX COMPASS_END_TIME_INDEX ON COMPASS ( END_TIME );");
+	            fromVersion = 2;
+			}
+			else if(fromVersion == 2)
+			{
+	            db.execSQL("DROP TABLE IF EXISTS REST");
+	        	
+	            db.execSQL("CREATE TABLE REST (_ID INTEGER PRIMARY KEY," +
+	            		"BEGIN_TIME LONG NOT NULL," +
+	            		"END_TIME LONG NOT NULL"
+	                    + ");");
+	            
+	            db.execSQL("CREATE INDEX REST_BEGIN_TIME_INDEX ON REST ( BEGIN_TIME );");
+	            db.execSQL("CREATE INDEX REST_END_TIME_INDEX ON REST ( END_TIME );");
+	            fromVersion = 3;
+			}
+			else if(fromVersion == 3)
+			{
+				db.execSQL("ALTER TABLE LOCATION ADD SPEED_MPS FLOAT NULL;");
+				db.execSQL("ALTER TABLE LOCATION ADD FLAGS LONG NOT NULL DEFAULT 0");
+				fromVersion = 4;
+			}
+			else if(fromVersion == 4)
+			{
+	            db.execSQL("CREATE TABLE WIFI_SCAN_RESULT (_ID INTEGER PRIMARY KEY," +
+	            		"TIME LONG NOT NULL," +
+	            		"SSID TEXT NOT NULL," +
+	            		"BSSID TEXT NOT NULL," +
+	            		"CAPABILITIES TEXT NOT NULL," +
+	            		"LEVEL INTEGER NOT NULL," +
+	            		"FREQUENCY INTEGER NOT NULL" +
+	                    ");");
+				fromVersion = 5;
+			}
+			else if(fromVersion == 5)
+			{
+	            db.execSQL("ALTER TABLE LOCATION RENAME TO GPS_LOCATION_TIME");
+	            db.execSQL("CREATE TABLE USER_LOCATION (" +
+	            		"_ID INTEGER PRIMARY KEY, " +
+	            		"NAME TEXT NOT NULL, "+
+	            		"LAT DOUBLE NOT NULL, "+
+	            		"LON DOUBLE NOT NULL, "+
+	            		"RADIUS_M DOUBLE NOT NULL," + //radius in meters
+	            		"CREATED_ON LONG NOT NULL)");
+				fromVersion = 6;
+			}
+			else if(fromVersion == 6)
+			{
+	            db.execSQL("ALTER TABLE USER_LOCATION RENAME TO OLD_USER_LOCATION");
+	            db.execSQL("CREATE TABLE USER_LOCATION (" +
+	            		"_ID INTEGER PRIMARY KEY, " +
+	            		"NAME TEXT NOT NULL, "+
+	            		"LAT_MD INTEGER NOT NULL, "+ //latitude in micro degrees
+	            		"LON_MD INTEGER NOT NULL, "+ //longitude in micro degrees
+	            		"RADIUS_M DOUBLE NOT NULL," + //radius in meters
+	            		"CREATED_ON LONG NOT NULL)");
+	            db.execSQL("INSERT INTO USER_LOCATION (_ID, NAME, LAT_MD, LON_MD, RADIUS_M, CREATED_ON) " +
+	            		" select _ID, NAME, round(LAT * 1000000), round(LON * 1000000), radius_m, created_on from OLD_USER_LOCATION");
+	            db.execSQL("drop table old_user_location;");
+	            
+	            db.execSQL("CREATE TABLE GPS_LOCATION_TIME (" +
+	            		"_ID INTEGER PRIMARY KEY," +
+	            		"TIME LONG NOT NULL," +
+	            		"LAT_MD LONG NOT NULL," +
+	            		"LON_MD LONG NOT NULL," +
+	            		"ALT DOUBLE NOT NULL," +
+	            		"TYPE BYTE NOT NULL," +
+	            		"SPEED_MPS FLOAT NULL,"+
+	            		"FLAGS LONG NOT NULL DEFAULT 0"
+	                    + ");");
+
+	            db.execSQL("INSERT INTO GPS_LOCATION_TIME (_ID, TIME, LAT_MD, LON_MD, ALT, TYPE, SPEED_MPS, FLAGS) " +
+        		" select _ID, TIME, round(LAT * 1000000), round(LON * 1000000), ALT, TYPE, SPEED_MPS, FLAGS from LOC_TIME");
+	            
+	            db.execSQL("DROP TABLE LOC_TIME");
+				fromVersion = 7;
+			}
+			else if(fromVersion == 7)
+			{
+	            db.execSQL("CREATE INDEX GPS_LOC_TIME_LAT_INDEX ON GPS_LOCATION_TIME ( LAT_MD );");
+	            db.execSQL("CREATE INDEX GPS_LOC_TIME_LON_INDEX ON GPS_LOCATION_TIME ( LON_MD );");
+	            db.execSQL("CREATE INDEX GPS_LOC_TIME_TIME_INDEX ON GPS_LOCATION_TIME ( TIME );");
+	            
+	            db.execSQL("CREATE INDEX USER_LOC_LAT_INDEX ON USER_LOCATION ( LAT_MD );");
+	            db.execSQL("CREATE INDEX USER_LOC_LON_INDEX ON USER_LOCATION ( LON_MD );");
+	            
+	            fromVersion = 8;
+			}
+			else if(fromVersion == 8)
+			{
+				db.execSQL(AndroidPreferenceSet.ANDROID_PREFS_CREATE_STATEMENT);
+				
+				db.execSQL("create table USER_DATA_KEY (_id integer primary key, " +
+	            		"APP_ID INTEGER NOT NULL," + // this identifies the application that
+	            		//created the row. It's here so that when we clean up old rows, we 
+	            		//can make sure to stay clear of rows that are in use
+						"encrypted_key blob)");
+				
+				db.execSQL("alter table GPS_LOCATION_TIME rename to OLD_GPS_LOCATION_TIME");
+				db.execSQL("CREATE TABLE GPS_LOCATION_TIME (" +
+	            		"_ID INTEGER PRIMARY KEY," +
+	            		"USER_DATA_KEY_FK INTEGER NOT NULL, " +
+	            		"SALT INTEGER NOT NULL," +
+	            		"DATA BLOB NOT NULL" +
+	            	 ///ALL THESE FUN THINGS ARE STORED IN THE BLOB 
+//	            		"TIME LONG NOT NULL," +
+//	            		"LAT_MD LONG NOT NULL," +
+//	            		"LON_MD LONG NOT NULL," +
+//	            		"ALT DOUBLE NOT NULL," +
+//	            		"SPEED_MPS FLOAT NULL,"+
+//	            		"TYPE BYTE NOT NULL," +
+//	            		"FLAGS LONG NOT NULL DEFAULT 0"
+	                   	");");
+				
+				db.execSQL("alter table USER_LOCATION rename to OLD_USER_LOCATION");
+				db.execSQL("CREATE TABLE USER_LOCATION (" +
+	            		"_ID INTEGER PRIMARY KEY," +
+	            		"SALT INTEGER NOT NULL," +
+	            		"USER_DATA_KEY_FK INTEGER NOT NULL, " +
+	            		"DATA BLOB NOT NULL" +
+		            	 ///ALL THESE FUN THINGS ARE STORED IN THE BLOB 
+//	            		"NAME TEXT NOT NULL, "+
+//	            		"LAT_MD INTEGER NOT NULL, "+ //latitude in micro degrees
+//	            		"LON_MD INTEGER NOT NULL, "+ //longitude in micro degrees
+//	            		"RADIUS_M DOUBLE NOT NULL," + //radius in meters
+//        		"CREATED_ON LONG NOT NULL)");
+	                   	");");
+	            
+				GpsTrailerCrypt.initialize(null);
+				
+				Cursor c = null;
+				try {
+					db.beginTransaction();
+					c = db.rawQuery("select _id, time, lat_md, lon_md, alt, speed_mps, type, flags " +
+							"from old_gps_location_time", null);
+					
+					GpsLocationRow er = GpsTrailerCrypt.allocateGpsLocationRow();
+					
+					while(c.moveToNext())
+					{
+						er.setData(c.getInt(0),c.getLong(1),c.getInt(2),
+								c.getInt(3),c.getDouble(4),
+								c.getFloat(5), c.getInt(6), c.getLong(7));
+						
+						er.insertRow2(db);
+					}
+					db.setTransactionSuccessful();
+				}
+				finally {
+					DbUtil.closeCursors(c);
+					db.endTransaction();
+				}
+	            
+				try {
+					db.beginTransaction();
+					c = db.rawQuery("select _id, name, lat_md, lon_md, radius_m from old_user_location", null);
+					
+					UserLocationRow er = GpsTrailerCrypt.allocateUserLocationRow();
+					while(c.moveToNext())
+					{
+						er.setData(c.getInt(0),c.getInt(2),c.getInt(3),
+								c.getString(1));
+						er.insertRow2(db);
+					}
+					db.setTransactionSuccessful();
+				}
+				finally {
+					DbUtil.closeCursors(c);
+					db.endTransaction();
+				}
+				
+				db.execSQL("drop table old_gps_location_time");
+				db.execSQL("drop table old_user_location");
+	            
+	            fromVersion = 9;
+			}
+			else if(fromVersion == 9)
+		 	{
+				GpsTrailerReviewerApplication.loadPreferencesFromDatabase();
+				
+				GpsTrailerCrypt.initialize(null);
+				
+				fromVersion = 10;				
+			}
+			else if(fromVersion == 10)
+		 	{
+				GpsTrailerReviewerApplication.loadPreferencesFromDatabase();
+				
+				GpsTrailerCrypt.initialize(null);
+				
+				db.execSQL("drop table if exists gps_loc_cache_row");
+				dropAndRecreateCacheTables(db);
+				fromVersion = 11;				
+			}
+			else if(fromVersion == 11)
+		 	{
+				GpsTrailerReviewerApplication.loadPreferencesFromDatabase();
+				
+				GpsTrailerCrypt.initialize(null);
+				
+				db.execSQL("drop table if exists time_panel");
+				dropAndRecreateCacheTables(db);
+				fromVersion = 12;				
+			}
+		}
+
+
+--
+
+				boolean vnOutsideOfOldStb = vn.outsideOf(vn.stBox);
+				boolean vnOutsideOfNewStb = vn.outsideOf(newLocalStBox);
+				
+				//if we are completely outside the old stb
+				if (vnOutsideOfOldStb)
+				{
+					//note, that then there are no points to show, so we won't bother checking any time stuff
+					
+	
+					if(!vnOutsideOfNewStb)
+						newPointCoverageEqualToOld = newPointConvergeAtLeastOld = false;
+				}
+				//if the ap is enclosed by the old stb
+				else if(vn.enclosedBy(vn.stBox))
+				{
+					if(!vn.enclosedBy(newLocalStBox))
+						newPointCoverageEqualToOld = newPointConvergeAtLeastOld = false;
+				}
+				//if we've not changed sizes of the stb
+				else if(vn.stBox.minX == newLocalStBox.minX &&
+							vn.stBox.maxX == newLocalStBox.maxX &&
+							vn.stBox.minY == newLocalStBox.minY &&
+							vn.stBox.maxY == newLocalStBox.maxY)
+						; //NOOP
+				//if we've grown in size and didn't shrink in any dimension
+				else if (vn.stBox.minX >= newLocalStBox.minX &&
+						vn.stBox.maxX <= newLocalStBox.maxX &&
+						vn.stBox.minY >= newLocalStBox.minY &&
+						vn.stBox.maxY <= newLocalStBox.maxY)
+					//newPointConvergeAtLeastOld is still true
+					newPointCoverageEqualToOld = false;
+				else //we've shrunk or moved, so we're no longer sure of anything
+					newPointCoverageEqualToOld = newPointConvergeAtLeastOld = false;
+				
+				
+					
+				
+					
+				boolean recheckTime, recheckSpace;
+				
+				if(vn.stBox == null)
+				{
+					recheckTime = recheckSpace = true;
+				}
+				else {
+					recheckTime = vn.needCheckTime(newLocalStBox);
+					recheckSpace = vn.needCheckSpace(newLocalStBox);
+					
+				}
+			}
+			
+		}
+		
+    public byte[] extractEntryToZippedByteArray(final ExtZipEntry zipEntry, String password)
+            throws IOException, ZipException, DataFormatException {
+        checkZipEntry(zipEntry);
+
+        ZipInputStream zipInputStream = null;
+
+        final OutputStreamToInputStreamPipe pipe = new OutputStreamToInputStreamPipe(
+                65536, 65536);
+
+        final CentralDirectoryEntry cde = zipEntry.getCentralDirectoryEntry();
+        if (!cde.isAesEncrypted()) {
+            throw new ZipException("only AES encrypted files are supported");
+        }
+        int cryptoHeaderOffset = zipEntry.getOffset()
+                - cde.getCryptoHeaderLength();
+        byte[] salt = raFile.readByteArray(cryptoHeaderOffset, 16);
+        byte[] pwVerification = raFile
+                .readByteArray(cryptoHeaderOffset + 16, 2);
+        if (LOG.isLoggable(Level.FINEST)) {
+            LOG.finest("\n" + cde.toString());
+            LOG.finest("offset    = " + zipEntry.getOffset());
+            LOG.finest("cryptoOff = " + cryptoHeaderOffset);
+            LOG.finest("password  = " + password + " - " + password.length());
+            LOG.finest("salt      = " + ByteArrayHelper.toString(salt) + " - "
+                    + salt.length);
+            LOG.finest("pwVerif   = "
+                    + ByteArrayHelper.toString(pwVerification) + " - "
+                    + pwVerification.length);
+        }
+        // encrypter throws ZipException for wrong password
+        decrypter.init(password, 256, salt, pwVerification);
+
+        // setup the decryptor
+        new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+              try {
+                ExtZipOutputStream zos = new ExtZipOutputStream(
+                        pipe.getOutputStreamToThisByteBuffer());
+                ExtZipEntry tmpEntry = new ExtZipEntry(zipEntry);
+                tmpEntry.setPrimaryCompressionMethod(zipEntry.getMethod());
+                tmpEntry.setCompressedSize(zipEntry.getEncryptedDataSize());
+                zos.putNextEntry(tmpEntry);
+                raFile.seek(cde.getOffset());
+                byte[] buffer = new byte[bufferSize];
+                CRC32 crc32 = new CRC32();
+                int remaining = (int) zipEntry.getEncryptedDataSize();
+                while (remaining > 0) {
+                    int len = (remaining > buffer.length) ? buffer.length
+                            : remaining;
+                    int read = raFile.readByteArray(buffer, len);
+                    decrypter.decrypt(buffer, read);
+                    zos.writeBytes(buffer, 0, read);
+                    remaining -= len;
+                    crc32.update(buffer, 0, read);
+                }
+                tmpEntry.setCrc(crc32.getValue());
+                zos.finish();
+              }
+              catch(PipeClosedException e)
+              {
+                  //if the input stream stopped reading, we just exit
+              } catch (IOException e) {
+                  //if we had trouble decrypting the file, we must notifiy the input stream
+                  pipe.notifyExceptionFromOutputStream(e);
+              }
+            }
+        }).start();
+
+        //co: we can't read this yet because we aren't done reading the data from the ra file
+        //but we won't be done until we finished reading from the input stream
+//        // now read from the decryptor's output using the regular unzip api
+//        byte[] storedMac = new byte[10];
+//        raFile.readByteArrayFully(storedMac, 0, 10);
+//        byte[] calcMac = decrypter.getFinalAuthentication();
+//        if (LOG.isLoggable(Level.FINE)) {
+//            LOG.fine("storedMac=" + Arrays.toString(storedMac));
+//            LOG.fine("calcMac=" + Arrays.toString(calcMac));
+//        }
+//        if (!Arrays.equals(storedMac, calcMac)) {
+//        	//FIXME HACK!!! TIM
+//            throw new ZipException(
+//                    "stored authentication (mac) value does not match calculated one");
+//        }
+
+        zipInputStream = new ZipInputStream(pipe);
+        
+        //get the next entry so that it's ready
+        zipInputStream.getNextEntry();
+        
+        // co: tim -- but we do have a crc entry, we set it above
+        // // At the end of the entry read-cycle a CRC check is performed.
+        // // Because our entry doesn't have a CRC this will result in an
+        // Exception
+        // // we solve this by updating a CRC and pass this to the entry.
+        // entry.setCrc( crc32.getValue() );
+        // if( entry.getSize()!=0 ) {
+        // crc32 = new CRC32();
+        // int read = zipInputStream.read(buffer);
+        // while (read > 0) {
+        // outStream.write(buffer, 0, read);
+        // crc32.update(buffer, 0, read);
+        // entry.setCrc(crc32.getValue());
+        // read = zipInputStream.read(buffer);
+        // }
+        // }
+
+        //TODO 2 what happens when we read all the data? EOF??
+        return zipInputStream;
+
+    }
+
+			private void parseGpxFile(GpxReader reader) {
+		File file = new File(filenameView.getText().toString());
+
+		int errorId = 0;
+
+		if (!file.exists())
+			return R.string.file_doesnt_exist;
+		else {
+
+			// read the first few bytes and check it out
+			byte[] data = new byte[32768];
+
+			FileInputStream fis = new FileInputStream(file);
+
+			Util.readFully(new FileInputStream(file), data);
+
+			fis.close();
+
+			// check if its a valid gpx file
+			if (isGpxFileStart(data)) {
+				fileType = FileType.RAW_GPX;
+			} else if (isEncryptedZip(data)) {
+				fileType = FileType.ENCRYPTED_GPX_ZIP;
+			} else if (isZip(data)) {
+				fileType = FileType.GPX_ZIP;
+			} else
+				errorId = R.string.file_not_recognized;
+		}
+
+		if (errorId != 0) {
+			errorTextView.setText(errorId);
+			restoreButton.setEnabled(false);
+		}
+
+	}
+
+	private boolean isEncryptedZip(String zipFile) {
+		AesZipFileDecrypter fd = new AesZipFileDecrypter(new File(zipFile), new AESDecrypterBC());
+		for(ExtZipEntry e : fd.getEntryList())
+		{
+			if(e.isEncrypted())
+			{
+			}
+		}
+		
+		fd.get
+		
+		fd.extractEntryToZippedByteArray(zipEntry, outStream, password)
+		
+		return false;
+	}
+
+		

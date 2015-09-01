@@ -1,0 +1,1013 @@
+package com.rareventure.gps2.database.cachecreator;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+
+import junit.framework.Assert;
+import android.util.Log;
+
+import com.rareventure.gps2.GTG;
+import com.rareventure.gps2.database.GpsLocCacheRow;
+import com.rareventure.gps2.database.GpsLocationRow;
+import com.rareventure.gps2.database.GpsTrailerCache;
+import com.rareventure.gps2.database.LeastSquaresData;
+import com.rareventure.gps2.database.LonmLeastSquaresData;
+import com.rareventure.gps2.database.cachecreator.WorkLoad.WorkSegment;
+
+/**
+ * Handles everything for adding a single point
+ */
+public class AddPointStatus {
+
+	/**
+	 * When a node is split out into new children, we encode this information in the id.
+	 * This is so we can combine newly created nodes when a row changes. 
+	 */
+	private static final int RIGHT_CHILD_ID_FLAG = 1 << 30;
+
+	private WorkLoad workLoad;
+	
+	/**
+	 * Keeps track of which ids have been saved to the database so we don't save them twice
+	 */
+	private HashSet<Integer> savedIds;
+
+	private HashMap<Integer,ArrayList<GpsLocCacheRowData>> idToRow;
+	
+	//this maps a 0 state row to the set of work segments that we are deleting from it.
+	//It allows us to know when we have completely changed a node in all cases and can remove,
+	//and what to adjust the start and end time ranges from and to
+	private HashMap<GpsLocCacheRow, WorkSegmentSet> row0StateToWorkSegmentSet;
+
+
+	Comparator<GpsLocCacheRowData> TIME_JUMP_DESC_COMPARATOR =  new Comparator<GpsLocCacheRowData>() {
+
+		@Override
+		public int compare(GpsLocCacheRowData r1, GpsLocCacheRowData r2) {
+			long v = r2.workSegment.start - r1.workSegment.start;
+			
+			if(v < 0)
+				return -1;
+			else if(v == 0)
+				return 0;
+			else return 1;
+		}
+	};
+
+
+	public void addPointToTop(GpsLocationRow gpsLocRow1, GpsLocationRow gpsLocRow2) {
+		workLoad = new WorkLoad();
+		idToRow = new HashMap<Integer, ArrayList<GpsLocCacheRowData>>();
+		row0StateToWorkSegmentSet = new HashMap<GpsLocCacheRow, WorkSegmentSet>();
+		savedIds = new HashSet<Integer>();
+		
+		GpsLocCacheRow topRow = GTG.cache.getTopRow(); 
+		
+		//if there is no top
+		if(topRow == null)
+		{
+			//create it and exit
+			topRow = new GpsLocCacheRowData(gpsLocRow1, gpsLocRow2, workLoad.copyCurrWorkSegment());
+			
+			topRow.insertRow(GTG.db);
+			return;
+		}
+		
+		//first create the changes to the tree
+		while(workLoad.hasWorkToDo())
+		{
+			GpsLocCacheRow topForTimePeriod = getSiblingForTimeJump(topRow, workLoad.currWorkSegment.start);
+			addPoint(topForTimePeriod, gpsLocRow1, gpsLocRow2, true);
+			
+			workLoad.goToNextWorkItem();
+		}
+		
+		//now we need to add the level 0 items to the RowCombiner so they can be combined, too.
+		while(!row0StateToWorkSegmentSet.isEmpty())
+		{
+			GpsLocCacheRow row0 = row0StateToWorkSegmentSet.keySet().iterator().next();
+			
+			updateRowDataForRow0(row0);
+			
+		}
+		
+		//TODO 2: HACK to print out tree universe
+//		new TreeUniverseViewer().viewTreeUniverse(idToRow.get(GpsTrailerCache.TOP_ROW_ID));
+		
+		//so while we were creating changes, we only changed stuff in memory.
+		//This is because a lot of the points can be combined because of the
+		//time jumps
+		//now we need to combine the rows and save the changes
+		
+		//So we start at the top, and go down, combining rows as we go
+		updateRowAndChildren(idToRow.get(GpsTrailerCache.TOP_ROW_ID));
+		
+	}
+	
+	private void updateRowDataForRow0(GpsLocCacheRow row0) {
+		boolean firstTime = true;
+		
+		//note that we are removing the data from row0StateToWorkSegmentSet here
+		WorkSegmentSet wss = row0StateToWorkSegmentSet.remove(row0);
+		
+		wss.sortWorkSegments();
+		
+		//create a 0 state row to add to the combinable row sets, so that state x rows can be combined with
+		//the state 0 nodes
+		for(WorkSegment ws : wss.workSegments)
+		{
+			
+			//for the first time, we can just mark it as a state0 now, so that the id will be saved
+			if(firstTime)
+			{
+				GpsLocCacheRowData rowData = new GpsLocCacheRowData(row0, ws, true);
+
+				addToIdToRow(rowData);
+				
+				firstTime = false;
+			}
+			else //otherwise, we need to actually find the parent(s) for the work segment and make
+				//them alive if they are dead
+			{
+				WorkSegment wsCopy = new WorkSegment(ws);
+				
+				//while there are still parents out there somewhere
+				while(wsCopy.start != wsCopy.end)
+				{
+					//the parent may be dead and resurrected or already alive. It's findParentRowData()'s job to do this
+					GpsLocCacheRowData parent = findParentRowData(wsCopy.start, row0);
+					
+					if(parent.workSegment.start != wsCopy.start)
+						Assert.fail("parent "+parent+" is not right for "+wsCopy.start+" - "+wsCopy.end);
+					
+					if(parent.workSegment.end > wsCopy.end)
+						Assert.fail("parent "+parent+" is not right for "+wsCopy.start+" - "+wsCopy.end);
+					
+					//we set isState0=false since there already is one that is being used by firstTime
+					GpsLocCacheRowData rowData = new GpsLocCacheRowData(row0, parent.workSegment, false);
+					addToIdToRow(rowData);
+					
+					if(parent.getChild1().id == rowData.id)
+					{
+						Assert.assertFalse(parent.getChild2().id == rowData.id);
+						parent.child1Replacement = null; // we are replacing the child in this case
+						parent.setChild1(rowData);
+					}
+					else
+					{
+						Assert.assertTrue(parent.getChild2().id == rowData.id);
+						Assert.assertFalse(parent.getChild1().id == rowData.id);
+						parent.child2Replacement = null; // we are replacing the child in this case
+						parent.setChild2(rowData);
+					}
+					
+					wsCopy.start = parent.workSegment.end;
+				}
+				
+			}
+			
+			
+			//HACK
+			if(!firstTime)
+				firstTime = false;
+				
+			firstTime = false;
+		}
+	}
+
+	private GpsLocCacheRowData findParentRowData(long timeJump, GpsLocCacheRow child) {
+		GpsLocCacheRow row = findParentRowData2(timeJump, child, null, GpsTrailerCache.TOP_ROW_ID);
+		
+		//TODO 3: kind of funky, I know..
+		//if the row is alive already
+		if(row instanceof GpsLocCacheRowData)
+		{
+			return (GpsLocCacheRowData) row;
+		}
+		else
+		{
+			GpsLocCacheRowData rowData = new GpsLocCacheRowData(row, new WorkSegment(row), true);
+			addToIdToRow(rowData);
+			
+			return rowData;
+		}
+	}
+
+	private GpsLocCacheRow findParentRowData2(long timeJump, GpsLocCacheRow child, GpsLocCacheRowData currLiveParent, int parentId) 
+	{
+		//the parent to work with may either be dead or alive. If it is dead, we don't bother creating a rowdata for it,
+		//since we aren't changing it. But, if there is a dead parent with a live replacement, we need to grab that replacement
+		//since it might link to a sub node that then links to the child. Also, we are really interested in the live replacement,
+		//if there is one. If not, we will create one for the dead parent
+		GpsLocCacheRow parentToWorkWith = null;
+		
+		//if we are not at the right item
+		if(currLiveParent == null || currLiveParent.getStartTimeJump() > timeJump || currLiveParent.getEndTimeJump() <= timeJump)
+		{
+			//first get the correct time sibling. Note that dead rows contain live rows, and the live rows will never extend
+			//beyond it's parents dead row
+			GpsLocCacheRow currDeadParent = getSiblingForTimeJump(GTG.cache.getGpsLocCacheRow(parentId), timeJump);
+			
+			//here is a tricky part. We can't deal with data that is not filled in for the state0, so we recall updateRowDataForRow0,
+			// which may in turn re-call findParentRowData() (and then this may recall this method), but the items should not 
+			// depend on each other in a loop, so we should be ok.
+			if(this.row0StateToWorkSegmentSet.containsKey(currDeadParent))
+				updateRowDataForRow0(currDeadParent);
+			
+			//find the parent that matches the correct start time
+			ArrayList<GpsLocCacheRowData> currLiveRow = this.idToRow.get(currDeadParent.id);
+			
+			//if it's not dead
+			if(currLiveRow != null)
+			{
+				//PERF: we keep sorting everything all the time, we should fix this issue
+				Collections.sort(currLiveRow, TIME_JUMP_DESC_COMPARATOR );
+				
+				//find sibling within row that makes sense for the curr row.
+				for(GpsLocCacheRowData rd : currLiveRow)
+				{
+					if(rd.workSegment.start <= timeJump)
+					{
+						if(rd.workSegment.end < timeJump)
+							Assert.fail("currRow "+currLiveRow+" rd "+rd);
+							
+						parentToWorkWith = rd;
+						break;
+					}
+				}
+				
+				if(parentToWorkWith == null)
+					Assert.fail("curr row is "+currLiveRow+", timejump is "+timeJump);
+			}
+			else //it is dead, so we use it as is
+			{
+				parentToWorkWith = currDeadParent;
+			}
+		}//if the current live parent wasn't covering the right time jump for the node
+		else parentToWorkWith = currLiveParent; //otherwise we can just use it
+		
+		//if the parent doesn't even contain the a point from the child, forget it.
+		if(!parentToWorkWith.containsPoint(child.getMinLonm(), child.getMinLatm(), child.getStartTimeMs()))
+			return null;
+		
+		GpsLocCacheRow child1 = parentToWorkWith.getChild1();
+		GpsLocCacheRow child2 = parentToWorkWith.getChild2();
+		
+		//note that we use getchild1() here instead of getChild1Fk() since we want the replacement if there is one
+		if(child1 != null)
+		{
+			Assert.assertTrue(child2 != null);
+			
+			if(child1.id == child.id || child2.id == child.id)
+				return parentToWorkWith;
+			
+			//TODO 3: these instanceof's are kind of bothering me, but I'm not sure what else to do...
+			//Try to find the child that matches the row. Note that we use child1 and child2 and not just their id's
+			//since we need the live copy. This is because sometimes we create new rows, and these new rows don't have
+			// a child id.
+			GpsLocCacheRow foundChild1 = findParentRowData2(timeJump, child, 
+					child1 instanceof GpsLocCacheRowData ? (GpsLocCacheRowData)child1 : null, child1.id);
+			GpsLocCacheRow foundChild2 = findParentRowData2(timeJump, child, 
+					child2 instanceof GpsLocCacheRowData ? (GpsLocCacheRowData)child2 : null, child2.id);
+			
+			if(foundChild1 != null)
+				return foundChild1;
+			else
+				return foundChild2;
+		}
+		
+		return null;
+	}
+
+	public class TreeUniverseViewer
+	{
+		HashMap<GpsLocCacheRowData,String> rowDataToRdId = new HashMap<GpsLocCacheRowData,String>();
+		private HashSet<ArrayList<GpsLocCacheRowData>> displayedRdArrays = new HashSet<ArrayList<GpsLocCacheRowData>>();
+		public void viewTreeUniverse(ArrayList<GpsLocCacheRowData> rowData) 
+		{
+//			Log.d("HACKVTS", "start");
+			Log.d("HACKVTU", "start");
+			Log.d("HACKVTU", "id,c1,c2,rep,tjs,wss,wse,"+GpsLocCacheRowData.commaSeparatedViewHeaders());
+			populateRowDataToIdFor(rowData);
+			
+			viewTreeUniverse2(rowData);
+		}
+	
+		private void viewTreeUniverse2(ArrayList<GpsLocCacheRowData> rowData) {
+			if(displayedRdArrays.contains(rowData))
+				return;
+			
+			displayedRdArrays.add(rowData);
+			
+			StringBuffer simple = new StringBuffer();
+			for(GpsLocCacheRowData rd : rowData)
+			{
+				simple.append(getSimpleData(rd, rowDataToRdId)).append(":");
+				Log.d("HACKVTU", getCommaSeparatedViewForRd(rd, rowDataToRdId));
+			}
+			simple.delete(simple.length()-1, simple.length());
+//			Log.d("HACKVTS", simple.toString());
+			
+			for(GpsLocCacheRowData rd : rowData)
+			{
+				viewTreeUniverse2(rd.child1Replacement);
+				viewTreeUniverse2(rd.child2Replacement);
+				viewTreeUniverse2(rd.getTimeJumpSiblingFk());
+				
+			}
+		}
+	
+		private void viewTreeUniverse2(int rowId) {
+			ArrayList<GpsLocCacheRowData> rowArray = idToRow.get(rowId);
+			
+			if(rowArray == null) return;
+			
+			viewTreeUniverse2(rowArray);
+		}
+
+		private void viewTreeUniverse2(GpsLocCacheRow row) {
+			if(row == null) return;
+			ArrayList<GpsLocCacheRowData> rowArray = idToRow.get(row.id);
+			
+			if(rowArray == null) return;
+			
+			viewTreeUniverse2(rowArray);
+		}
+
+		private String getSimpleData(GpsLocCacheRowData rd, HashMap<GpsLocCacheRowData, String> rowDataToRdId) {
+			String child1Id = getRdId(rd.getChild1(), rd.getChild1Fk(), rowDataToRdId);
+			String child2Id = getRdId(rd.getChild2(), rd.getChild2Fk(), rowDataToRdId);
+			String replacement = getRdId(rd.replacement, Integer.MIN_VALUE, rowDataToRdId);
+			String tjs = getRdId(null, rd.getTimeJumpSiblingFk(), rowDataToRdId);
+			
+			return String.format("id=%s c1=%s c2=%s r=%s tjs=%s wstj=%d wetj=%d",
+					rowDataToRdId.get(rd),
+					child1Id,
+					child2Id,
+					replacement,
+					tjs,
+					rd.workSegment.start,
+					rd.workSegment.end);
+		}
+
+		private String getCommaSeparatedViewForRd(GpsLocCacheRowData rd, HashMap<GpsLocCacheRowData, String> rowDataToRdId) {
+			String child1Id = getRdId(rd.getChild1(), rd.getChild1Fk(), rowDataToRdId);
+			String child2Id = getRdId(rd.getChild2(), rd.getChild2Fk(), rowDataToRdId);
+			String replacement = getRdId(rd.replacement, Integer.MIN_VALUE, rowDataToRdId);
+			String tjs = getRdId(null, rd.getTimeJumpSiblingFk(), rowDataToRdId);
+			
+			return String.format("%s,%s,%s,%s,%s,%d,%d,%s",
+					rowDataToRdId.get(rd),
+					child1Id,
+					child2Id,
+					replacement,
+					tjs,
+					rd.workSegment.start,
+					rd.workSegment.end,
+					rd.toCommaSeparatedView());
+					
+		}
+		
+		private String getRdId(GpsLocCacheRow rd, int fk, HashMap<GpsLocCacheRowData, String> rowDataToRdId)
+		{
+			if(rd == null)
+			{
+				return "("+fk+")";
+			}
+			
+			String v = rowDataToRdId.get(rd);
+			if(v != null)
+				return v;
+			
+			return rd.id+"";
+		}
+	
+		private void populateRowDataToIdFor(ArrayList<GpsLocCacheRowData> rowData) {
+			if(rowData == null)
+				return;
+			
+			int i = 0;
+			
+			int id0 = rowData.get(0).id;
+			
+			for(GpsLocCacheRowData rd : rowData)
+			{
+				if(!rowDataToRdId.containsKey(rd))
+				{
+					rowDataToRdId.put(rd, id0+"~"+(i++));
+					if(rd.child1Replacement != null)
+						populateRowDataToIdFor(idToRow.get(rd.child1Replacement.id));
+					if(rd.child2Replacement != null)
+						populateRowDataToIdFor(idToRow.get(rd.child2Replacement.id));
+					if(rd.replacement != null)
+						populateRowDataToIdFor(idToRow.get(rd.replacement.id));
+					if(idToRow.containsKey(rd.getTimeJumpSiblingFk()))
+						populateRowDataToIdFor(idToRow.get(rd.getTimeJumpSiblingFk()));
+				}
+			}
+		}
+	} //end TreeUniverseViewer
+	
+	private void updateRowAndChildren(ArrayList<GpsLocCacheRowData> l) 
+	{
+		//if we already saved it, don't do it again
+		if(!savedIds.add(l.get(0).id))
+			return;
+		
+		//Log.d("AddPointStatus","updating row for "+l.get(0));
+				
+		Collections.sort(l, TIME_JUMP_DESC_COMPARATOR );
+		
+		//got keep up on those time siblings
+		ArrayList<GpsLocCacheRowData> timeSibling = idToRow.get(l.get(l.size()-1).getTimeJumpSiblingFk());
+
+		if(timeSibling != null)
+		{
+			updateRowAndChildren(timeSibling);
+			
+			//if we add some state 1 data for the row, we want to make sure to set the time jump sibling to the new fk
+			//actually not sure this will happen, so lets assert it first
+			Assert.assertTrue(l.get(l.size()-1).getTimeJumpSiblingFk() == timeSibling.get(0).id);
+			//l.get(l.size()-1).setTimeJumpSiblingFk(timeSibling.get(0).id);
+		}
+		
+		//we start at negative one so that we can updateRowAndChildren() the first row. We need the row after i to be updated
+		//before we start working with it, so we always updateRowAndChildren() i+1
+		for(int i = -1; i < l.size()-1; i++)
+		{
+			GpsLocCacheRowData r1 = i < 0 ? null : l.get(i),r2 = l.get(i+1);
+			
+			//we need to combine and update all the children before we can work on the parents
+			
+			if(r2.getChild1() != null)
+			{
+				ArrayList<GpsLocCacheRowData> child1Row = idToRow.get(r2.getChild1().id);
+				
+				//if we are creating a new parent, we won't add the children to idToRow since they don't change
+				//TODO 3: this is a little awkward
+				if(child1Row != null)
+					updateRowAndChildren(child1Row);
+				
+				ArrayList<GpsLocCacheRowData>  child2Row = idToRow.get(r2.getChild2().id);
+				if(child2Row != null)
+					updateRowAndChildren(child2Row);
+			}
+			
+			//if there is a state0 then it gets to keep the id.
+			//otherwise we let the first row to have the id
+			//For the top row, we play it a little differently. 
+			//We always want row 1 to be the start of the time jump siblings.
+			if(!r2.isTopRow && r2.isState0 && i != -1)
+			{
+				l.get(0).id = -1;
+			}
+			else if(i != -1)
+				r2.id = Integer.MIN_VALUE; //we set the id to MIN_VALUE, to specify
+			//that we want to insert the row rather than update it. (the state0 row gets
+			// to keep the id, so any dead parent links link to it properly)
+			
+			//if we are at -1, there are no children to combine.
+			//we also want to keep the row.id to the current value
+			if(i == -1)
+				continue;
+			
+			//if they are the same and either they both have children or they both don't
+			if(r1.paramsEqual(r2))// && (r1.getChild1() == null) == (r2.getChild1() == null)) // commented out because I think they both will always
+				//have children
+			{
+				
+				//Make r1 handle both r1 and r2
+				
+				if(r2.workSegment.end != r1.workSegment.start)
+					Assert.fail("r1 is "+r1+", r2 is "+r2);
+				
+				//sometimes the childrens worksegments overlap. It's sad but true. See the FACTS in the notes.txt 
+				//about row 196 
+				
+				boolean canCombine = true;
+				
+				if(r1.getChild1() != null)
+				{
+					if(r1.getChild1().id != r2.getChild1().id 
+							&& getLastTimeJumpSibling(r1.getChild1()).getStartTimeJump() != 
+						r2.getChild1().getEndTimeJump())
+						canCombine = false;
+					if(r1.getChild2().id != r2.getChild2().id 
+							&& getLastTimeJumpSibling(r1.getChild2()).getStartTimeJump() != 
+						r2.getChild2().getEndTimeJump())
+						canCombine = false;
+				}
+				
+				if(canCombine)
+				{
+					//
+					// Now we need to hook up the time siblings of the children (unless they both point to the same ones)
+					//
+					
+					//note that we compare id's here for that hack where we are creating new rows for children we don't
+					//intend to change and therefore don't add to idToRow
+					//Note that at this point, any child that we access will have a newly assigned, real id, so we can
+					//check ids and safely know if we are dealing with the same child (which we have to for the case
+					// of the dead children wrapper, since we wrap the same dead child with two wrapper objects)
+					if(r1.getChild1() != null)
+					{
+						if(r1.getChild1().id != r2.getChild1().id)
+						{
+							//I think there always will be children, so we are assuming that is true
+							
+							//combine the children using time jumps
+							GpsLocCacheRow child1 = getLastTimeJumpSibling(r1.getChild1());
+							
+							//we check if the items are in the same sibling chain. If
+							//not we need to link the two time sibling chains together
+							if(child1.id != getLastTimeJumpSibling(r2.getChild1()).id)
+							{
+								//make sure that we aren't writing over some other time jump sibling
+								Assert.assertTrue(child1.getTimeJumpSiblingFk() == Integer.MIN_VALUE);
+								
+								child1.setTimeJumpSiblingFk(r2.getChild1().id);
+								
+								//here we updated the child, so we need to save it. Note that this is at
+								//one level deeper than the current row, so this should be fine.. (considering
+								//that we save in the order from children to parents)
+								updateDatabaseForRow(child1);
+							}
+						}
+							
+						//And the same for the second child
+						if(r1.getChild2().id != r2.getChild2().id)
+						{
+							//I think there always will be children, so we are assuming that is true
+							
+							//combine the children using time jumps
+							GpsLocCacheRow child2 = getLastTimeJumpSibling(r1.getChild2());
+							
+							//we check if the items are in the same sibling chain. If
+							//not we need to link the two time sibling chains together
+							if(child2.id != getLastTimeJumpSibling(r2.getChild2()).id)
+							{
+								//make sure that we aren't writing over some other time jump sibling
+								Assert.assertTrue(child2.getTimeJumpSiblingFk() == Integer.MIN_VALUE);
+								
+								child2.setTimeJumpSiblingFk(r2.getChild2().id);
+		
+								//PERF: updating child twice! Once we save the child in the deeper recursion
+								//of addPoint() and again now.
+								//here we updated the child, so we need to save it. Note that this is at
+								//one level deeper than the current row, so this should be fine.. (considering
+								//that we save in the order from children to parents)
+								updateDatabaseForRow(child2);
+							}
+						}
+					}
+					else //if r1.getChild1() is null (then they all should be)
+						Assert.assertTrue(r1.getChild2() == null && r2.getChild1() == null && r2.getChild2() == null);
+								
+					r1.workSegment = new WorkSegment(r2.workSegment.start, r1.workSegment.end);
+					
+					//mark the current row as having a replacement (r1)
+					//PERF: this worries me for garbage collection performance
+					r2.replaceWith(r1);
+					
+					//remove the second row and rerun the current one
+					l.remove(i+1);
+					i--;
+				} //if we determined that we can combine the two rows
+			}//if the params are equal between the current and the next row
+			
+					
+		} // for to look for rows to combine for the single id
+		
+		//now update the rows
+		for(int i = l.size()-1; i >=0; i--)
+		{
+			GpsLocCacheRowData r = l.get(i);
+		
+			//if we can update the internal row to actual ids
+			Assert.assertTrue(r.updateInternalRow());
+
+			updateDatabaseForRow(r);
+
+			//if we are at the top row, we need to create time siblings between all the ids
+			//TODO 3:  PERF: maybe we can apply this same strategy for non top rows. Right now we 
+			//wait for the children to save first then update time jump sibling fks for them
+			if(l.get(0).isTopRow && i > 0)
+			{
+				l.get(i-1).setTimeJumpSiblingFk(l.get(i).id);
+			}
+			
+		}
+	}
+
+	private void updateDatabaseForRow(GpsLocCacheRow r) {
+		if(r.id >= 0) //if the id is real, it will be greater than 0
+		{
+			//we delete the row id, because the original row object may be different from 
+			//the row data copy that we are creating
+			//So that means that when we update the data of the row, we may not be touching
+			//the original cache, which means the cache would become incorrect. 
+			GTG.cache.deleteRowId(r.id);
+			
+			r.updateRow(GTG.db);
+		}
+		else //otherwise its a "fake" id for a brand new node added on behalf of an existing id
+			r.insertRow(GTG.db);
+		
+		//PERF: maybe we should insert the row back into the cache rather than just let us read
+		//from the db again
+	}
+
+	private GpsLocCacheRow getLastTimeJumpSibling(GpsLocCacheRow gpsLocCacheRow) {
+		for(;;)
+		{
+			int id = gpsLocCacheRow.getTimeJumpSiblingFk();
+			
+			if(id == Integer.MIN_VALUE)
+				return gpsLocCacheRow;
+			
+			gpsLocCacheRow = GTG.cache.getGpsLocCacheRow(id);
+		}
+	}
+
+	private void addToIdToRow(GpsLocCacheRowData rowData) {
+		ArrayList<GpsLocCacheRowData> l = idToRow.get(rowData.id);
+		
+		if(l == null)
+			idToRow.put(rowData.id, l = new ArrayList<GpsLocCacheRowData>());
+		
+		l.add(rowData);
+	}
+
+	//if we get here, it means we must add the point to the row, somehow..
+	private GpsLocCacheRowData addPoint(GpsLocCacheRow row, GpsLocationRow gpsLocRow1, GpsLocationRow gpsLocRow2, 
+			boolean isTopRow, ExpandableSpace es) {
+		
+		workLoad.adjustWork(row.getEndTimeJump());
+		
+		// now determine the "best" child to add to based on the zoom area.
+		// we want to equalize the size of each child
+		GpsLocCacheRow child1 = getSiblingForTimeJump(row.getChild1(), workLoad.currWorkSegment.start);
+		GpsLocCacheRow child2 = getSiblingForTimeJump(row.getChild2(), workLoad.currWorkSegment.start);
+
+		//if there are children
+		if(child1 != null)
+		{	
+			if(child2 == null)
+				Assert.fail("row "+row+", child1 "+child1+" child2 null, workLoad currSegment is "+workLoad.currWorkSegment.start);
+
+			workLoad.adjustWork(child1.getEndTimeJump());
+			workLoad.adjustWork(child2.getEndTimeJump());
+
+			// now we handle as much of the point as possible
+			while(true)
+			{
+				CursoryCheckResults ccr1 = doCursoryAddSegmentCheck(child1, segment, es.getChildEs(child1,child2));
+				CursoryCheckResults ccr2 = doCursoryAddSegmentCheck(child2, segment, es.getChildEs(child2,child1));
+				
+				CursoryCheckResults ccr3 = doCursoryExpandParentCheck(row, segment, es, child1, child2);
+				
+				if(ccr1.isBetterThan(ccr2))
+				{
+					if(ccr1.isBetterThan(ccr3))
+					{
+						//add to child1
+						//TODO 1: add it
+					}
+					else if(ccr3.isBetterThan(ccr2))
+					{
+						//create a new point and combine child 1 and child2
+						//TODO 1: add it
+					}
+						
+				}
+				else if(ccr3.isBetterThan(ccr2))
+				{
+					//create a new point and combine child 1 and child2
+					//TODO 1: add it
+				}
+				else
+				{
+					//add to child2
+					//TODO 1: add it
+				}
+			}
+		} // if there are children
+		else
+		{
+			//expand parent to cover both pieces as much as possible
+		}
+	}
+	
+	
+	public CursoryCheckResults doCursoryAddSegmentCheck(GpsLocCacheRow row, GpsSegment segment, ExpandableSpace childEs) {
+		CursoryCheckResults ccr = new CursoryCheckResults(childEs);
+		ccr.addChild(row.getChild1());
+		ccr.addChild(row.getChild2());
+		ccr.addSegment(segment);
+		
+		return ccr;
+	}
+
+
+	private CursoryCheckResults doCursoryExpandParentCheck(GpsLocCacheRow row, GpsSegment segment, ExpandableSpace es,
+			GpsLocCacheRow child1, GpsLocCacheRow child2) {
+		throw new IllegalStateException("TODO"); //TODO. Created 6:38:11 PM Aug 28, 2010
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * We don't want a time jump for every new point that comes in, or we get thousands of
+	 * different time jump levels. So we round the timejump
+	 * @param newPointTimeJump
+	 * @return
+	 */
+	private long granualize(long timeJump) {
+		int index = Arrays.binarySearch(GpsTrailerCache.TIME_JUMP_LEVELS, timeJump);
+		
+		index = index >= 0 ? index : -index-1;
+		if(index >= GpsTrailerCache.TIME_JUMP_LEVELS.length)
+			index = GpsTrailerCache.TIME_JUMP_LEVELS.length -1;
+		
+		//-(-index - 1)= index + 1
+		return GpsTrailerCache.TIME_JUMP_LEVELS[index];
+		
+	}
+
+	private GpsLocCacheRow getSiblingForTimeJump(GpsLocCacheRow row, long timeJump) 
+	{
+		while(row != null)
+		{
+			if(timeJump >= row.getStartTimeJump())
+			{
+				if(row.getEndTimeJump() < timeJump)
+					Assert.fail(row+" and timejump "+timeJump);
+				return row;
+			}
+			
+			//each parent has only two children per time jump level
+			row = row.getTimeJumpSibling();
+		}
+		return null;
+	}
+
+	private void subtractFromWorkload(GpsLocCacheRow row, WorkSegment workSegmentToDelete) {
+		WorkSegmentSet wss = row0StateToWorkSegmentSet.get(row);
+		
+		if(wss == null)
+			row0StateToWorkSegmentSet.put(row, wss = new WorkSegmentSet(row));
+		
+		wss.subtractWorkSegment(workSegmentToDelete);
+	}
+
+	/**
+	 * This adds an entirely new row to the code. The new row will be given a null (min value) id and
+	 * added to new nodes
+	 */
+	private GpsLocCacheRowData createNewRowCopyForWorkLoad(int id, GpsLocCacheRowData rowData, boolean isLeft) {
+		rowData.id = createNewChildIdForId(id, isLeft);
+		
+		addToIdToRow(rowData);
+		
+		return rowData;
+	}
+
+	private int createNewChildIdForId(int id, boolean isLeft) {
+		return isLeft ? -id : (-id &  (~RIGHT_CHILD_ID_FLAG));
+	}
+
+	/**
+	 * This adds a row that is meant to be a copy of an existing one. The difference here
+	 * is that the id is kept and it's added to idToRow. This allows the node to be
+	 * combined with the existing data.
+	 */
+	private GpsLocCacheRowData createExistingRowCopyForWorkLoad(GpsLocCacheRow row) {
+		GpsLocCacheRowData rowData = new GpsLocCacheRowData(row, workLoad.copyCurrWorkSegment(),false);
+
+		addToIdToRow(rowData);
+		return rowData;
+	}
+
+	// Util.intToByteArray(lstb.minLatm, data, MIN_LATM.pos);
+	// Util.intToByteArray(lstb.minLonm, data, MIN_LONM.pos);
+	// Util.intToByteArray(lstb.maxLatm - lstb.minLatm, data, HEIGHT_LATM.pos);
+	// Util.intToByteArray(lstb.maxLonm - lstb.minLonm, data, WIDTH_LONM.pos);
+	// Util.floatToByteArray(lstb.latmPerMs, data, LATM_PER_MS.pos);
+	// Util.floatToByteArray(lstb.lonmPerMs, data, LONM_PER_MS.pos);
+	// Util.intToByteArray(getInt(NUM_SEGMENTS)+1, data, NUM_SEGMENTS.pos);
+	// Util.longToByteArray(gpsLocRow2.getTime(), data, END_TIME.pos);
+	//
+	// return numCachePointsAdded;
+	// }
+
+	/**
+	 * Examines the point to see if we can add it and gives an estimate
+	 * about how big the resulting box will be and where it will be.
+	 * Note this is also used to determine the resulting parameters
+	 * for a node after the children are updated. This is a cursory
+	 * examination, meant to speed things up.
+	 */
+	public LopsidedSpaceTimeBox doCursoryExamination(GpsLocCacheRow row, GpsLocationRow gpsLocRow1, GpsLocationRow gpsLocRow2) {
+		
+		
+		//now determine if we can add the point.
+
+		// first we adjust the slope to come up with the best fit
+		// we do this regardless because :
+		// 1. even if the point fits with the current slope, we need to adjust it anyway, and
+		// 2. if it doesn't fit, we still need to adjust the slope to see if it would with a different slope
+
+		// PERF: we may consider not trying to adjust the slope anymore after a certain number of points (especially if it fits)
+
+		// This won't find the best slope (which is really hard to do IMO) but it should work well enough.
+		// Note that we are trying to minimize for lat/lon distance. Not for distance through space time
+		//
+		// Consider:
+		//
+		//         *          *       *
+		// -----*--------*------*----- <--slope
+		//    *             *
+		// time -->>
+		//
+		//               *
+		//               *
+		//                 *
+		//            *
+		// --------------*----------- <--slope
+		//                *
+		//              *
+		//                *
+		//               *
+		//              *
+		// time -->>
+		//
+		// In the second case, we still have a somewhat horizontal line. This is because we limit the distance in space(the vertical direction)
+		// only. We don't care about distance in time
+		//
+		//
+		//          /*
+		//        */
+		//        *
+		//     * /
+		//    * /
+		//   * /
+		//    /*
+		//   / *
+		//  / *
+		// /*
+		// time -->>
+		//
+		// In this case we do have a more vertical line, but it's simply because it minimizes the space
+		
+		long parentStartTime = row.getLong(row.START_TIME);
+
+		double latmPerMs = 0;
+		double lonmPerMs = 0;
+
+		GpsLocCacheRow child1 = row.getChild1();
+		GpsLocCacheRow child2 = row.getChild2();
+		
+		// got this from wikipedia: http://en.wikipedia.org/wiki/Numerical_methods_for_linear_least_squares (under Computation)
+		LeastSquaresData lsdLatm = new LeastSquaresData(parentStartTime, row.getInt(row.MIN_LATM));
+		LonmLeastSquaresData lsdLonm = new LonmLeastSquaresData(parentStartTime);
+		
+		if(child1 != null)
+		{
+			addToLeastSquares(child1, lsdLatm,lsdLonm);
+			addToLeastSquares(child2, lsdLatm,lsdLonm);
+		}
+		
+		if(gpsLocRow1 != null)
+		{
+			lsdLonm.addPoint(gpsLocRow1.getTime(), gpsLocRow1.getInt(gpsLocRow1.LONM), 1);
+			lsdLatm.addPoint(gpsLocRow1.getTime(), gpsLocRow1.getInt(gpsLocRow1.LATM), 1);
+	
+			lsdLonm.addPoint(gpsLocRow2.getTime(), gpsLocRow2.getInt(gpsLocRow1.LONM), 1);
+			lsdLatm.addPoint(gpsLocRow2.getTime(), gpsLocRow2.getInt(gpsLocRow1.LATM), 1);
+		}
+		else 
+			Assert.assertNull(gpsLocRow2);
+		
+		//figure the new slope
+		latmPerMs = lsdLatm.getSlope();
+		lonmPerMs = lsdLonm.getSlope();
+		
+//		//TODO x1: hack
+//		if(id == 14)
+//		{
+//			Log.d(GpsTrailer.TAG, "p1 "+gpsLocRow1.toString(getLong(START_TIME), getInt(MIN_LATM), getInt(MIN_LONM)));
+//			Log.d(GpsTrailer.TAG, "p2 "+gpsLocRow2.toString(getLong(START_TIME), getInt(MIN_LATM), getInt(MIN_LONM)));
+//			Log.d(GpsTrailer.TAG,"slope lat "+latmPerMs+" slope lon "+lonmPerMs);
+//		}
+		
+
+		// now find the max and min lat and lon at the start time, given the slope
+		// if there is a gps loc row, we will determine the time jump for it
+		LopsidedSpaceTimeBox lstb = new LopsidedSpaceTimeBox(row.getLong(row.START_TIME), latmPerMs, lonmPerMs, 
+				row.getLong(row.END_TIME), gpsLocRow1 == null ? row.getLong(row.END_TIME) : gpsLocRow1.getTime());
+		
+		// go through all the children and calculate the lstb
+		if(child1 != null)
+		{
+			lstb.addChild(child1);
+			lstb.addChild(child2);
+		}
+		
+		if(gpsLocRow1 != null)
+		{
+			lstb.addPoint(gpsLocRow1);
+			lstb.addPoint(gpsLocRow2);
+		}
+
+		return lstb;
+	}
+
+	private void addToLeastSquares(GpsLocCacheRow child, LeastSquaresData lsdLatm, LonmLeastSquaresData lsdLonm) {
+
+		long childStartTime = child.getLong(child.START_TIME);
+		long childEndTime = child.getLong(child.END_TIME);
+
+		int minLatm = child.getInt(child.MIN_LATM);
+		int maxLatm = child.getInt(child.MIN_LATM) + child.getInt(child.HEIGHT_LATM);
+
+		lsdLatm.addPoint(childStartTime, minLatm, 1);
+		lsdLatm.addPoint(childEndTime, child.getEndMinLatm(), 1);
+		lsdLatm.addPoint(childStartTime, maxLatm, 1);
+		lsdLatm.addPoint(childEndTime, child.getEndMaxLatm(), 1);
+
+		if(child.isInfiniteLonm())
+		{
+			lsdLonm.addInfiniteRange();
+		}
+		else {
+			int minLonm = child.getInt(child.MIN_LONM);
+			int maxLonm = child.getInt(child.MIN_LONM) + child.getInt(child.WIDTH_LONM);
+			
+			lsdLonm.addRange(childStartTime, minLonm, maxLonm, 1);
+			int minEndLonm = child.getEndMinLonm();
+			lsdLonm.addRange(childEndTime, minEndLonm, minEndLonm + child.getInt(child.WIDTH_LONM), 1);
+		}
+	}
+
+	/**
+	 * Since the new children may not have been loaded into the db yet, they may not have an id
+	 * so we have to do direct references
+	 * 
+	 * So what we have is:
+	 *
+	 *    n1
+	 *   /  \
+	 * c1   c2
+	 *
+	 * And what we want is:
+	 *
+	 *      n1
+	 *      /  \
+	 *    nc1   nc2
+     *   /  \
+	 *	c1  c2
+	 *
+	 */
+	private void promoteToParent(GpsLocCacheRowData newParent, GpsLocCacheRowData newChild1, GpsLocCacheRowData newChild2) {
+		
+		if(newParent.child1Replacement == null)
+		{
+			//Note that we are NOT adding this to idToRow, or state0ToWorkSegmentSet, this is because we aren't actually changing the child,
+			//so there is no need to update it. 
+			//TODO 3: this is a little odd, I hope it won't cause bugs that we aren't adding it to idToRow
+			GpsLocCacheRow child1 = newParent.getChild1();
+			
+			if(child1 != null)
+				newParent.setChild1(new GpsLocCacheRowData(getSiblingForTimeJump(child1, workLoad.currWorkSegment.start), 
+					workLoad.copyCurrWorkSegment(), false));
+		}
+		if(newParent.child2Replacement == null)
+		{
+			//Note that we are NOT adding this to idToRow, or state0ToWorkSegmentSet, this is because we aren't actually changing the child,
+			//so there is no need to update it. 
+			//TODO 3: this is a little odd, I hope it won't cause bugs that we aren't adding it to idToRow
+			GpsLocCacheRow child2 = newParent.getChild2();
+
+			if(child2 != null)
+				newParent.setChild2(new GpsLocCacheRowData(getSiblingForTimeJump(child2, workLoad.currWorkSegment.start), 
+					workLoad.copyCurrWorkSegment(), false)); 
+		}
+		
+		newChild1.setChild1(newParent.child1Replacement);
+		newChild1.setChild2(newParent.child2Replacement); 
+		
+		//since newChild1 takes over these links, we can set them to null for new parent
+		newParent.child1Replacement = null;
+		newParent.child2Replacement = null;
+		
+		newParent.setChild1(newChild1);
+		newParent.setChild2(newChild2);
+	}
+
+	
+
+}

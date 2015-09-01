@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:ads="http://schemas.android.com/apk/lib/com.google.ads"
+    android:id="@+id/mainlayout"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
+
+    <com.rareventure.gps2.reviewer.map.OsmMapView
+        android:id="@+id/osmmapview"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:clickable="true" />
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:orientation="vertical" >
+ 
+        <fragment
+            android:id="@+id/tooltip"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            class="com.rareventure.android.widget.ToolTipFragment" />
+
+        <fragment
+            android:id="@+id/infoNotice"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            class="com.rareventure.android.widget.InfoNoticeStatusFragment" />
+
+        <fragment
+            android:id="@+id/status"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            class="com.rareventure.android.widget.OngoingProcessStatusFragment" />
+
+        <TextView
+            android:id="@+id/thankyou"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:paddingLeft="5dp"
+            android:text="@string/map_attrition" />
+
+        <TextView
+            android:id="@+id/dist_traveled"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:paddingLeft="5dp"
+            android:text="Distance Traveled: --"
+            android:textColor="#FF000000" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:orientation="vertical" >
+
+        <RelativeLayout
+            android:id="@+id/main_window_area"
+            android:layout_width="fill_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" >
+
+            <include
+                android:id="@+id/sas_panel"
+                android:layout_width="300dp"
+                android:layout_height="fill_parent"
+                layout="@layout/selected_area_info_panel" />
+
+            <ImageButton
+                android:id="@+id/AutoZoom"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentLeft="true"
+                android:background="@drawable/autozoom_button"
+                android:contentDescription="@string/auto_zoom"
+                android:scaleType="fitCenter" />
+
+            <ImageButton
+                android:id="@+id/pan_to_location"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_above="@id/AutoZoom"
+                android:layout_alignParentLeft="true"
+                android:background="@drawable/pan_to_location_disabled"
+                android:contentDescription="@string/pan_to_gps_loc"
+                android:scaleType="fitCenter" />
+
+            <!--
+        For the checkbox below,
+              we use background to designate the image, and set
+             button to null, because button doesn't scale with
+             the image size,but background does. And if we don't
+             set it to null, then a default checkbox will appear
+            -->
+	<!--  co: no multi sas for now
+            <CheckBox
+                android:id="@+id/selected_areas_add_lock"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_above="@id/pan_to_location"
+                android:layout_alignParentRight="true"
+                android:background="@drawable/selected_area_plus_button"
+                android:button="@null"
+                android:contentDescription="@string/select_multiple_areas"
+                android:scaleType="fitCenter" />
+ -->
+            <!--
+            <ImageButton
+                android:id="@+id/selected_areas_view"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_above="@id/selected_areas_add_lock"
+                android:layout_alignParentRight="true"
+                android:background="@drawable/selected_area_view_button"
+                android:contentDescription="@string/select_multiple_areas"
+                android:scaleType="fitCenter" />
+            -->
+        </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/BottomBar"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="5dp" >
+
+            <com.rareventure.gps2.reviewer.map.MaplessScaleWidget
+                android:id="@+id/scaleWidget"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <ZoomControls
+                android:id="@+id/zoomControls"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <RelativeLayout
+            android:id="@+id/timeview_layout"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" >
+
+            <com.rareventure.gps2.reviewer.timeview.TimeView
+                android:id="@+id/timeview"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="#80000000" />
+
+            <ImageView
+                android:id="@+id/date_picker"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:src="@drawable/clock" />
+            </RelativeLayout>
+            <!--  ttt_installer:premium_disable_comment
+             ttt_installer:premium_disable_comment -->
+             <!-- ttt_installer:trial_disable_comment
+                  ttt_installer:trial_disable_comment-->
+            <!--  co: screw ads!
+		<com.google.ads.AdView
+            android:id="@+id/adView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            ads:adSize="BANNER"
+            ads:adUnitId="a150edd8c060f9c"
+            ads:loadAdOnCreate="true"
+            ads:testDevices="0149C7ED1600400B,emulator-5554" /> 
+        	-->
+        	</LinearLayout>
+</RelativeLayout>

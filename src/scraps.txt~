@@ -1,0 +1,223 @@
+Vector polygonATranslation = new Vector();
+
+PolygonCollisionResult r = PolygonCollision(polygonA, polygonB, velocity);
+
+if (r.WillIntersect) {
+  // Move the polygon by its velocity, then move
+
+  // the polygons appart using the Minimum Translation Vector
+
+  polygonATranslation = velocity + r.MinimumTranslationVector;
+} else {
+  // Just move the polygon by its velocity
+
+  polygonATranslation = velocity;
+}
+
+polygonA.Offset(polygonATranslation);
+
+// Calculate the distance between [minA, maxA] and [minB, maxB]
+
+// The distance will be negative if the intervals overlap
+
+public float IntervalDistance(float minA, float maxA, float minB, float maxB) {
+    if (minA < minB) {
+        return minB - maxA;
+    } else {
+        return minA - maxB;
+    }
+}
+
+// Calculate the projection of a polygon on an axis
+
+// and returns it as a [min, max] interval
+
+public void ProjectPolygon(Vector axis, Polygon polygon, 
+                           ref float min, ref float max) {
+    // To project a point on an axis use the dot product
+
+    float dotProduct = axis.DotProduct(polygon.Points[0]);
+    min = dotProduct;
+    max = dotProduct;
+    for (int i = 0; i < polygon.Points.Count; i++) {
+        dotProduct = polygon.Points[i].DotProduct(axis);
+        if (d < min) {
+            min = dotProduct;
+        } else {
+            if (dotProduct> max) {
+                max = dotProduct;
+            }
+        }
+    }
+}
+
+
+// Structure that stores the results of the PolygonCollision function
+
+public struct PolygonCollisionResult {
+    // Are the polygons going to intersect forward in time?
+
+    public bool WillIntersect;
+    // Are the polygons currently intersecting?
+
+    public bool Intersect;
+    // The translation to apply to the first polygon to push the polygons apart.
+
+    public Vector MinimumTranslationVector;
+}
+
+
+
+
+----
+
+10/14/10
+
+	private void modifyPoints(AreaPanel panel, Point bestPoint, GpsLocationRow r1, GpsLocationRow r2) {
+		//if there is no point to contain it 
+		//create a new one, and send it to any kids we have
+		if(bestPoint == null)
+		{
+			addPointToPanelAndDescendents(panel, bestPoint);
+			return;
+		}
+		
+		//we have a best point
+		PointDiamond pd = bestPoint.constructPointDiamond();
+		
+		PointDiamond mpd = new PointDiamond(r1,r2);
+		mpd = mpd.addPointDiamond(pd);
+			
+		Point modifiedBestPoint = bestPoint.makeCopyWithPointDiamond(mpd);
+		
+	}
+
+
+	public void addToPointAndKids(Point parent, PointDiamond modifiedParentDiamond, GpsLocationRow r1, GpsLocationRow r2) {
+		Point modifiedParentPoint = new Point();
+		modifiedParentPoint.updateFromPointDiamond(modifiedParentDiamond, parent.getNumSegments()+1);
+		modifiedPoints.put(parent,modifiedParentPoint);
+		
+		
+		addToPointAndKids(monsterChain.get(monsterChain.size()-1),r1, r2);
+	}
+
+
+10/29
+
+alternate way to calculate error for pointmapping, not tested, also needs support for subpoints with errors themselves
+
+			double avgStartLonm = 0, avgEndLonm = 0, avgStartLatm = 0, avgEndLatm = 0;
+			
+			int count = 0;
+			
+			CPoint lastP = null;
+			PointDiamond lastPd = null;
+
+			for(int i = 0; i < oldPoints.size(); i++)
+			{
+				CPoint p = oldPoints.get(i);
+				PointDiamond pd = p.constructPointDiamond();
+				
+				//if this is a continuation of the last item, then we want to treat both as a single point
+				//for determining the average start and end
+				if(i >= 1 && lastP.getTimePanel().getEndTime() == lastP.getTimePanel().getStartTime())
+				{
+					avgEndLatm -= lastPd.getEndCenterLatm();
+					avgEndLonm -= lastPd.getEndCenterLonm();
+					
+					avgEndLatm += pd.getEndCenterLatm();
+					avgEndLonm += pd.getEndCenterLonm();
+				}
+				else {
+					avgStartLatm += pd.getStartCenterLatm();
+					avgStartLonm += pd.getStartCenterLonm();
+					avgEndLatm += pd.getEndCenterLatm();
+					avgEndLonm += pd.getEndCenterLonm();
+					count++;
+				}
+				
+				lastP = p;
+				lastPd = pd;
+			}
+			
+			avgStartLatm /= count;
+			avgStartLonm /= count;
+			avgEndLatm /= count;
+			avgEndLonm /= count;
+			
+			lastP = oldPoints.get(0);
+			lastPd = lastP.constructPointDiamond();
+			
+			double error = 0;
+			
+			PointDiamond chainPd = lastPd;
+			
+			for(int i = 1; i < oldPoints.size(); i++)
+			{
+				CPoint p = oldPoints.get(i);
+				
+				//PERF: making point diamonds twice
+				PointDiamond pd = p.constructPointDiamond();
+				
+				//TODO 2: We should probably do something about points that are chained together
+				//but go forwards and then backwards. It's really a problem of having a consistent
+				//speed, where going backwards is going at a negative speed.
+				
+				//if the points line up in time we pretend the points are combined, and add
+				//the fatness of the chain point diamond
+				if(p.getTimePanel().getStartTime() == lastP.getTimePanel().getEndTime())
+				{
+					chainPd.addPointDiamond(pd);
+				}
+				else //either at the start of a chain or not in a chain at all
+				{
+					chainPd = pd;
+					
+					//we can add the point either forwards or backwards, so we calculate both
+					//and take the minimum
+					double error1 = Util.getDist(pd.getStartCenterLonm(), pd.getStartCenterLatm(),
+							avgStartLonm, avgStartLatm);
+					double error2 = Util.getDist(pd.getStartCenterLonm(), pd.getStartCenterLatm(),
+							avgEndLonm, avgEndLatm);
+					
+					error += Math.min(error1, error2);
+				}
+				
+				//if not in a chain of points (or at the end of one)
+				if(i == oldPoints.size()-1 || p.getTimePanel().getEndTime() != oldPoints.get(i+1).
+						getTimePanel().getStartTime())
+				{
+					//we can add the point either forwards or backwards, so we calculate both
+					//and take the minimum
+					double error1 = Util.getDist(pd.getEndCenterLonm(), pd.getEndCenterLatm(),
+							avgStartLonm, avgStartLatm);
+					double error2 = Util.getDist(pd.getEndCenterLonm(), pd.getEndCenterLatm(),
+							avgEndLonm, avgEndLatm);
+
+					error += Math.min(error1, error2);
+					error += chainPd.fatnessMd2;
+				}
+			} //while calculating error
+			
+			return error;
+
+
+
+	public int getNumPoints() {
+		return Util.byteArrayToInt(data, NUM_POINTS.pos);
+	}
+
+	public int getPointFk(int i) {
+		return Util.byteArrayToInt(data, POINTS.pos + (getNumChildren()+ i) * (Integer.SIZE >> 3)); //size is in bits
+	}
+	
+	private int getPointLocX(int i)
+	{
+		return  POINTS.pos + (getNumChildren()+ i) * (Integer.SIZE >> 3);
+	}
+	
+	public CPoint getPoint(int i) {
+		return GTG.pointCache.getRow(getPointFk(i));
+	}
+

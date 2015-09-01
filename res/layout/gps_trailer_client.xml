@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" 
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+	<Button android:text="Clear" android:id="@+id/ClearButton"
+		android:layout_width="wrap_content" android:layout_height="wrap_content"></Button>
+	<Button android:text="Start" android:id="@+id/StartButton"
+		android:layout_width="wrap_content" android:layout_height="wrap_content"></Button>
+	<Button android:text="Stop" android:id="@+id/StopButton"
+		android:layout_width="wrap_content" android:layout_height="wrap_content"></Button>
+<!--	<com.rareventure.android.widget.TimePeriodDialSet android:id="@+id/DialTest"
+		android:layout_width="fill_parent" android:layout_height="fill_parent">
+	</com.rareventure.android.widget.TimePeriodDialSet>-->
+</LinearLayout>
+

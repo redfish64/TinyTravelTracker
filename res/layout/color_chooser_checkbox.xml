@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    android:padding="5dp"
+    android:layout_weight="1"
+    android:orientation="vertical" >
+
+
+    <CheckBox
+        android:id="@+id/checkBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <FrameLayout 
+        android:layout_width="37dp"
+        android:layout_height="37dp"
+        android:background="@android:color/white"
+        >
+    <FrameLayout
+        android:id="@+id/color"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:background="@android:color/darker_gray"
+        android:layout_gravity="center">
+	</FrameLayout>
+    </FrameLayout>
+    
+
+</LinearLayout>

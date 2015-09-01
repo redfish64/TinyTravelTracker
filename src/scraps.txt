@@ -1,0 +1,497 @@
+Vector polygonATranslation = new Vector();
+
+PolygonCollisionResult r = PolygonCollision(polygonA, polygonB, velocity);
+
+if (r.WillIntersect) {
+  // Move the polygon by its velocity, then move
+
+  // the polygons appart using the Minimum Translation Vector
+
+  polygonATranslation = velocity + r.MinimumTranslationVector;
+} else {
+  // Just move the polygon by its velocity
+
+  polygonATranslation = velocity;
+}
+
+polygonA.Offset(polygonATranslation);
+
+// Calculate the distance between [minA, maxA] and [minB, maxB]
+
+// The distance will be negative if the intervals overlap
+
+public float IntervalDistance(float minA, float maxA, float minB, float maxB) {
+    if (minA < minB) {
+        return minB - maxA;
+    } else {
+        return minA - maxB;
+    }
+}
+
+// Calculate the projection of a polygon on an axis
+
+// and returns it as a [min, max] interval
+
+public void ProjectPolygon(Vector axis, Polygon polygon, 
+                           ref float min, ref float max) {
+    // To project a point on an axis use the dot product
+
+    float dotProduct = axis.DotProduct(polygon.Points[0]);
+    min = dotProduct;
+    max = dotProduct;
+    for (int i = 0; i < polygon.Points.Count; i++) {
+        dotProduct = polygon.Points[i].DotProduct(axis);
+        if (d < min) {
+            min = dotProduct;
+        } else {
+            if (dotProduct> max) {
+                max = dotProduct;
+            }
+        }
+    }
+}
+
+
+// Structure that stores the results of the PolygonCollision function
+
+public struct PolygonCollisionResult {
+    // Are the polygons going to intersect forward in time?
+
+    public bool WillIntersect;
+    // Are the polygons currently intersecting?
+
+    public bool Intersect;
+    // The translation to apply to the first polygon to push the polygons apart.
+
+    public Vector MinimumTranslationVector;
+}
+
+
+
+
+----
+
+10/14/10
+
+	private void modifyPoints(AreaPanel panel, Point bestPoint, GpsLocationRow r1, GpsLocationRow r2) {
+		//if there is no point to contain it 
+		//create a new one, and send it to any kids we have
+		if(bestPoint == null)
+		{
+			addPointToPanelAndDescendents(panel, bestPoint);
+			return;
+		}
+		
+		//we have a best point
+		PointDiamond pd = bestPoint.constructPointDiamond();
+		
+		PointDiamond mpd = new PointDiamond(r1,r2);
+		mpd = mpd.addPointDiamond(pd);
+			
+		Point modifiedBestPoint = bestPoint.makeCopyWithPointDiamond(mpd);
+		
+	}
+
+
+	public void addToPointAndKids(Point parent, PointDiamond modifiedParentDiamond, GpsLocationRow r1, GpsLocationRow r2) {
+		Point modifiedParentPoint = new Point();
+		modifiedParentPoint.updateFromPointDiamond(modifiedParentDiamond, parent.getNumSegments()+1);
+		modifiedPoints.put(parent,modifiedParentPoint);
+		
+		
+		addToPointAndKids(monsterChain.get(monsterChain.size()-1),r1, r2);
+	}
+
+
+10/29
+
+alternate way to calculate error for pointmapping, not tested, also needs support for subpoints with errors themselves
+
+			double avgStartLonm = 0, avgEndLonm = 0, avgStartLatm = 0, avgEndLatm = 0;
+			
+			int count = 0;
+			
+			CPoint lastP = null;
+			PointDiamond lastPd = null;
+
+			for(int i = 0; i < oldPoints.size(); i++)
+			{
+				CPoint p = oldPoints.get(i);
+				PointDiamond pd = p.constructPointDiamond();
+				
+				//if this is a continuation of the last item, then we want to treat both as a single point
+				//for determining the average start and end
+				if(i >= 1 && lastP.getTimePanel().getEndTime() == lastP.getTimePanel().getStartTime())
+				{
+					avgEndLatm -= lastPd.getEndCenterLatm();
+					avgEndLonm -= lastPd.getEndCenterLonm();
+					
+					avgEndLatm += pd.getEndCenterLatm();
+					avgEndLonm += pd.getEndCenterLonm();
+				}
+				else {
+					avgStartLatm += pd.getStartCenterLatm();
+					avgStartLonm += pd.getStartCenterLonm();
+					avgEndLatm += pd.getEndCenterLatm();
+					avgEndLonm += pd.getEndCenterLonm();
+					count++;
+				}
+				
+				lastP = p;
+				lastPd = pd;
+			}
+			
+			avgStartLatm /= count;
+			avgStartLonm /= count;
+			avgEndLatm /= count;
+			avgEndLonm /= count;
+			
+			lastP = oldPoints.get(0);
+			lastPd = lastP.constructPointDiamond();
+			
+			double error = 0;
+			
+			PointDiamond chainPd = lastPd;
+			
+			for(int i = 1; i < oldPoints.size(); i++)
+			{
+				CPoint p = oldPoints.get(i);
+				
+				//PERF: making point diamonds twice
+				PointDiamond pd = p.constructPointDiamond();
+				
+				//TODO 2: We should probably do something about points that are chained together
+				//but go forwards and then backwards. It's really a problem of having a consistent
+				//speed, where going backwards is going at a negative speed.
+				
+				//if the points line up in time we pretend the points are combined, and add
+				//the fatness of the chain point diamond
+				if(p.getTimePanel().getStartTime() == lastP.getTimePanel().getEndTime())
+				{
+					chainPd.addPointDiamond(pd);
+				}
+				else //either at the start of a chain or not in a chain at all
+				{
+					chainPd = pd;
+					
+					//we can add the point either forwards or backwards, so we calculate both
+					//and take the minimum
+					double error1 = Util.getDist(pd.getStartCenterLonm(), pd.getStartCenterLatm(),
+							avgStartLonm, avgStartLatm);
+					double error2 = Util.getDist(pd.getStartCenterLonm(), pd.getStartCenterLatm(),
+							avgEndLonm, avgEndLatm);
+					
+					error += Math.min(error1, error2);
+				}
+				
+				//if not in a chain of points (or at the end of one)
+				if(i == oldPoints.size()-1 || p.getTimePanel().getEndTime() != oldPoints.get(i+1).
+						getTimePanel().getStartTime())
+				{
+					//we can add the point either forwards or backwards, so we calculate both
+					//and take the minimum
+					double error1 = Util.getDist(pd.getEndCenterLonm(), pd.getEndCenterLatm(),
+							avgStartLonm, avgStartLatm);
+					double error2 = Util.getDist(pd.getEndCenterLonm(), pd.getEndCenterLatm(),
+							avgEndLonm, avgEndLatm);
+
+					error += Math.min(error1, error2);
+					error += chainPd.fatnessMd2;
+				}
+			} //while calculating error
+			
+			return error;
+
+
+
+	public int getNumPoints() {
+		return Util.byteArrayToInt(data, NUM_POINTS.pos);
+	}
+
+	public int getPointFk(int i) {
+		return Util.byteArrayToInt(data, POINTS.pos + (getNumChildren()+ i) * (Integer.SIZE >> 3)); //size is in bits
+	}
+	
+	private int getPointLocX(int i)
+	{
+		return  POINTS.pos + (getNumChildren()+ i) * (Integer.SIZE >> 3);
+	}
+	
+	public CPoint getPoint(int i) {
+		return GTG.pointCache.getRow(getPointFk(i));
+	}
+
+	public void addPoint(CPoint p) {
+		int numPoints = getNumPoints();
+		//PERF: hack to check
+		for(int i = 0; i < getNumPoints(); i++)
+		{
+			if(getPointFk(i) == p.id)
+				TAssert.fail(p.id+"");
+		}
+		
+		int insertIndex = POINTS.pos + (getNumPoints() + getNumChildren()) * (Integer.SIZE >> 3);
+		insertInt(insertIndex, p.id);
+		
+		Util.intToByteArray(numPoints+1, data, NUM_POINTS.pos);
+		
+		//PERF: hack
+		if(p.getDepthIndex() > 127)
+			TAssert.fail();
+		
+		if(p.getDepthIndex() > getMaxDepth())
+			data[MAX_DEPTH.pos] = (byte) p.getDepthIndex();
+	}
+	
+	//TODO 2: Handle time siblings for getPoints()
+	/**
+	 * Warning: maxdepth is NOT recomputed when remove is called. This is done for performance reasons
+	 * and the fact that currently maxdepth never decreases when points are added
+	 */
+	public Iterable<CPoint> getPoints(final int maxPoints) {
+		return new Iterable<CPoint>() {
+			
+			@Override
+			public Iterator<CPoint> iterator() {
+				return new Iterator<CPoint>() {
+
+					int index = getNumPoints() -1;
+					int stop = maxPoints == Integer.MAX_VALUE ? 0 : Math.max(index - maxPoints,0);
+					@Override
+					public boolean hasNext() {
+						return index > stop;
+					}
+
+					@Override
+					public CPoint next() {
+						return GTG.pointCache.getRow(getPointFk(index--));
+					}
+
+					@Override
+					public void remove() {
+						CPoint point = getPoint(index+1);
+						
+						int pos = getPointLoc((index+1));
+						System.arraycopy(data, pos + (Integer.SIZE>>3), data, pos, 
+								dataLength-(pos+(Integer.SIZE>>3)));
+						dataLength -= (Integer.SIZE>>3);
+						Util.intToByteArray(getNumPoints()-1,data,NUM_POINTS.pos);
+						
+					}
+
+				};
+			}
+		};
+	}
+	
+	public Iterable<CPoint> getRecentPoints() {
+		return getPoints(prefs.numRecentPoints);
+	}
+
+
+	public int getNumPoints() {
+		return getPointBlock().getNumPoints();
+	}
+
+	public int getPointFk(int i) {
+		return Util.byteArrayToInt(data, POINTS.pos + (getNumChildren()+ i) * (Integer.SIZE >> 3)); //size is in bits
+	}
+	
+	private int getPointLoc(int i)
+	{
+		return  POINTS.pos + (getNumChildren()+ i) * (Integer.SIZE >> 3);
+	}
+	
+
+	
+	public CPoint getPoint(int i) {
+		return GTG.pointCache.getRow(getPointFk(i));
+	}
+
+	public void addPoint(CPoint p) {
+		int numPoints = getNumPoints();
+		//PERF: hack to check
+		for(int i = 0; i < getNumPoints(); i++)
+		{
+			if(getPointFk(i) == p.id)
+				TAssert.fail(p.id+"");
+		}
+		
+		int insertIndex = POINTS.pos + (getNumPoints() + getNumChildren()) * (Integer.SIZE >> 3);
+		insertInt(insertIndex, p.id);
+		
+		Util.intToByteArray(numPoints+1, data, NUM_POINTS.pos);
+		
+		//PERF: hack
+		if(p.getDepthIndex() > 127)
+			TAssert.fail();
+		
+		if(p.getDepthIndex() > getMaxDepth())
+			data[MAX_DEPTH.pos] = (byte) p.getDepthIndex();
+	}
+	
+	public Iterable<CPoint> getRecentPoints() {
+		return getPoints(prefs.numRecentPoints);
+	}
+
+	//TODO 2: Handle time siblings for getPoints()
+	/**
+	 * Warning: maxdepth is NOT recomputed when remove is called. This is done for performance reasons
+	 * and the fact that currently maxdepth never decreases when points are added
+	 */
+	public Iterable<CPoint> getPoints(final int maxPoints) {
+		return new Iterable<CPoint>() {
+			
+			@Override
+			public Iterator<CPoint> iterator() {
+				return new Iterator<CPoint>() {
+
+					int index = getNumPoints() -1;
+					int stop = maxPoints == Integer.MAX_VALUE ? 0 : Math.max(index - maxPoints,0);
+					@Override
+					public boolean hasNext() {
+						return index > stop;
+					}
+
+					@Override
+					public CPoint next() {
+						return GTG.pointCache.getRow(getPointFk(index--));
+					}
+
+					@Override
+					public void remove() {
+						CPoint point = getPoint(index+1);
+						
+						int pos = getPointLoc((index+1));
+						System.arraycopy(data, pos + (Integer.SIZE>>3), data, pos, 
+								dataLength-(pos+(Integer.SIZE>>3)));
+						dataLength -= (Integer.SIZE>>3);
+						Util.intToByteArray(getNumPoints()-1,data,NUM_POINTS.pos);
+						
+					}
+
+				};
+			}
+		};
+	}
+	
+	public ArrayList<CPoint> getAllPointsArray()
+	{
+		ArrayList<CPoint> a = new ArrayList<CPoint>();
+		
+		for(CPoint p : getAllPoints())
+		{
+			a.add(p);
+		}
+		
+		return a;
+	}
+
+	public void removePoints(ArrayList<CPoint> oldPoints, HashSet<CPoint> removedPointsHack) {
+		for(CPoint oldPoint : oldPoints)
+		{
+			PointDiamond pd = oldPoint.constructPointDiamond();
+			
+			//we only try to remove if we are close
+			if(CacheCreator.areWeClose(this, pd, -1))
+			{
+				//we call getAllPoints( here since the point should always
+				// be inside the panel and should be fairly recent, so no
+				//performance effect should be present (ie we won't have to
+				// go through all the poitns of the panel which may contain
+				// zillions of them)
+				
+				boolean hackIsPresent = false;
+				for(Iterator<CPoint> i = getAllPoints().iterator(); i.hasNext();)
+				{
+					CPoint p = i.next();
+					if(p == oldPoint)
+					{
+						removedPointsHack.add(p);
+						i.remove();
+						hackIsPresent = true;
+						break;
+					}
+				}
+				
+				if(!hackIsPresent)
+				{
+					Assert.fail("point "+oldPoint+" not present in areapanel "+this
+							+" with points "+getAllPointsArray());
+				}
+			}
+		}
+	}
+	
+	private Iterable<CPoint> getAllPoints() {
+		return getPoints(Integer.MAX_VALUE);
+	}
+
+	public void copyPointsFrom(AreaPanel other) {
+		int neededDataLength = (other.getNumPoints() - getNumPoints())*(Integer.SIZE>>3) + dataLength;
+
+		Util.intToByteArray(other.getNumPoints(), data, NUM_POINTS.pos);
+		data[MAX_DEPTH.pos] = other.getMaxDepth();
+		
+		if(data.length < neededDataLength)
+		{
+			byte [] newData = new byte[neededDataLength];
+			
+			System.arraycopy(data, 0, newData, 0, data.length);
+			data = newData;
+		}
+		
+		System.arraycopy(other.data, other.getPointLoc(0), this.data, getPointLoc(0), other.getNumPoints() * (Integer.SIZE >> 3));
+		
+		dataLength = neededDataLength;
+
+//		for(CPoint p : getPoints())
+//		{
+//			//PERF: HACK will slow things down... 
+//			//TODO 3: there is a small bug here where sometimes the point
+//			//is really close but not touching so we make it 0
+//			if(!CacheCreator.areWeClose(this, p.constructPointDiamond(), 0))
+//				TAssert.fail();
+//		}
+	}
+
+		public boolean containsId(int i) {
+		for(int index = 0; index < getNumPoints(); index++)
+		{
+			if(getPointFk(index) == i)
+				return true;
+		}
+		
+		return false;
+	}
+
+
+
+	private boolean replaceTimePoint(int startGroupIndex, int index, CPoint newPoint) {
+		int i = startGroupIndex;
+		int startTimeSec = getTimeSec(i);
+		
+		while(i < getNumTimePoints() && getTimeSec(i) == startTimeSec)
+		{
+			if(getTimePointFk(i) == newPoint.getId(GTG.db))
+			{
+				deleteData(getPointLoc(i), POINT_SIZE);
+				setNumTimePoints(getNumTimePoints()-1);
+				return true; //each time point should only appear once
+			}
+			else i ++;
+		}
+		
+		setTimePointFk(index, newPoint.getId(GTG.db));
+		
+		return false;
+	}
+
+
+
+
+
+#AreaPanel(id=0,x=0,y=0,depth=26,timeIntervalTreeHeadFk=26,stSec=1271712807,etSec=1274623788,sp0=-2147483648,sp1=7874,sp2=1,sp3=-2147483648)
+[#AreaPanel(id=7874,x=33554432,y=0,depth=25,timeIntervalTreeHeadFk=9200,stSec=1273251896,etSec=1274623788,sp0=-2147483648,sp1=-2147483648,sp2=7875,sp3=-2147483648), 
+#AreaPanel(id=1,x=0,y=33554432,depth=25,timeIntervalTreeHeadFk=25,stSec=1271712807,etSec=1273494478,sp0=-2147483648,sp1=2,sp2=-2147483648,sp3=-2147483648)]
+

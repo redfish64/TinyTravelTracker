@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/dateSliderMainLayout"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <!--
+    note that I'd like to provide a scrollview here incase the text is too big for the phone,
+    but unfortunately that interferes with dragging. Specifically if the user starts in a time scroller
+    and leaves it while scrolling, the parent will steal the rest of the scroll. This makes the 
+    time scroller somewhat difficult to control
+    -->
+
+   <TextView
+       android:id="@+id/title"
+       style="?android:attr/textAppearanceMedium"
+       android:layout_width="fill_parent"
+       android:layout_height="wrap_content"
+       android:padding="5dip"
+       android:text="@string/enter_from_date_to_to_date_title"
+       android:textColor="@android:color/white" />
+   <LinearLayout
+        android:id="@+id/foo"
+        android:layout_width="fill_parent"
+        android:layout_height="0px"
+        android:layout_weight="1"
+        android:orientation="vertical" >
+
+       <TextView
+           android:id="@+id/from"
+           style="?android:attr/textAppearanceMedium"
+           android:layout_width="fill_parent"
+           android:layout_height="wrap_content"
+           android:textColor="@android:color/white"
+           android:padding="5dip"
+           android:text="@string/from"
+		 />
+        <LinearLayout
+            android:id="@+id/from_sliders_container"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+
+        <TextView
+            android:id="@+id/to"
+            style="?android:attr/textAppearanceMedium"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dip"
+            android:text="@string/to"
+            android:textColor="@android:color/white" />
+        <LinearLayout
+            android:id="@+id/to_sliders_container"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+    </LinearLayout>
+
+   <LinearLayout
+        android:id="@+id/button_bar"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/date_slider_cancel_button"
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/cancel" />
+
+        <Button
+            android:id="@+id/date_slider_ok_button"
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/ok" />
+    </LinearLayout>
+
+</LinearLayout>

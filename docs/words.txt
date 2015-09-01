@@ -1,0 +1,19 @@
+GPS Trail 
+Auto Zoom button
+gray panel
+Date Chooser button
+Find My Location button
+Defining a Selected Area
+
+Topics of interest
+Date Chooser button
+gray panel
+Auto Zoom button
+Find My Location button
+Defining a Selected Area
+
+
+ActivityManager.getMemoryClass() get max heap size
+ActivityManager.getLargeMemoryClass()
+
+gingerbread use bitmap.recycle()

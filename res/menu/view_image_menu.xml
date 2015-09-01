@@ -1,0 +1,8 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+	<item android:id="@+id/share" android:title="@string/share"
+		android:visible="true" android:enabled="true" 
+		android:titleCondensed="@string/share"></item>
+	<item android:id="@+id/delete" android:title="@string/delete"
+		android:visible="true" android:enabled="true" 
+		android:titleCondensed="@string/delete"></item>
+</menu>

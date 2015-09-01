@@ -1,0 +1,3 @@
+. setup_eclipse_project_env /home/tim/workspace/AndroidHelper /home/tim/projects/dev/java_utils/
+
+java TestDataReader $*

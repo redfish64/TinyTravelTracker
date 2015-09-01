@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+     <declare-styleable name="SpeechBubbleWidget">
+		<!-- Border between big speech bubble to type in and the edge of the map -->
+		<attr name="bigSpeechBubbleBorder" format="dimension" />
+	
+		<!-- The amount of space between the edge of the bubble to the inner area -->
+		<attr name="speechBubbleInnerPad" format="dimension" />
+	
+		<!-- The radius of the rounded corners of the speech bubble -->
+		<attr name="speechBubbleRoundedCorner" format="dimension" />
+		
+		<!-- The amount of distance from the left to the right of the speech bubble for displaying the \| -->
+		<attr name="speechBubbleTriXPerc" format="float" />
+		
+		<!-- The width of the \| -->
+		<attr name="speechBubbleTriWidth" format="dimension" />
+		
+		
+		<!-- The height of the \| -->
+		<attr name="speechBubbleTriHeight" format="dimension" />
+    </declare-styleable>
+	
+    <declare-styleable name="TextSpeechBubbleWidget">
+		<!-- The amount of space between the edge of the bubble to the inner area -->
+		<attr name="innerPad" format="dimension" />
+
+		<!-- The radius of the rounded corners of the speech bubble -->
+		<attr name="roundedCorner" format="dimension" />
+		
+		<!-- The amount of distance from the left to the right of the speech bubble for displaying the \| -->
+		<attr name="triXPerc" format="float" />
+		
+		<!-- The width of the \| -->
+		<attr name="triWidth" format="dimension" />
+		
+		<!-- The height of the \| -->
+		<attr name="triHeight" format="dimension" />
+	
+		<!-- The size of the font -->
+		<attr name="fontSize" format="dimension" />
+    </declare-styleable>
+    
+    <attr name="minValue" format="float"/>
+    <attr name="maxValue" format="float"/>
+    <attr name="printfFormat" format="string"/>
+    
+    <attr name="steps" format="integer"/>
+    
+    <declare-styleable name="com.rareventure.android.widget.SeekBarWithText">
+        <attr name="minValue"/>
+        <attr name="maxValue"/>
+        <attr name="printfFormat"/>
+ 
+    	<!--  the number of steps between min and max (including max, but excluding min (the minimum is 1 step)) -->
+        <attr name="steps"/>
+    </declare-styleable>
+    
+    <declare-styleable name="SeekBarDialogPreference">
+        <attr name="title" format="string"/>
+        <attr name="desc" format="string"/>
+        <attr name="minValue"/>
+        <attr name="maxValue"/>
+        <attr name="printfFormat"/>
+        <attr name="steps"/>
+    </declare-styleable>
+</resources>
+

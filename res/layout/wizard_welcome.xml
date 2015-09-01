@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/relativeLayout1"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1.00"
+        android:text="@string/welcome_wizard_text"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+         />
+
+    <include layout="@layout/wizard_buttons" />
+
+</LinearLayout>

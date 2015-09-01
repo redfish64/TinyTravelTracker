@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/RelativeLayout1"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:text="The Tiny Travel Tracker database on the external storage is missing. Press 'Recreate Database' to create a fresh database with no GPS points, or 'Exit' to exit the application"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+    
+    	
+	<LinearLayout 
+	    android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentBottom="true"
+	    >
+
+    <Button
+        android:id="@+id/button2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:onClick="onRecreateDatabase"
+        android:text="Recreate Database" />
+
+	 <Button
+	     android:id="@+id/button1"
+	     android:layout_width="wrap_content"
+	     android:layout_height="wrap_content"
+	     android:layout_weight="1"
+	     android:onClick="onExit"
+	     android:text="Exit" />
+
+    </LinearLayout>
+</RelativeLayout>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <item name="photo_dot_with_single_large_photo_pointer_loc_x" format="integer" type="dimen">20</item>
+  <item name="photo_dot_with_single_large_photo_pointer_loc_y" format="integer" type="dimen">46</item>
+  <item name="photo_dot_with_single_large_photo_border" format="integer" type="dimen">5</item>
+  <item name="photo_dot_with_multi_large_photo_pointer_loc_x" format="integer" type="dimen">20</item>
+  <item name="photo_dot_with_multi_large_photo_pointer_loc_y" format="integer" type="dimen">51</item>
+  <item name="photo_dot_with_multi_large_photo_border_x" format="integer" type="dimen">5</item>
+  <item name="photo_dot_with_multi_large_photo_border_y" format="integer" type="dimen">10</item>
+</resources>

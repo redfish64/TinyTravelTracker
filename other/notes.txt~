@@ -1,0 +1,1754 @@
+MODE_WRITE_STRATEGY_STATUS  1: Sun May 16 17:00:58 CEST 2010
+MODE_WRITE_STRATEGY_STATUS  2: Sun May 16 16:10:56 CEST 2010
+MODE_WRITE_STRATEGY_STATUS  9:                30000
+
+
+MODE_WRITE_STRATEGY_STATUS  1: Sun May 16 17:00:58 CEST 2010
+MODE_WRITE_STRATEGY_STATUS  2: Sun May 16 17:07:42 CEST 2010
+MODE_WRITE_STRATEGY_STATUS  9:               611508
+
+
+
+MODE_WRITE_STRATEGY_STATUS  9:                30000
+MODE_WRITE_STRATEGY_STATUS  9:                60000
+MODE_WRITE_STRATEGY_STATUS  9:               120000
+MODE_WRITE_STRATEGY_STATUS  9:               125835
+MODE_WRITE_STRATEGY_STATUS  9:               240000
+MODE_WRITE_STRATEGY_STATUS  9:               611508
+
+ 0 gpsOn
+ 1 gpsAttemptStartedMs
+ 2 gpsAttemptEndedMs
+ 3 lastGpsReadingMs
+ 4 lastGpsStatsUpdate
+ 5 nextSignificantEvent
+ 6 wantGpsLevel
+ 7 stoppedStartMs
+ 8 state
+ 9 gpsTimeWantedPerTry
+10 totalTimeGpsRunningMs
+11 totalTimeRunning
+
+
+D/GpsTrailer( 7321): inserted GpsLocCacheRow(startTimeMs=2010-04-20 05:53:50.120,endTimeMs=2010-04-20 06:15:34.358,minLatStart=      -25.5951881409,minLatEnd=      -25.5951881409,minLonStart=      -54.5747375488,minLonEnd=      -54.5747375488,slopeLatm=       -0.0025539817,slopeLonm=       -0.0008227026,id=102,ftdfk=-2147483648,fpdfk=101,sfk=-2147483648)
+E/GpsTrailer( 7321): Bad child data!!! 
+
+GpsLocCacheRow(startTimeMs=2010-04-20 05:33:26.470,endTimeMs=2010-04-20 06:15:34.358,minLatStart=      -25.5990753174,minLatEnd=      -25.5954570770,minLonStart=      -54.5716438293,minLonEnd=      -54.5694198608,slopeLatm=        0.0002198765,slopeLonm=       -0.0025273715,id=13,ftdfk=-2147483648,fpdfk=102,sfk=-2147483648) child: 
+GpsLocCacheRow(startTimeMs=2010-04-20 05:41:52.286,endTimeMs=2010-04-20 05:53:50.120,minLatStart=      -25.5981407166,minLatEnd=      -25.5981407166,minLonStart=      -54.5706710815,minLonEnd=      -54.5706710815,slopeLatm=        0.0041095852,slopeLonm=       -0.0056572966,id=75,ftdfk=-2147483648,fpdfk=74,sfk=12)
+
+
+
+GpsLocCacheRow(startTimeMs=2010-04-20 05:33:26.470,endTimeMs=2010-04-20 06:15:34.358,minLatStart=      -25.5990753174,minLatEnd=      -25.5954570770,minLonStart=      -54.5716438293,minLonEnd=      -54.5694198608,slopeLatm=        0.0002198765,slopeLonm=       -0.0025273715,id=13,ftdfk=-2147483648,fpdfk=102,sfk=-2147483648,numsegments=2)
+GpsLocCacheRow(startTimeMs=2010-04-20 05:41:52.286,endTimeMs=2010-04-20 05:53:50.120,minLatStart=      -25.5981407166,minLatEnd=      -25.5981407166,minLonStart=      -54.5706710815,minLonEnd=      -54.5706710815,slopeLatm=        0.0041095852,slopeLonm=       -0.0056572966,id=75,ftdfk=-2147483648,fpdfk=74,sfk=12,numsegments=0)
+
+
+
+GpsLocCacheRow(startTimeMs=2010-04-20 05:33:26.470,endTimeMs=2010-04-20 05:53:50.120,minLatStart=      -25.5994873047,minLatEnd=      -25.5982513428,minLonStart=      -54.5704498291,minLonEnd=      -54.5687904358,slopeLatm=        0.0026641048,slopeLonm=       -0.0037185454,id=13,ftdfk=-2147483648,fpdfk=75,sfk=-2147483648,numsegments=1)
+
+
+Ok, this is really annoying. I have a hard time knowing what points are there, what direction they are in.. the numbers are so long. What I'd like to
+do is look at the children and then verify the slope. But it's difficult, cause I don't know the elements. I don't know the direction. and bla
+So what's the best way to do this?
+I think that if I just print out the children in relation to the parent, we're cool. Right?
+So we just print child 1, child 2, child 3. Then we can check the slope. We also need to print gpslocation, too, though. 
+As a fake point. Or something. Why can't we just create one? Can we.. or would that mess things up?
+
+I don't think so. But it does create a big problem.
+
+Well not really big.. it's just a little copied code..
+
+D/GpsTrailer( 7617): c GpsLocCacheRow(id=        12,st=       0,mlatm=       0,mlonm=       0)
+D/GpsTrailer( 7617): p1 GpsLocationRow(id=       2,t=  505816,latm=     113,lonm=    -225)
+D/GpsTrailer( 7617): p2 GpsLocationRow(id=       3,t= 1223650,latm=    3063,lonm=   -4286)
+D/GpsTrailer( 7617): slope lat 0.0026641048 slope lon -0.0037185454
+
+D/GpsTrailer( 7617): c GpsLocCacheRow(id=        12,dt=  505816,st=       0,mlatm=    1236,mlonm=      -1)
+D/GpsTrailer( 7617): c GpsLocCacheRow(id=        75,dt=  717834,st=  505816,mlatm=    1349,mlonm=    -226)
+D/GpsTrailer( 7617): p1 GpsLocationRow(id=       3,              t= 1223650,latm=     4299,lonm=    -4287)
+D/GpsTrailer( 7617): p2 GpsLocationRow(id=       4,              t= 2527888,latm=      968,lonm=    -5360)
+D/GpsTrailer( 7617): slope lat 2.1987647E-4 slope lon -0.0025273715
+
+D/GpsTrailer( 7617): c GpsLocCacheRow(id=        12,dt=  505816,st=       0,mlatm=     824,mlonm=    1195)
+D/GpsTrailer( 7617): c GpsLocCacheRow(id=        75,dt=  717834,st=  505816,mlatm=     937,mlonm=     970)
+D/GpsTrailer( 7617): c GpsLocCacheRow(id=       102,dt= 1304238,st= 1223650,mlatm=    3887,mlonm=   -3091)
+D/GpsTrailer( 7617): p1 GpsLocationRow(id=       4,              t= 2527888, latm=     556, lonm=   -4164)
+D/GpsTrailer( 7617): p2 GpsLocationRow(id=       5,              t= 2537221, latm=     551, lonm=   -4153)
+
+D/GpsTrailer( 7617): slope lat -2.8081433E-4 slope lon -0.0022428657
+
+
+--
+
+Ok so whats the problem????
+
+D/GpsTrailer( 7617): Processing gps loc row GpsLocationRow(timeMs=2010-04-20 05:53:50.120,latm=      -25.5951881409,lonm=      -54.5747375488,id=3)
+D/GpsTrailer( 7617): inserted GpsLocCacheRow(startTimeMs=2010-04-20 05:41:52.286,endTimeMs=2010-04-20 05:53:50.120,minLatStart=      -25.5981407166,minLatEnd=      -25.5981407166,minLonStart=      -54.5706710815,minLonEnd=      -54.5706710815,slopeLatm=        0.0041095852,slopeLonm=       -0.0056572966,id=75,ftdfk=-2147483648,fpdfk=74,sfk=-2147483648,numsegments=0)
+
+So the problem is that when we create 75, it's already wacked. So lets take a look, in response to what do we create 75?
+
+D/GpsTrailer( 7617): Processing gps loc row GpsLocationRow(timeMs=2010-04-20 05:53:50.120,latm=      -25.5951881409,lonm=      -54.5747375488,id=3)
+D/GpsTrailer( 7617): cx GpsLocCacheRow(startTimeMs=2010-04-20 05:33:26.470,endTimeMs=2010-04-20 05:41:52.286,minLatStart=      -25.5982513428,minLatEnd=      -25.5982513428,minLonStart=      -54.5704498291,minLonEnd=      -54.5704498291,slopeLatm=        0.0002234014,slopeLonm=       -0.0004448258,id=12,ftdfk=-2147483648,fpdfk=11,sfk=-2147483648,numsegments=0)
+D/GpsTrailer( 7617): c GpsLocCacheRow(id=        12,dt=  505816,st=       0,mlatm=       0,mlonm=       0)
+D/GpsTrailer( 7617): p1 GpsLocationRow(id=       2,t=  505816,latm=     113,lonm=    -225)
+D/GpsTrailer( 7617): p2 GpsLocationRow(id=       3,t= 1223650,latm=    3063,lonm=   -4286)
+D/GpsTrailer( 7617): slope lat 0.0026641048 slope lon -0.0037185454
+
+
+
+So below is not the problem... it's just where we revisit 13 and find out, oh darn, there is a problem:
+
+D/GpsTrailer( 7617): c GpsLocCacheRow(id=        12,dt=  505816,st=       0,mlatm=       0,mlonm=       0)
+D/GpsTrailer( 7617): p1 GpsLocationRow(id=       2,t=  505816,latm=     113,lonm=    -225)
+D/GpsTrailer( 7617): p2 GpsLocationRow(id=       3,t= 1223650,latm=    3063,lonm=   -4286)
+D/GpsTrailer( 7617): slope lat 0.0026641048 slope lon -0.0037185454
+
+
+So from p1 and p2 13 says ok,, but 75 is created and is *not* ok
+
+Here is 75:
+
+D/GpsTrailer( 7617): inserted GpsLocCacheRow(startTimeMs=2010-04-20 05:41:52.286,endTimeMs=2010-04-20 05:53:50.120,minLatStart=      -25.5981407166,minLatEnd=      -25.5981407166,minLonStart=      -54.5706710815,minLonEnd=      -54.5706710815,slopeLatm=        0.0041095852,slopeLonm=       -0.0056572966,id=75,ftdfk=-2147483648,fpdfk=74,sfk=-2147483648,numsegments=0)
+
+
+-----
+
+
+
+
+D/GpsTrailer( 7617): Processing gps loc row GpsLocationRow(timeMs=2010-04-20 06:15:34.358,latm=      -25.5985202789,lonm=      -54.5758094788,id=4)
+D/GpsTrailer( 7617): c GpsLocCacheRow(id=        12,dt=  505816,st=       0,mlatm=    1236,mlonm=      -1)
+D/GpsTrailer( 7617): c GpsLocCacheRow(id=        75,dt=  717834,st=  505816,mlatm=    1349,mlonm=    -226)
+D/GpsTrailer( 7617): p1 GpsLocationRow(id=       3,              t= 1223650, latm=    4299, lonm=   -4287)
+D/GpsTrailer( 7617): p2 GpsLocationRow(id=       4,              t= 2527888, latm=     968, lonm=   -5360)
+D/GpsTrailer( 7617): slope lat 2.1987647E-4 slope lon -0.0025273715
+
+
+D/GpsTrailer( 7617): inserted GpsLocCacheRow(startTimeMs=2010-04-20 05:53:50.120,endTimeMs=2010-04-20 06:15:34.358,minLatStart=      -25.5951881409,minLatEnd=      -25.5951881409,minLonStart=      -54.5747375488,minLonEnd=      -54.5747375488,slopeLatm=       -0.0025539817,slopeLonm=       -0.0008227026,id=100,ftdfk=-2147483648,fpdfk=-2147483648,sfk=-2147483648,numsegments=0)
+D/GpsTrailer( 7617): inserted GpsLocCacheRow(startTimeMs=2010-04-20 05:53:50.120,endTimeMs=2010-04-20 06:15:34.358,minLatStart=      -25.5951881409,minLatEnd=      -25.5951881409,minLonStart=      -54.5747375488,minLonEnd=      -54.5747375488,slopeLatm=       -0.0025539817,slopeLonm=       -0.0008227026,id=101,ftdfk=-2147483648,fpdfk=100,sfk=-2147483648,numsegments=0)
+D/GpsTrailer( 7617): inserted GpsLocCacheRow(startTimeMs=2010-04-20 05:53:50.120,endTimeMs=2010-04-20 06:15:34.358,minLatStart=      -25.5951881409,minLatEnd=      -25.5951881409,minLonStart=      -54.5747375488,minLonEnd=      -54.5747375488,slopeLatm=       -0.0025539817,slopeLonm=       -0.0008227026,id=102,ftdfk=-2147483648,fpdfk=101,sfk=-2147483648,numsegments=0)
+
+
+E/GpsTrailer( 7617): Bad child data!!! GpsLocCacheRow(startTimeMs=2010-04-20 05:33:26.470,endTimeMs=2010-04-20 06:15:34.358,minLatStart=      -25.5990753174,minLatEnd=      -25.5954570770,minLonStart=      -54.5716438293,minLonEnd=      -54.5694198608,slopeLatm=        0.0002198765,slopeLonm=       -0.0025273715,id=13,ftdfk=-2147483648,fpdfk=102,sfk=-2147483648,numsegments=2) child: 
+GpsLocCacheRow(startTimeMs=2010-04-20 05:41:52.286,endTimeMs=2010-04-20 05:53:50.120,minLatStart=      -25.5981407166,minLatEnd=      -25.5981407166,minLonStart=      -54.5706710815,minLonEnd=      -54.5706710815,slopeLatm=        0.0041095852,slopeLonm=       -0.0056572966,id=75,ftdfk=-2147483648,fpdfk=74,sfk=12,numsegments=0)
+
+
+D/GpsTrailer( 7617): cx GpsLocCacheRow(startTimeMs=2010-04-20 05:41:52.286,endTimeMs=2010-04-20 05:53:50.120,minLatStart=      -25.5981407166,minLatEnd=      -25.5981407166,minLonStart=      -54.5706710815,minLonEnd=      -54.5706710815,slopeLatm=        0.0041095852,slopeLonm=       -0.0056572966,id=75,ftdfk=-2147483648,fpdfk=74,sfk=12,numsegments=0)
+D/GpsTrailer( 7617): cx GpsLocCacheRow(startTimeMs=2010-04-20 05:33:26.470,endTimeMs=2010-04-20 05:41:52.286,minLatStart=      -25.5982513428,minLatEnd=      -25.5982513428,minLonStart=      -54.5704498291,minLonEnd=      -54.5704498291,slopeLatm=        0.0002234014,slopeLonm=       -0.0004448258,id=12,ftdfk=-2147483648,fpdfk=11,sfk=-2147483648,numsegments=0)
+
+
+
+So here is the story:
+
+D/GpsTrailer( 7738): inserted GpsLocCacheRow(startTimeMs=2010-04-20 05:33:26.470,endTimeMs=2010-04-20 05:41:52.286,minLatStart=      -25.5982513428,minLatEnd=      -25.5982513428,minLonStart=      -54.5704498291,minLonEnd=      -54.5704498291,slopeLatm=        0.0002234014,slopeLonm=       -0.0004448258,id=13,ftdfk=-2147483648,fpdfk=12,sfk=-2147483648,numsegments=0)
+
+then:
+
+D/GpsTrailer( 7738): Processing gps loc row GpsLocationRow(timeMs=2010-04-20 05:53:50.120,latm=      -25.5951881409,lonm=      -54.5747375488,id=3)
+D/GpsTrailer( 7738): cx GpsLocCacheRow(startTimeMs=2010-04-20 05:33:26.470,endTimeMs=2010-04-20 05:41:52.286,minLatStart=      -25.5982513428,minLatEnd=      -25.5982513428,minLonStart=      -54.5704498291,minLonEnd=      -54.5704498291,slopeLatm=        0.0002234014,slopeLonm=       -0.0004448258,id=12,ftdfk=-2147483648,fpdfk=11,sfk=-2147483648,numsegments=0)
+
+
+D/GpsTrailer( 7738): c GpsLocCacheRow(id=        12,dt=  505816,st=       0,mlatm=       0,mlonm=       0)
+D/GpsTrailer( 7738): p1 GpsLocationRow(id=       2,              t=  505816, latm=     113, lonm=    -225)
+D/GpsTrailer( 7738): p2 GpsLocationRow(id=       3,              t= 1223650, latm=    3063, lonm=   -4286)
+
+D/GpsTrailer( 7738): slope lat 0.0026641048 slope lon -0.0037185454
+
+D/GpsTrailer( 7738): inserted GpsLocCacheRow(startTimeMs=2010-04-20 05:41:52.286,endTimeMs=2010-04-20 05:53:50.120,minLatStart=      -25.5981407166,minLatEnd=      -25.5981407166,minLonStart=      -54.5706710815,minLonEnd=      -54.5706710815,slopeLatm=        0.0041095852,slopeLonm=       -0.0056572966,id=73,ftdfk=-2147483648,fpdfk=-2147483648,sfk=-2147483648,numsegments=0)
+D/GpsTrailer( 7738): inserted GpsLocCacheRow(startTimeMs=2010-04-20 05:41:52.286,endTimeMs=2010-04-20 05:53:50.120,minLatStart=      -25.5981407166,minLatEnd=      -25.5981407166,minLonStart=      -54.5706710815,minLonEnd=      -54.5706710815,slopeLatm=        0.0041095852,slopeLonm=       -0.0056572966,id=74,ftdfk=-2147483648,fpdfk=73,sfk=-2147483648,numsegments=0)
+D/GpsTrailer( 7738): inserted GpsLocCacheRow(startTimeMs=2010-04-20 05:41:52.286,endTimeMs=2010-04-20 05:53:50.120,minLatStart=      -25.5981407166,minLatEnd=      -25.5981407166,minLonStart=      -54.5706710815,minLonEnd=      -54.5706710815,slopeLatm=        0.0041095852,slopeLonm=       -0.0056572966,id=75,ftdfk=-2147483648,fpdfk=74,sfk=-2147483648,numsegments=0)
+
+D/GpsTrailer( 7738): this has become GpsLocCacheRow(startTimeMs=2010-04-20 05:33:26.470,endTimeMs=2010-04-20 05:53:50.120,minLatStart=      -25.5994873047,minLatEnd=      -25.5982513428,minLonStart=      -54.5704498291,minLonEnd=      -54.5687904358,slopeLatm=        0.0026641048,slopeLonm=       -0.0037185454,id=13,ftdfk=-2147483648,fpdfk=75,sfk=-2147483648,numsegments=1)
+
+
+So even after we insert 75, were still ok.. it's just
+
+D/GpsTrailer( 7738): Processing gps loc row GpsLocationRow(timeMs=2010-04-20 06:15:34.358,latm=      -25.5985202789,lonm=      -54.5758094788,id=4)
+D/GpsTrailer( 7738): cx GpsLocCacheRow(startTimeMs=2010-04-20 05:41:52.286,endTimeMs=2010-04-20 05:53:50.120,minLatStart=      -25.5981407166,minLatEnd=      -25.5981407166,minLonStart=      -54.5706710815,minLonEnd=      -54.5706710815,slopeLatm=        0.0041095852,slopeLonm=       -0.0056572966,id=75,ftdfk=-2147483648,fpdfk=74,sfk=12,numsegments=0)
+D/GpsTrailer( 7738): c GpsLocCacheRow(id=        75,dt=  717834,st=  505816,mlatm=    1349,mlonm=    -226)
+D/GpsTrailer( 7738): cx GpsLocCacheRow(startTimeMs=2010-04-20 05:33:26.470,endTimeMs=2010-04-20 05:41:52.286,minLatStart=      -25.5982513428,minLatEnd=      -25.5982513428,minLonStart=      -54.5704498291,minLonEnd=      -54.5704498291,slopeLatm=        0.0002234014,slopeLonm=       -0.0004448258,id=12,ftdfk=-2147483648,fpdfk=11,sfk=-2147483648,numsegments=0)
+D/GpsTrailer( 7738): c GpsLocCacheRow(id=        12,dt=  505816,st=       0,mlatm=    1236,mlonm=      -1)
+D/GpsTrailer( 7738): p1 GpsLocationRow(id=       3,              t= 1223650, latm=    4299, lonm=   -4287)
+D/GpsTrailer( 7738): p2 GpsLocationRow(id=       4,              t= 2527888, latm=     968, lonm=   -5360)
+D/GpsTrailer( 7738): slope lat 2.1987647E-4 slope lon -0.0025273715
+D/GpsTrailer( 7738): inserted GpsLocCacheRow(startTimeMs=2010-04-20 05:53:50.120,endTimeMs=2010-04-20 06:15:34.358,minLatStart=      -25.5951881409,minLatEnd=      -25.5951881409,minLonStart=      -54.5747375488,minLonEnd=      -54.5747375488,slopeLatm=       -0.0025539817,slopeLonm=       -0.0008227026,id=100,ftdfk=-2147483648,fpdfk=-2147483648,sfk=-2147483648,numsegments=0)
+D/GpsTrailer( 7738): inserted GpsLocCacheRow(startTimeMs=2010-04-20 05:53:50.120,endTimeMs=2010-04-20 06:15:34.358,minLatStart=      -25.5951881409,minLatEnd=      -25.5951881409,minLonStart=      -54.5747375488,minLonEnd=      -54.5747375488,slopeLatm=       -0.0025539817,slopeLonm=       -0.0008227026,id=101,ftdfk=-2147483648,fpdfk=100,sfk=-2147483648,numsegments=0)
+D/GpsTrailer( 7738): inserted GpsLocCacheRow(startTimeMs=2010-04-20 05:53:50.120,endTimeMs=2010-04-20 06:15:34.358,minLatStart=      -25.5951881409,minLatEnd=      -25.5951881409,minLonStart=      -54.5747375488,minLonEnd=      -54.5747375488,slopeLatm=       -0.0025539817,slopeLonm=       -0.0008227026,id=102,ftdfk=-2147483648,fpdfk=101,sfk=-2147483648,numsegments=0)
+E/GpsTrailer( 7738): Bad child data!!! GpsLocCacheRow(startTimeMs=2010-04-20 05:33:26.470,endTimeMs=2010-04-20 06:15:34.358,minLatStart=      -25.5990753174,minLatEnd=      -25.5954570770,minLonStart=      -54.5716438293,minLonEnd=      -54.5694198608,slopeLatm=        0.0002198765,slopeLonm=       -0.0025273715,id=13,ftdfk=-2147483648,fpdfk=102,sfk=-2147483648,numsegments=2) child: GpsLocCacheRow(startTimeMs=2010-04-20 05:41:52.286,endTimeMs=2010-04-20 05:53:50.120,minLatStart=      -25.5981407166,minLatEnd=      -25.5981407166,minLonStart=      -54.5706710815,minLonEnd=      -54.5706710815,slopeLatm=        0.0041095852,slopeLonm=       -0.0056572966,id=75,ftdfk=-2147483648,fpdfk=74,sfk=12,numsegments=0)
+E/GpsTrailer( 7738): Bad child data!!! GpsLocCacheRow(startTimeMs=2010-04-20 05:33:26.470,endTimeMs=2010-04-20 06:15:34.358,minLatStart=      -25.5990753174,minLatEnd=      -25.5954570770,minLonStart=      -54.5716438293,minLonEnd=      -54.5694198608,slopeLatm=        0.0002198765,slopeLonm=       -0.0025273715,id=13,ftdfk=-2147483648,fpdfk=102,sfk=-2147483648,numsegments=2) child: GpsLocCacheRow(startTimeMs=2010-04-20 05:33:26.470,endTimeMs=2010-04-20 05:41:52.286,minLatStart=      -25.5982513428,minLatEnd=      -25.5982513428,minLonStart=      -54.5704498291,minLonEnd=      -54.5704498291,slopeLatm=        0.0002234014,slopeLonm=       -0.0004448258,id=12,ftdfk=-2147483648,fpdfk=11,sfk=-2147483648,numsegments=0)
+D/GpsTrailer( 7738): this has become GpsLocCacheRow(startTimeMs=2010-04-20 05:33:26.470,endTimeMs=2010-04-20 06:15:34.358,minLatStart=      -25.5990753174,minLatEnd=      -25.5954570770,minLonStart=      -54.5716438293,minLonEnd=      -54.5694198608,slopeLatm=        0.0002198765,slopeLonm=       -0.0025273715,id=13,ftdfk=-2147483648,fpdfk=102,sfk=-2147483648,numsegments=2)
+
+So this second one is the poison pill.
+
+Let's simplify the above:
+
+So 13 has 75 and 12 as it's children already.
+
+Then we add a new point and it says the 75 is bad!
+So that's what was confusing me, because 75 was already there.
+
+But see, we changed the slope during this new point.. only it didn't work right.
+It also says that 12 is bad now. So 75 and 12 died because the slope changed and
+messed them up.
+
+But the new point, probably 102, is st
+
+lon width is 2223.9685000045
+lat height is 3618.24040000158
+
+ah, so lon is already negative
+And we can see already that 12 is wrong, cause it's one off
+
+But what about 75? It says -226 but the slope times the time is -1279
+Now for lat we got 1349, but i think it's cool, lets see:
+
+505816 * 0.00021987647
+
+Yea, 111
+
+So we need to debug it for 75 then.
+
+So we should, what? run it again? if id == 13, run and run again?
+
+
+
+
+D/GpsTrailer( 7738): Processing gps loc row GpsLocationRow(timeMs=2010-04-20 06:15:34.358,latm=      -25.5985202789,lonm=      -54.5758094788,id=4)
+D/GpsTrailer( 7738): cx GpsLocCacheRow(startTimeMs=2010-04-20 05:41:52.286,endTimeMs=2010-04-20 05:53:50.120,minLatStart=      -25.5981407166,minLatEnd=      -25.5981407166,minLonStart=      -54.5706710815,minLonEnd=      -54.5706710815,slopeLatm=        0.0041095852,slopeLonm=       -0.0056572966,id=75,ftdfk=-2147483648,fpdfk=74,sfk=12,numsegments=0)
+D/GpsTrailer( 7738): cx GpsLocCacheRow(startTimeMs=2010-04-20 05:33:26.470,endTimeMs=2010-04-20 05:41:52.286,minLatStart=      -25.5982513428,minLatEnd=      -25.5982513428,minLonStart=      -54.5704498291,minLonEnd=      -54.5704498291,slopeLatm=        0.0002234014,slopeLonm=       -0.0004448258,id=12,ftdfk=-2147483648,fpdfk=11,sfk=-2147483648,numsegments=0)
+D/GpsTrailer( 7738): c GpsLocCacheRow(id=        12,dt=  505816,st=       0,mlatm=    1236,mlonm=      -1)
+D/GpsTrailer( 7738): c GpsLocCacheRow(id=        75,dt=  717834,st=  505816,mlatm=    1349,mlonm=    -226)
+D/GpsTrailer( 7738): p1 GpsLocationRow(id=       3,              t= 1223650, latm=    4299, lonm=   -4287)
+D/GpsTrailer( 7738): p2 GpsLocationRow(id=       4,              t= 2527888, latm=     968, lonm=   -5360)
+D/GpsTrailer( 7738): slope lat 2.1987647E-4 slope lon -0.0025273715
+
+So now, who is right? The test or the code?
+
+Let's see, we have start time, so if we multiply t * slopelat and t * slope lon, we should be able to find
+
+
+D/GpsTrailer( 7738): inserted GpsLocCacheRow(startTimeMs=2010-04-20 05:53:50.120,endTimeMs=2010-04-20 06:15:34.358,minLatStart=      -25.5951881409,minLatEnd=      -25.5951881409,minLonStart=      -54.5747375488,minLonEnd=      -54.5747375488,slopeLatm=       -0.0025539817,slopeLonm=       -0.0008227026,id=100,ftdfk=-2147483648,fpdfk=-2147483648,sfk=-2147483648,numsegments=0)
+D/GpsTrailer( 7738): inserted GpsLocCacheRow(startTimeMs=2010-04-20 05:53:50.120,endTimeMs=2010-04-20 06:15:34.358,minLatStart=      -25.5951881409,minLatEnd=      -25.5951881409,minLonStart=      -54.5747375488,minLonEnd=      -54.5747375488,slopeLatm=       -0.0025539817,slopeLonm=       -0.0008227026,id=101,ftdfk=-2147483648,fpdfk=100,sfk=-2147483648,numsegments=0)
+D/GpsTrailer( 7738): inserted GpsLocCacheRow(startTimeMs=2010-04-20 05:53:50.120,endTimeMs=2010-04-20 06:15:34.358,minLatStart=      -25.5951881409,minLatEnd=      -25.5951881409,minLonStart=      -54.5747375488,minLonEnd=      -54.5747375488,slopeLatm=       -0.0025539817,slopeLonm=       -0.0008227026,id=102,ftdfk=-2147483648,fpdfk=101,sfk=-2147483648,numsegments=0)
+E/GpsTrailer( 7738): Bad child data!!! GpsLocCacheRow(startTimeMs=2010-04-20 05:33:26.470,endTimeMs=2010-04-20 06:15:34.358,minLatStart=      -25.5990753174,minLatEnd=      -25.5954570770,minLonStart=      -54.5716438293,minLonEnd=      -54.5694198608,slopeLatm=        0.0002198765,slopeLonm=       -0.0025273715,id=13,ftdfk=-2147483648,fpdfk=102,sfk=-2147483648,numsegments=2) child: GpsLocCacheRow(startTimeMs=2010-04-20 05:41:52.286,endTimeMs=2010-04-20 05:53:50.120,minLatStart=      -25.5981407166,minLatEnd=      -25.5981407166,minLonStart=      -54.5706710815,minLonEnd=      -54.5706710815,slopeLatm=        0.0041095852,slopeLonm=       -0.0056572966,id=75,ftdfk=-2147483648,fpdfk=74,sfk=12,numsegments=0)
+E/GpsTrailer( 7738): Bad child data!!! GpsLocCacheRow(startTimeMs=2010-04-20 05:33:26.470,endTimeMs=2010-04-20 06:15:34.358,minLatStart=      -25.5990753174,minLatEnd=      -25.5954570770,minLonStart=      -54.5716438293,minLonEnd=      -54.5694198608,slopeLatm=        0.0002198765,slopeLonm=       -0.0025273715,id=13,ftdfk=-2147483648,fpdfk=102,sfk=-2147483648,numsegments=2) child: GpsLocCacheRow(startTimeMs=2010-04-20 05:33:26.470,endTimeMs=2010-04-20 05:41:52.286,minLatStart=      -25.5982513428,minLatEnd=      -25.5982513428,minLonStart=      -54.5704498291,minLonEnd=      -54.5704498291,slopeLatm=        0.0002234014,slopeLonm=       -0.0004448258,id=12,ftdfk=-2147483648,fpdfk=11,sfk=-2147483648,numsegments=0)
+D/GpsTrailer( 7738): this has become GpsLocCacheRow(startTimeMs=2010-04-20 05:33:26.470,endTimeMs=2010-04-20 06:15:34.358,minLatStart=      -25.5990753174,minLatEnd=      -25.5954570770,minLonStart=      -54.5716438293,minLonEnd=      -54.5694198608,slopeLatm=        0.0002198765,slopeLonm=       -0.0025273715,id=13,ftdfk=-2147483648,fpdfk=102,sfk=-2147483648,numsegments=2)
+
+
+It's a full 28 bigger, that is the childs max lon compared to max lonm at start
+width lonm is 2224
+
+maxLonmAtChildStart - minLonmAtChildStart = 2224
+
+minLonmAtChildStart - getMinLonm() = -1280
+
+and slopelon is  -0.0025273715
+
+So, yea, it looks wrong to me. But I'm worried about 28.. I mean it's not by
+a lot.
+
+What if it's a float rounding error, I mean. 
+
+So how do we determine this?
+Well hold on a minute, we know that the floats add up properly, I mean they
+are 2224, which is the same as the width.
+
+I hate that I have to chase this down, I mean this will always be an issue
+What is the limit for float?
+
+I suppose we can find out.. because if we can find out then we can be
+confidenter? Or should we just switch to double and rerun?
+
+Well the problem here is that the thing is not computing properly, I mean
+the same. Because when we recompute the min and max based on the slope,
+we should not be off by 28. So that means that.. hmm So we start
+with a slope and what, how do we do it?
+
+Ok to start with, start time is fixed
+
+Then we use a method called calcDist
+
+Now remember, the issue is that the max lon at child start is off.
+
+So we compute as:
+round(child.max(at start) + (child.starttime - parent.starttime) * slope)
+
+In the test, we compute it the same way, just swap the addition and don't round, so:
+(child.starttime - parent.starttime) * slope) + child.max(at start) 
+
+
+
+Ok so we need to compare the variables..
+Now I have one question.. did we add a child before we did the test?
+Yes!
+So we added a child. So when we calculated it for adding a kid, 
+was the slope the same? So, I'm confused. Lets see, we choose
+a min and a max based on the points and the children.
+
+Because we only print out c= when we do the update, but not
+during the test.
+
+For the test:
+
+child max lonm is  (int) -54570674
+child start time is  (long) 1271713312286
+my start time is  (long) 1271712806470
+my slope is  (float) -0.0025273715
+my max lon is (int) -54569420
+child.id = 75
+
+For the real thing:
+
+c my start time is 1271712806470
+c my slope is -0.0025273715
+my max lon is (int) -54569420
+
+
+
+oh but the trick is that we then add to child if necessary.
+So then the child gets extended first. So during that period,
+what is going on? The parent slope isn't changing, of course.
+But something is changing. And not in the way that's predictable
+cause we should be able to hold on to it, ie the point we just
+added should make sense.
+
+But something is changing...
+Lets see, we print out the children.. right? so which one is changing,
+and how?
+
+We got this to start with:
+
+D/GpsTrailer( 7738): c GpsLocCacheRow(id=        12,dt=  505816,st=       0,mlatm=    1236,mlonm=      -1)
+D/GpsTrailer( 7738): c GpsLocCacheRow(id=        75,dt=  717834,st=  505816,mlatm=    1349,mlonm=    -226)
+D/GpsTrailer( 7738): p1 GpsLocationRow(id=       3,              t= 1223650, latm=    4299, lonm=   -4287)
+D/GpsTrailer( 7738): p2 GpsLocationRow(id=       4,              t= 2527888, latm=     968, lonm=   -5360)
+
+actually: 
+
+D/GpsTrailer( 7738): cx GpsLocCacheRow(startTimeMs=2010-04-20 05:41:52.286,endTimeMs=2010-04-20 05:53:50.120,minLatStart=      -25.5981407166,minLatEnd=      -25.5981407166,minLonStart=      -54.5706710815,minLonEnd=      -54.5706710815,slopeLatm=        0.0041095852,slopeLonm=       -0.0056572966,id=75,ftdfk=-2147483648,fpdfk=74,sfk=12,numsegments=0)
+D/GpsTrailer( 7738): cx GpsLocCacheRow(startTimeMs=2010-04-20 05:33:26.470,endTimeMs=2010-04-20 05:41:52.286,minLatStart=      -25.5982513428,minLatEnd=      -25.5982513428,minLonStart=      -54.5704498291,minLonEnd=      -54.5704498291,slopeLatm=        0.0002234014,slopeLonm=       -0.0004448258,id=12,ftdfk=-2147483648,fpdfk=11,sfk=-2147483648,numsegments=0)
+
+So now, what do we got?
+
+Here is one:
+ (com.rareventure.gps2.database.GpsLocCacheRow) GpsLocCacheRow(startTimeMs=2010-04-20 05:41:52.286,endTimeMs=2010-04-20 05:53:50.120,minLatStart=      -25.5981407166,minLatEnd=      -25.5981407166,minLonStart=      -54.5706710815,minLonEnd=      -54.5706710815,slopeLatm=        0.0041095852,slopeLonm=       -0.0056572966,id=75,ftdfk=-2147483648,fpdfk=74,sfk=12,numsegments=0)
+
+No, wait... wait wait wait. They are entirely the same, but wait.
+
+The slope is the same.
+
+The max lon is the same.
+So we are comparing the child data to the max lon, and the child, number 75 hasn't changed. It's the same as when we calculated the max lon.
+But wait... we want to figure out what the child is at the start. Right? So arent we doing this backwards?
+Aren't we? I mean we want to know what to set the max parent lonm to. So we start at a particular time and a particular lon value for the child.
+Then we should be working backwards... right?
+
+It is working backwards, I see that now.
+So, its actually:
+round(child.max(at start) + (parent.starttime - child.starttime) * slope)
+
+and our test is:
+
+(child.starttime - parent.starttime) * slope) + parent_max
+
+which is backwards and should result in the same value.
+
+So then, supposedly:
+
+child max lonm is  (int) -54570674
+child start time is  (long) 1271713312286
+my start time is  (long) 1271712806470
+my slope is  (float) -0.0025273715
+my max lon is (int) -54569420
+child.id = 75
+
+For the real thing:
+
+c my start time is 1271712806470
+c my slope is -0.0025273715
+c my max lon is (int) -54569420
+(nv) child max lonm is -54.570674 <--- note this is a guess
+(nv) child start time is 1271713312286
+
+wait so it changed? Or is it float error?
+
+this is child max lonm (int) -54570674
+
+and this is getMaxLonm()/1000000f = -54.57067
+wait.. well there already is a rounding error right there..
+but how do we get the child value?
+And when we print it out, for some reason it's different. Oh I know
+we are printing it out using printf
+I see. but it's messed up. So the float is not good enough to
+really calculate the exact position necessary. Which of course
+means, neither is the slope. So then we need to decide, do we need
+a double for the slope? Should we use an end point instead and 
+calculate the slope that way? I think a double would be easier and
+it should work better. It does sort of make sense that it couldn't 
+contain the differences since a float is the same size as an int,
+but an int can contain up to what, 2,147,483,648
+Two billion. Yet we are only talking about 54,570,674.. 54 million.
+That's why I thought a float would work. However, I can't think of 
+any other flaw in this. So what we are proposing is that calcing forward
+and backwards yields this flaw of 28
+
+So the computation is the following:
+
+Math.round(-54570674+ (1271712806470-1271713312286)*(-0.0025273715f))
+
+That's the original
+
+The backwards calc is
+(1271713312286-1271712806470)*(-0.0025273715f) + (-54569420)
+
+So lets see.
+
+real is -54569392
+test is -54570700
+
+real is -54569392 +54569420 = 28
+test is -54570700 + 54570674 = -26
+
+Now.. for something completely different, we need to try doubles.
+
+I mean, I don't know if we can do floats. Can we? Do we care?
+Is there cases where we still will be off? Yes, but not by more than
+one.. Look.. we need to test this, and not have any wiggle room, you know?
+
+7/10
+
+ARGHH ITS STILL THERE< CHARLIE BROWN KICK THE FOOTBALL!
+
+Here is the child:
+
+GpsLocCacheRow(startTimeMs=2010-04-20 05:41:52.286,endTimeMs=2010-04-20 05:53:50.120,minLatStart=           -25598139,minLatEnd=           -25598139,minLonStart=           -54570674,minLonEnd=           -54570674,slopeLatm=        0.0041095852,slopeLonm=       -0.0056572966,id=75,ftdfk=-2147483648,fpdfk=74,sfk=12,numsegments=0)
+
+Here is the min and max in lat and lon at parent time 0:
+
+-25598252
+-25598252
+-54569392
+-54569392
+
+So if we take these numbers and do the test, it should go back to the original
+
+(1271713312286 - 1271712806470) * (-0.0025273715) + (-54569392) = -54570670.3849426
+ok so that's good. It's greater than the actual.. Now lets do it with java
+
+(1271713312286l - 1271712806470l) * (-0.0025273715f) + (-54569392) = -5.4570672E7
+
+Even better.
+
+So, then, does the parent max become this?
+
+
+Ok so now 14 is bad:
+
+Both lat end and lon end max are bad
+min lon end is also bad
+child min lon end  (int) -54578032
+parent min at same location (float) -5.4577896E7
+child id is 13
+GpsLocCacheRow(startTimeMs=2010-04-20 05:33:26.470,endTimeMs=2010-04-20 06:15:34.358,minLatStart=           -25599076,minLatEnd=           -25595458,minLonStart=           -54571644,minLonEnd=           -54569392,slopeLatm=        0.0002198765,slopeLonm=       -0.0025273715,id=13,ftdfk=-2147483648,fpdfk=102,sfk=-2147483648,numsegments=2)
+
+this is (id 14):
+GpsLocCacheRow(startTimeMs=2010-04-20 05:33:26.470,endTimeMs=2010-04-20 06:15:34.358,minLatStart=           -25599488,minLatEnd=           -25595306,minLonStart=           -54571768,minLonEnd=           -54568792,slopeLatm=        0.0000968464,slopeLonm=       -0.0024247244,id=14,ftdfk=-2147483648,fpdfk=13,sfk=-2147483648,numsegments=2)
+
+
+D/GpsTrailer( 1920): Processing gps loc row GpsLocationRow(timeMs=2010-04-20 06:15:34.358,latm=           -25598520,lonm=           -54575808,id=4)
+D/GpsTrailer( 1920): cx GpsLocCacheRow(startTimeMs=2010-04-20 05:33:26.470,endTimeMs=2010-04-20 05:53:50.120,minLatStart=           -25599488,minLatEnd=           -25598252,minLonStart=           -54570448,minLonEnd=           -54568792,slopeLatm=        0.0026641048,slopeLonm=       -0.0037185454,id=13,ftdfk=-2147483648,fpdfk=75,sfk=-2147483648,numsegments=1)
+D/GpsTrailer( 1920): c GpsLocCacheRow(id=        13,dt= 1223650,st=       0,mlatm=       0,mlonm=       0)
+D/GpsTrailer( 1920): p1 GpsLocationRow(id=       3,              t= 1223650, latm=    4299, lonm=   -4287)
+D/GpsTrailer( 1920): p2 GpsLocationRow(id=       4,              t= 2527888, latm=     968, lonm=   -5360)
+D/GpsTrailer( 1920): slope lat 9.684643E-5 slope lon -0.0024247244
+D/GpsTrailer( 1920): inserted GpsLocCacheRow(startTimeMs=2010-04-20 05:53:50.120,endTimeMs=2010-04-20 06:15:34.358,minLatStart=           -25595189,minLatEnd=           -25595189,minLonStart=           -54574735,minLonEnd=           -54574735,slopeLatm=       -0.0025539817,slopeLonm=       -0.0008227026,id=100,ftdfk=-2147483648,fpdfk=-2147483648,sfk=-2147483648,numsegments=0)
+D/GpsTrailer( 1920): inserted GpsLocCacheRow(startTimeMs=2010-04-20 05:53:50.120,endTimeMs=2010-04-20 06:15:34.358,minLatStart=           -25595189,minLatEnd=           -25595189,minLonStart=           -54574735,minLonEnd=           -54574735,slopeLatm=       -0.0025539817,slopeLonm=       -0.0008227026,id=101,ftdfk=-2147483648,fpdfk=100,sfk=-2147483648,numsegments=0)
+D/GpsTrailer( 1920): inserted GpsLocCacheRow(startTimeMs=2010-04-20 05:53:50.120,endTimeMs=2010-04-20 06:15:34.358,minLatStart=           -25595189,minLatEnd=           -25595189,minLonStart=           -54574735,minLonEnd=           -54574735,slopeLatm=       -0.0025539817,slopeLonm=       -0.0008227026,id=102,ftdfk=-2147483648,fpdfk=101,sfk=-2147483648,numsegments=0)
+E/GpsTrailer( 1920): Bad child data!!! GpsLocCacheRow(startTimeMs=2010-04-20 05:33:26.470,endTimeMs=2010-04-20 06:15:34.358,minLatStart=           -25599488,minLatEnd=           -25595306,minLonStart=           -54571768,minLonEnd=           -54568792,slopeLatm=        0.0000968464,slopeLonm=       -0.0024247244,id=14,ftdfk=-2147483648,fpdfk=13,sfk=-2147483648,numsegments=2) child: GpsLocCacheRow(startTimeMs=2010-04-20 05:33:26.470,endTimeMs=2010-04-20 06:15:34.358,minLatStart=           -25599076,minLatEnd=           -25595458,minLonStart=           -54571644,minLonEnd=           -54569392,slopeLatm=        0.0002198765,slopeLonm=       -0.0025273715,id=13,ftdfk=-2147483648,fpdfk=102,sfk=-2147483648,numsegments=2)
+E/GpsTrailer( 1920): Bad child data!!! GpsLocCacheRow(startTimeMs=2010-04-20 05:33:26.470,endTimeMs=2010-04-20 06:15:34.358,minLatStart=           -25599488,minLatEnd=           -25595306,minLonStart=           -54571768,minLonEnd=           -54568792,slopeLatm=        0.0000968464,slopeLonm=       -0.0024247244,id=14,ftdfk=-2147483648,fpdfk=13,sfk=-2147483648,numsegments=2) child: GpsLocCacheRow(startTimeMs=2010-04-20 05:33:26.470,endTimeMs=2010-04-20 06:15:34.358,minLatStart=           -25599076,minLatEnd=           -25595458,minLonStart=           -54571644,minLonEnd=           -54569392,slopeLatm=        0.0002198765,slopeLonm=       -0.0025273715,id=13,ftdfk=-2147483648,fpdfk=102,sfk=-2147483648,numsegments=2)
+D/GpsTrailer( 1920): this has become GpsLocCacheRow(startTimeMs=2010-04-20 05:33:26.470,endTimeMs=2010-04-20 06:15:34.358,minLatStart=           -25599488,minLatEnd=           -25595306,minLonStart=           -54571768,minLonEnd=           -54568792,slopeLatm=        0.0000968464,slopeLonm=       -0.0024247244,id=14,ftdfk=-2147483648,fpdfk=13,sfk=-2147483648,numsegments=2)
+
+
+
+Ok, so stop stop stop!
+
+Let's think about this. Why don't we have a more classier way to do all this.
+
+Ok so here is the thing. We have the parent. Then we set the slope to whatever.
+Then we go through each child and for it's 8 points, we expand the parent.
+Now, think, we need to know in which direction we are expanding to make sure that
+we get it all.
+
+Now, first, is that true? Yes, because we are doing forward and back calculation
+Right. Let's just be safe and do it. Ok fine.
+
+Anyway, so we need to have the parent variables, and add the child to them
+Well what about a space time box? no, it's not a box, but a lopsided rectangular
+cylinder or lrc.
+
+So we create a  LopsidedRectangularCylinder and add the children to it.
+Just like the LeastSquareData, where we add points, except that we add
+children here because we need to be completely encompessing.
+
+But the thing is.. the child should be able to specify it's own extent.
+
+And when we add to the parent, we can use the lopsided box, sure, but that means
+we should add the calculation in where, util? Or make it public static I suppose
+So then the child should have methods get minEnd getMaxEnd and they should take
+into account the slop. Because if we don't then we get disappearing points. And
+that is so annoying.
+
+So we just need to modify gpslocacherow I guess...
+
+So then, to be clear... we need to not allow any more direct getX access,
+and just have methods, because otherwise we'll create more bugs. Then the
+lopsided box thing is the lopsided box (we should probably make it an inner
+class) and stick calcDist back (as calcDistWithSlop or something)
+
+
+ok so now 101:
+
+So at least, the child start min latm is before the parent
+
+D/GpsTrailer( 8910): Processing gps loc row GpsLocationRow(timeMs=2010-04-20 06:15:43.691,latm=           -25598525,lonm=           -54575797,id=5)
+D/GpsTrailer( 8910): cx GpsLocCacheRow(startTimeMs=2010-04-20 05:53:50.120,endTimeMs=2010-04-20 06:15:34.358,minLatStart=           -25595189,minLatEnd=           -25595189,minLonStart=           -54574735,minLonEnd=           -54574735,slopeLatm=       -0.0025539817,slopeLonm=       -0.0008227026,id=100,ftdfk=-2147483648,fpdfk=-2147483648,sfk=-2147483648,numsegments=0)
+D/GpsTrailer( 8910): c GpsLocCacheRow(id=       100,dt= 1304238,st=       0,mlatm=       0,mlonm=       0)
+D/GpsTrailer( 8910): p1 GpsLocationRow(id=       4,              t= 1304238, latm=   -3331, lonm=   -1073)
+D/GpsTrailer( 8910): p2 GpsLocationRow(id=       5,              t= 1313571, latm=   -3336, lonm=   -1062)
+D/GpsTrailer( 8910): slope lat -0.0025490876 slope lon -8.178497E-4
+E/GpsTrailer( 8910): Bad child data!!! GpsLocCacheRow(startTimeMs=2010-04-20 05:53:50.120,endTimeMs=2010-04-20 06:15:43.691,minLatStart=           -25595196,minLatEnd=           -25595176,minLonStart=           -54574740,minLonEnd=           -54574720,slopeLatm=       -0.0025490876,slopeLonm=       -0.0008178497,id=101,ftdfk=-2147483648,fpdfk=100,sfk=-2147483648,numsegments=1) child: 
+                                       GpsLocCacheRow(startTimeMs=2010-04-20 05:53:50.120,endTimeMs=2010-04-20 06:15:43.691,minLatStart=           -25597848,minLatEnd=           -25597848,minLonStart=           -54577340,minLonEnd=           -54577340,slopeLatm=       -0.0005145958,slopeLonm=        0.0011753836,id=100,ftdfk=-2147483648,fpdfk=-2147483648,sfk=-2147483648,numsegments=1)
+E/GpsTrailer( 8910): Bad child data!!! GpsLocCacheRow(startTimeMs=2010-04-20 05:53:50.120,endTimeMs=2010-04-20 06:15:43.691,minLatStart=           -25595196,minLatEnd=           -25595176,minLonStart=           -54574740,minLonEnd=           -54574720,slopeLatm=       -0.0025490876,slopeLonm=       -0.0008178497,id=101,ftdfk=-2147483648,fpdfk=100,sfk=-2147483648,numsegments=1) child: GpsLocCacheRow(startTimeMs=2010-04-20 05:53:50.120,endTimeMs=2010-04-20 06:15:43.691,minLatStart=           -25597848,minLatEnd=           -25597848,minLonStart=           -54577340,minLonEnd=           -54577340,slopeLatm=       -0.0005145958,slopeLonm=        0.0011753836,id=100,ftdfk=-2147483648,fpdfk=-2147483648,sfk=-2147483648,numsegments=1)
+D/GpsTrailer( 8910): this has become GpsLocCacheRow(startTimeMs=2010-04-20 05:53:50.120,endTimeMs=2010-04-20 06:15:43.691,minLatStart=           -25595196,minLatEnd=           -25595176,minLonStart=           -54574740,minLonEnd=           -54574720,slopeLatm=       -0.0025490876,slopeLonm=       -0.0008178497,id=101,ftdfk=-2147483648,fpdfk=100,sfk=-2147483648,numsegments=1)
+
+
+
+Ok, so before the evil point:
+
+GpsLocCacheRow(startTimeMs=2010-04-20 05:53:50.120,endTimeMs=2010-04-20 06:15:34.358,minLatStart=           -25595189,minLatEnd=           -25595189,minLonStart=           -54574735,minLonEnd=           -54574735,slopeLatm=       -0.0025539817,slopeLonm=       -0.0008227026,id=101,ftdfk=-2147483648,fpdfk=100,sfk=-2147483648,numsegments=0)
+GpsLocCacheRow(startTimeMs=2010-04-20 05:53:50.120,endTimeMs=2010-04-20 06:15:34.358,minLatStart=           -25595189,minLatEnd=           -25595189,minLonStart=           -54574735,minLonEnd=           -54574735,slopeLatm=       -0.0025539817,slopeLonm=       -0.0008227026,id=100,ftdfk=-2147483648,fpdfk=-2147483648,sfk=-2147483648,numsegments=0)
+
+Perfect harmony.. but wait, calcDist is calculating minlatm as one greater, -25595188
+
+-2.5595188E7.. oh because nevermind of the slope fix, we're still messed if the slope is zero
+
+Alright this is bad. It's really error prone. So lets think
+
+we have the start locations.. these are accurate. Then we have each point at a certain time. We need to adjust the points by a certain amount
+based on the slope. Now we need to calculate this backwards to get the starting positions.
+
+So why don't we add just one percent? Even with zero slope there is an issue. One percent of what?
+The area may not always work. It's just so wacky, this issue.
+
+We could break down and use double. Why don't we do that? We can keep the slope a float even.
+Can we?
+
+Ok, think... we'll take the value and make calcDist use a double. Then we
+won't need to worry about max and min float slop.
+
+This is because, we, well, we can just use double and round and it should 
+always be fine.
+
+GpsLocCacheRow(startTimeMs=2010-04-20 05:33:26.470,endTimeMs=2010-04-20 05:41:52.286,minLatStart=           -25598252,minLatEnd=           -25598252,minLonStart=           -54570449,minLonEnd=           -54570449,slopeLatm=        0.0002234014,slopeLonm=       -0.0004448258,id=0,ftdfk=-2147483648,fpdfk=10,sfk=-2147483648,numsegments=0)
+GpsLocCacheRow(startTimeMs=2010-04-20 05:33:26.470,endTimeMs=2010-04-20 05:41:52.286,minLatStart=           -25598252,minLatEnd=           -25598252,minLonStart=           -54570449,minLonEnd=           -54570449,slopeLatm=        0.0002234014,slopeLonm=       -0.0004448258,id=10,ftdfk=-2147483648,fpdfk=-2147483648,sfk=-2147483648,numsegments=0)
+
+ (int) -25598139
+ (int) -25598140
+
+
+child end max lonm  (int) -54570674
+parent max lonm at child end (int) -54570675
+
+
+
+
+E/GpsTrailer(13789): Bad child data!!! GpsLocCacheRow(startTimeMs=2010-04-20 05:33:26.470,endTimeMs=2010-04-20 05:41:52.286,minLatStart=           -25598252,minLatEnd=           -25598252,minLonStart=           -54570449,minLonEnd=           -54570449,slopeLatm=        0.0002234014,slopeLonm=       -0.0004448258,id=0,ftdfk=-2147483648,fpdfk=10,sfk=-2147483648,numsegments=0) child: GpsLocCacheRow(startTimeMs=2010-04-20 05:33:26.470,endTimeMs=2010-04-20 05:41:52.286,minLatStart=           -25598252,minLatEnd=           -25598252,minLonStart=           -54570449,minLonEnd=           -54570449,slopeLatm=        0.0002234014,slopeLonm=       -0.0004448258,id=10,ftdfk=-2147483648,fpdfk=-2147483648,sfk=-2147483648,numsegments=0)
+
+
+
+
+child min latm (int) -25597850
+parent min latm at child  (int) -25595197
+
+-25595189
+
+D/GpsTrailer(13906): Processing gps loc row GpsLocationRow(timeMs=2010-04-20 06:15:43.691,latm=           -25598525,lonm=           -54575797,id=5)
+D/GpsTrailer(13906): cx GpsLocCacheRow(startTimeMs=2010-04-20 05:53:50.120,endTimeMs=2010-04-20 06:15:34.358,minLatStart=           -25595189,minLatEnd=           -25595189,minLonStart=           -54574735,minLonEnd=           -54574735,slopeLatm=       -0.0025539817,slopeLonm=       -0.0008227026,id=100,ftdfk=-2147483648,fpdfk=-2147483648,sfk=-2147483648,numsegments=0)
+D/GpsTrailer(13906): c GpsLocCacheRow(id=       100,dt= 1304238,st=       0,mlatm=       0,mlonm=       0)
+D/GpsTrailer(13906): p1 GpsLocationRow(id=       4,              t= 1304238, latm=   -3331, lonm=   -1073)
+D/GpsTrailer(13906): p2 GpsLocationRow(id=       5,              t= 1313571, latm=   -3336, lonm=   -1062)
+D/GpsTrailer(13906): slope lat -0.0025492138 slope lon -8.177235E-4
+E/GpsTrailer(13906): Bad child data!!! 
+GpsLocCacheRow(startTimeMs=2010-04-20 05:53:50.120,endTimeMs=2010-04-20 06:15:43.691,minLatStart=           -25595197,minLatEnd=           -25595176,minLonStart=           -54574742,minLonEnd=           -54574722,slopeLatm=       -0.0025492138,slopeLonm=       -0.0008177235,id=101,ftdfk=-2147483648,fpdfk=100,sfk=-2147483648,numsegments=1) child: 
+GpsLocCacheRow(startTimeMs=2010-04-20 05:53:50.120,endTimeMs=2010-04-20 06:15:43.691,minLatStart=           -25597850,minLatEnd=           -25597848,minLonStart=           -54577341,minLonEnd=           -54577340,slopeLatm=       -0.0005145958,slopeLonm=        0.0011753836,id=100,ftdfk=-2147483648,fpdfk=-2147483648,sfk=-2147483648,numsegments=1)
+
+
+GpsLocCacheRow(startTimeMs=2010-04-20 05:53:50.120,endTimeMs=2010-04-20 06:15:34.358,minLatStart=           -25595189,minLatEnd=           -25595189,minLonStart=           -54574735,minLonEnd=           -54574735,slopeLatm=       -0.0025539817,slopeLonm=       -0.0008227026,id=100,ftdfk=-2147483648,fpdfk=-2147483648,sfk=-2147483648,numsegments=0)
+GpsLocCacheRow(startTimeMs=2010-04-20 05:53:50.120,endTimeMs=2010-04-20 06:15:34.358,minLatStart=           -25595189,minLatEnd=           -25595189,minLonStart=           -54574735,minLonEnd=           -54574735,slopeLatm=       -0.0025539817,slopeLonm=       -0.0008227026,id=100,ftdfk=-2147483648,fpdfk=-2147483648,sfk=-2147483648,numsegments=0)
+GpsLocCacheRow(startTimeMs=2010-04-20 05:53:50.120,endTimeMs=2010-04-20 06:15:43.691,minLatStart=           -25597850,minLatEnd=           -25597848,minLonStart=           -54577341,minLonEnd=           -54577340,slopeLatm=       -0.0005145958,slopeLonm=        0.0011753836,id=100,ftdfk=-2147483648,fpdfk=-2147483648,sfk=-2147483648,numsegments=1)
+
+So here is the thing... a new point can radically change the child and make it bigger in ways that can't be anticipated.
+So what we need to do is have a "dirty" flag and save later..
+
+Now there is a problem here that when we link a child to it's parent, the child needs to be already saved so we know the id.
+
+So wait, here are the scenarios:
+
+1. New point, 0 level onl
+
+So the problem is that when we have a non-zero level cache, we can't decide whether to add it until we check with the children.
+So then we need to ask the child. So we will just do that, then. Yes it'll be slower. But who cares?
+
+So lets see. What we need to do is ask the child (can I add you), no then we need to actually have the child morph itself, or at
+least return a lopsided box of what it will become. Then we add that lopsided box to our own. If our lopsided box is not too big,
+we are ok.
+
+So specifically, we have what, two methods?
+
+Well, lets see,
+we say please add this point from the cache creator.
+Then the level 0 says ok, and starts shopping it to the kids.
+The kids say yes or no... then what..
+can we do it backwards I mean..
+can we say at the bottom when we are sure we can add the segment
+parent.confirm();
+and parent.confirm() will call parent.parent.confirm()
+and so on.
+
+Sure, but what about calling it twice, with save and a no save.
+I mean our goal on the no save is to return a lopsided box. 
+If we find one we can do we return it. Otherwise, we return null.
+
+Why not just that, slow but effective. Ok.. ok..
+
+Look, it's going to be really slow to do that. I'm not sure I like
+it. The reason is this.. Say you're at level 0, then you ask level 1
+then level 1 has to ask all it's children find 1 that says yes, and
+return yes. Then you say go ahead, and it's levels 1 turn to ask level
+2. So that x zoomlevels for it to work.
+
+So then we have two options. We can change lopsided box to have an id
+associated with it. So that after we find a working item, we can
+see if it works up above, too. Have a lopsided box array where each
+lopsided box represents the currently working data.
+
+Then we can just reset it whenever we change our minds or whatever.
+So that's fine I guess. It's yet another class representing the same
+thing though. Why don't we just create cache row copies?
+
+Because a lopsided box has internal info that can make stuff run faster
+
+Is this true? I mean we go down to the bottom and we find a spot that can
+handle it. Then we go back up and it will most likely handle it... very
+rarely will it puke and say no, can't do. So it seems like a copy would
+work... it's only just that we have a linked list of data.. and it
+just seems the lopsided box would work just fine. It would just contain
+a reference to the cache row it needs. besides, we need to create one
+anyway.
+
+Ok so this it then. We do the following, pass an array of lopsided boxes
+and a zoom level. The item in question tells it's children to figure it out
+and then makes it changes to the lopsided box based on it's kids. 
+Then it passes it up. 
+
+Finally at the top, probably at level 0, we just say commit() and it
+goes through the lopsided boxes and tells them all to do their work.
+
+They save and insert and whatever.
+
+
+I think that it would be better if we just put an "undo" on the child
+so we update it, and if we don't like it, we "undo" the change. We 
+can "undo" it not with a bunch of lopsided boxes, but a static "backup"
+class that simply contains the array of data.
+
+The only issue with this is new items. Well, wait.. new items can be
+added at the end. So we work like this
+
+1. parent has add segment. 
+2. parent calls child to add segment.
+3. if no children accept the point, we mark an insert flag on our
+"AddSegmentStatus" class
+4. parent checks if it is ok
+5. if ok parent returns true.
+6. if not, parent calls "AddSegmentStatus" undo() and returns false.
+7. At the end, the "AddSegmentStatus"s will write all the necessary
+data out.
+
+7/11
+
+I can't believe I'm still down to work on this stuff. Darn...
+
+E/GpsTrailer(15410): Bad child data!!! 
+
+GpsLocCacheRow(startTimeMs=2010-04-21 03:43:32.690,endTimeMs=2010-04-21 04:32:13.710,minLatStart=           -25691139,minLatEnd=           -25652308,minLonStart=           -54547667,minLonEnd=           -54528660,slopeLatm=       -0.1889273822,slopeLonm=       -0.0212337729,id=401,ftdfk=-2147483648,fpdfk=814,sfk=14,numsegments=19) child: 
+GpsLocCacheRow(startTimeMs=2010-04-21 03:43:32.690,endTimeMs=2010-04-21 03:51:03.223,minLatStart=           -25674323,minLatEnd=           -25672916,minLonStart=           -54504084,minLonEnd=           -54500493,slopeLatm=       -0.2048377842,slopeLonm=       -0.0846197084,id=400,ftdfk=-2147483648,fpdfk=444,sfk=-2147483648,numsegments=2)
+
+
+child max lonm is greater than parent max lonm at start
+ (int) -54500493                    -54528660
+
+ok so here is the lstb max lonm:    -54502611
+
+Ok, so the time we are doing real:
+
+GpsLocCacheRow(startTimeMs=2010-04-21 03:43:32.690,endTimeMs=2010-04-21 03:50:26.431,minLatStart=           -25673493,minLatEnd=           -25673493,minLonStart=           -54502611,minLonEnd=           -54502611,slopeLatm=       -0.2034437060,slopeLonm=       -0.0881783515,id=400,ftdfk=-2147483648,fpdfk=399,sfk=-2147483648,numsegments=1)
+
+
+D/GpsTrailer(15489): Processing gps loc row GpsLocationRow(timeMs=2010-04-21 04:32:13.710,latm=           -26238790,lonm=           -54597952,id=35)
+D/GpsTrailer(15489): cx GpsLocCacheRow(startTimeMs=2010-04-21 04:18:54.837,endTimeMs=2010-04-21 04:26:11.896,minLatStart=           -26064118,minLatEnd=           -26063682,minLonStart=           -54589778,minLonEnd=           -54588832,slopeLatm=       -0.2345333546,slopeLonm=        0.0133381262,id=814,ftdfk=-2147483648,fpdfk=813,sfk=598,numsegments=2)
+D/GpsTrailer(15489): c GpsLocCacheRow(id=       814,dt=  437059,st= 2122147,mlatm= -369366,mlonm=  -55470)
+D/GpsTrailer(15489): cx GpsLocCacheRow(startTimeMs=2010-04-21 04:05:43.965,endTimeMs=2010-04-21 04:18:54.837,minLatStart=           -25910286,minLatEnd=           -25904065,minLonStart=           -54572413,minLonEnd=           -54567016,slopeLatm=       -0.1943284869,slopeLonm=       -0.0256861206,id=598,ftdfk=-2147483648,fpdfk=786,sfk=535,numsegments=10)
+D/GpsTrailer(15489): c GpsLocCacheRow(id=       598,dt=  790872,st= 1331275,mlatm= -215534,mlonm=  -38105)
+D/GpsTrailer(15489): cx GpsLocCacheRow(startTimeMs=2010-04-21 03:58:59.957,endTimeMs=2010-04-21 04:05:43.965,minLatStart=           -25862759,minLatEnd=           -25860198,minLonStart=           -54559623,minLonEnd=           -54550969,slopeLatm=       -0.1079805493,slopeLonm=       -0.0183039755,id=535,ftdfk=-2147483648,fpdfk=570,sfk=472,numsegments=2)
+D/GpsTrailer(15489): c GpsLocCacheRow(id=       535,dt=  404008,st=  927267,mlatm= -168007,mlonm=  -25315)
+D/GpsTrailer(15489): cx GpsLocCacheRow(startTimeMs=2010-04-21 03:51:03.223,endTimeMs=2010-04-21 04:32:13.710,minLatStart=           -25776257,minLatEnd=           -25766609,minLonStart=           -54545916,minLonEnd=           -54538617,slopeLatm=       -0.1882999986,slopeLonm=       -0.0211700965,id=472,ftdfk=-2147483648,fpdfk=507,sfk=400,numsegments=3)
+D/GpsTrailer(15489): c GpsLocCacheRow(id=       472,dt= 2470487,st=  450533,mlatm=  -81505,mlonm=  -11608)
+D/GpsTrailer(15489): p1 GpsLocationRow(id=      34,              t= 2559206, latm= -471436, lonm=  -49638)
+D/GpsTrailer(15489): p2 GpsLocationRow(id=      35,              t= 2921020, latm= -544038, lonm=  -63644)
+D/GpsTrailer(15489): slope lat -0.18892738 slope lon -0.021233773
+D/GpsTrailer(15489): this has become GpsLocCacheRow(startTimeMs=2010-04-21 03:43:32.690,endTimeMs=2010-04-21 04:32:13.710,minLatStart=           -25691139,minLatEnd=           -25652308,minLonStart=           -54547667,minLonEnd=           -54528660,slopeLatm=       -0.1889273822,slopeLonm=       -0.0212337729,id=401,ftdfk=-2147483648,fpdfk=814,sfk=14,numsegments=19)
+D/GpsTrailer(15489): inserted GpsLocCacheRow(startTimeMs=2010-04-21 04:26:11.896,endTimeMs=2010-04-21 04:32:13.710,minLatStart=           -26166188,minLatEnd=           -26166188,minLonStart=           -54583946,minLonEnd=           -54583946,slopeLatm=       -0.2006611079,slopeLonm=       -0.0387104973,id=865,ftdfk=-2147483648,fpdfk=-2147483648,sfk=-2147483648,numsegments=1)
+D/GpsTrailer(15489): inserted GpsLocCacheRow(startTimeMs=2010-04-21 04:26:11.896,endTimeMs=2010-04-21 04:32:13.710,minLatStart=           -26166188,minLatEnd=           -26166188,minLonStart=           -54583946,minLonEnd=           -54583946,slopeLatm=       -0.2006611079,slopeLonm=       -0.0387104973,id=866,ftdfk=-2147483648,fpdfk=865,sfk=-2147483648,numsegments=1)
+D/GpsTrailer(15489): inserted GpsLocCacheRow(startTimeMs=2010-04-21 04:26:11.896,endTimeMs=2010-04-21 04:32:13.710,minLatStart=           -26166188,minLatEnd=           -26166188,minLonStart=           -54583946,minLonEnd=           -54583946,slopeLatm=       -0.2006611079,slopeLonm=       -0.0387104973,id=867,ftdfk=-2147483648,fpdfk=866,sfk=-2147483648,numsegments=1)
+E/GpsTrailer(15489): Bad child data!!! GpsLocCacheRow(startTimeMs=2010-04-21 03:43:32.690,endTimeMs=2010-04-21 04:32:13.710,minLatStart=           -25691139,minLatEnd=           -25652308,minLonStart=           -54547667,minLonEnd=           -54528660,slopeLatm=       -0.1889273822,slopeLonm=       -0.0212337729,id=401,ftdfk=-2147483648,fpdfk=814,sfk=14,numsegments=19) child: GpsLocCacheRow(startTimeMs=2010-04-21 03:43:32.690,endTimeMs=2010-04-21 03:51:03.223,minLatStart=           -25674323,minLatEnd=           -25672916,minLonStart=           -54504084,minLonEnd=           -54500493,slopeLatm=       -0.2048377842,slopeLonm=       -0.0846197084,id=400,ftdfk=-2147483648,fpdfk=444,sfk=-2147483648,numsegments=2)
+
+
+The child is already linked... the child is already linked.
+
+Why would that happen?
+
+because we simply choose the child that we update which may already be
+linked. So what we need to do is only return the child if it is newly
+added (because that is the only time we do not have a linked beforehand)
+
+
+Here we go again:
+
+E/GpsTrailer(15963): Bad child data!!! 
+GpsLocCacheRow(startTimeMs=2010-04-20 05:33:26.470,endTimeMs=2010-04-20 06:15:34.358,minLatStart=           -25598254,minLatEnd=           -25598250,minLonStart=           -54570451,minLonEnd=           -54570447,slopeLatm=        0.0002243289,slopeLonm=       -0.0004457973,id=12,ftdfk=-2147483648,fpdfk=11,sfk=-2147483648,numsegments=3) child: 
+GpsLocCacheRow(startTimeMs=2010-04-20 05:33:26.470,endTimeMs=2010-04-20 06:15:34.358,minLatStart=          2147483647,minLatEnd=          2147483639,minLonStart=          2147483647,minLonEnd=          2147483639,slopeLatm=    -3509.9638671875,slopeLonm=    -3509.9638671875,id=11,ftdfk=-2147483648,fpdfk=10,sfk=-2147483648,numsegments=3)
+
+child max latm at start is greater than parent max latm at start
+
+
+(same for lonm) plus some more
+
+
+
+
+D/GpsTrailer(16149): Processing gps loc row GpsLocationRow(timeMs=2010-04-20 06:15:34.358,latm=           -25598520,lonm=           -54575808,id=4)
+E/GpsTrailer(16149): Bad child data!!! GpsLocCacheRow(startTimeMs=2010-04-20 05:33:26.470,endTimeMs=2010-04-20 06:15:34.358,minLatStart=           -25598254,minLatEnd=           -25598250,minLonStart=           -54570451,minLonEnd=           -54570447,slopeLatm=        0.0002243289,slopeLonm=       -0.0004457973,id=12,ftdfk=-2147483648,fpdfk=11,sfk=-2147483648,numsegments=3) child: 
+GpsLocCacheRow(startTimeMs=2010-04-20 05:33:26.470,endTimeMs=2010-04-20 06:15:34.358,minLatStart=          2147483647,minLatEnd=          2147483639,minLonStart=          2147483647,minLonEnd=          2147483639,slopeLatm=    -3509.9638671875,slopeLonm=    -3509.9638671875,id=11,ftdfk=-2147483648,fpdfk=10,sfk=-2147483648,numsegments=3)
+
+11/13
+
+9580
+
+D/GTG     ( 8390): GpsLocationRow(timeMs=   20101028 02:50:52,latm=            13737840,lonm=           100560822,id=9580) length from prev 4.493575271624476E7
+
+
+11/19
+
+why do we need to have end times at all? We can look up the end time
+in the point itself. except this issue here. Which is that...
+
+We are putting start time and end time directly in the area panel along
+with each point as longs. We don't use ints because that would be around
+26 days. We could change the time down to seconds if we would like to change this.
+We store both start times and end times in the area panel. If an areapanel gets
+too many points that even storing the *index* of points in memory becomes 
+cumbersome (because the point arrays within the areapanel are indexes, they
+are sorted based on the time the point was entered) we create a link to a 
+"LinkBlock" table. We signify this by turning the upper bit on (or maybe a 
+negative number or something). The linkblock table will be generic (I hope)
+and will store points in array blocks.
+
+So points have certain times they are *active*, which is when a point they
+envelope is active. So if a point represents several days, every day, 7 am
+you drive to work... we only want to show it at that 7 am time period. If the
+time range of the space time box does not cover it, we don't show it.
+
+Also consider that points can be long standing and criss cross an area panel.
+So in other words, we need both the start time and the end time, since we 
+cannot use the point information at all. (A further example, A and C are long
+standing and both crisscross a panel. B is not and is in another panel entirely.
+If at a certain time, we go A->B->C, we will never know to stop displaying both
+A and C when B is active).
+
+
+11/30
+
+D/GpsTrailer( 9574): Processing gps loc row GpsLocationRow(timeMs=   20100420 06:15:43,latm=           -25598525,lonm=           -54575797,id=5)
+E/GpsTrailer( 9574): checking cache!
+D/GTG     ( 9574): Checking cache for com.rareventure.gps2.database.cache.AreaPanelCache@46028110
+E/GTG     ( 9574): #AreaPanel(id=3,maxDepth=0,isFake=f,numChildren=1,numPoints=4,lonmWidth=360000000,latmHeight=360000000,minLonm=-180000000,minLatm=-180000000)
+E/GTG     ( 9574): -1.8E8 -1.8E8
+E/GTG     ( 9574): 1.8E8 -1.8E8
+E/GTG     ( 9574): 1.8E8 1.8E8
+E/GTG     ( 9574): -1.8E8 1.8E8
+E/GTG     ( 9574): -1.8E8 -1.8E8
+E/GTG     ( 9574): 
+E/GTG     ( 9574):  in cache is wrong, orig: #AreaPanel(id=3,maxDepth=1,isFake=f,numChildren=1,numPoints=4,lonmWidth=360000000,latmHeight=360000000,minLonm=-180000000,minLatm=-180000000)
+E/GTG     ( 9574): -1.8E8 -1.8E8
+E/GTG     ( 9574): 1.8E8 -1.8E8
+E/GTG     ( 9574): 1.8E8 1.8E8
+E/GTG     ( 9574): -1.8E8 1.8E8
+E/GTG     ( 9574): -1.8E8 -1.8E8
+E/GTG     ( 9574): 
+D/GTG     ( 9574): Checking cache for com.rareventure.gps2.database.cache.PointCache@46028d00
+
+11/30
+D/GpsTrailer(12529): Processing gps loc row GpsLocationRow(timeMs=   20100421 11:15:23,latm=           -34590867,lonm=           -58374202,id=276)
+
+
+E/GTG     (12529): ERROR: can't find cache row for id 61
+
+E/AndroidRuntime(12529): java.lang.IllegalAccessError
+E/AndroidRuntime(12529):        at com.rareventure.gps2.database.TAssert.fail(TAssert.java:19)
+E/AndroidRuntime(12529):        at com.rareventure.gps2.database.TAssert.fail(TAssert.java:24)
+E/AndroidRuntime(12529):        at com.rareventure.android.database.Cache.getRow(Cache.java:70)
+E/AndroidRuntime(12529):        at com.rareventure.gps2.database.cache.AreaPanelCache.getRow(AreaPanelCache.java:51)
+E/AndroidRuntime(12529):        at com.rareventure.gps2.database.cache.AreaPanel.getChildrenPanels(AreaPanel.java:160)
+E/AndroidRuntime(12529):        at com.rareventure.gps2.database.cache.CacheCreator.findAreaPanelsCloseTo2(CacheCreator.java:251)
+E/AndroidRuntime(12529):        at com.rareventure.gps2.database.cache.CacheCreator.findAreaPanelsCloseTo2(CacheCreator.java:253)
+E/AndroidRuntime(12529):        at com.rareventure.gps2.database.cache.CacheCreator.findAreaPanelsCloseTo2(CacheCreator.java:253)
+E/AndroidRuntime(12529):        at com.rareventure.gps2.database.cache.CacheCreator.findAreaPanelsCloseTo2(CacheCreator.java:253)
+E/AndroidRuntime(12529):        at com.rareventure.gps2.database.cache.CacheCreator.findAreaPanelsCloseTo2(CacheCreator.java:253)
+E/AndroidRuntime(12529):        at com.rareventure.gps2.database.cache.CacheCreator.findAreaPanelsCloseTo2(CacheCreator.java:253)
+E/AndroidRuntime(12529):        at com.rareventure.gps2.database.cache.CacheCreator.findAreaPanelsCloseTo2(CacheCreator.java:253)
+E/AndroidRuntime(12529):        at com.rareventure.gps2.database.cache.CacheCreator.findAreaPanelsCloseTo(CacheCreator.java:238)
+E/AndroidRuntime(12529):        at com.rareventure.gps2.database.cache.CacheCreator.createPointMapping(CacheCreator.java:175)
+E/AndroidRuntime(12529):        at com.rareventure.gps2.database.cache.CacheCreator.updatePanelsRedux(CacheCreator.java:277)
+E/AndroidRuntime(12529):        at com.rareventure.gps2.database.cache.CacheCreator.addSegment(CacheCreator.java:49)
+E/AndroidRuntime(12529):        at com.rareventure.gps2.database.cachecreator.GpsTrailerCacheCreator.processGpsPoint(GpsTrailerCacheCreator.java:344)
+E/AndroidRuntime(12529):        at com.rareventure.gps2.database.cachecreator.GpsTrailerCacheCreator.fillInCacheUpTo(GpsTrailerCacheCreator.java:269)
+
+
+The parent of 61 during the delete:
+
+#AreaPanel(id=68,maxDepth=-1,isFake=t,numChildren=4,numPoints=-42,lonmWidth=122030504,latmHeight=149929312,minLonm=-180000000,minLatm=-180000000)
+-1.8E8 -1.8E8
+-5.7969496E7 -1.8E8
+-5.7969496E7 -3.0070688E7
+-1.8E8 -3.0070688E7
+-1.8E8 -1.8E8
+
+remember to delete dirty items from cache when they are deleted from the db
+
+Yea, so the cache not containing it anymore is the problem. But why doesn't it? The cache only contains 24 rows?
+
+It's because row 68 was created fresh, and then modified so it didn't exist in the cache at all
+
+So the deal is that 68 was created as a parent of 61. Then it was later changed to not be a parent of 61 but not
+saved. Since it wasn't in the cache, when it was requeried, it was taken directly from the db to be a parent of 61
+again, but 61 doesn't exist.
+
+12/1
+
+So the idea is that if we change dirtyRows to a hashmap
+
+id = 22
+
+Parent is 
+#AreaPanel(id=27,maxDepth=-1,isFake=t,numChildren=1,numPoints=-42,lonmWidth=125429440,latmHeight=154403336,minLonm=-180000000,minLatm=-180000000)
+-1.8E8 -1.8E8
+-5.457056E7 -1.8E8
+-5.457056E7 -2.5596664E7
+-1.8E8 -2.5596664E7
+-1.8E8 -1.8E8
+
+D/GpsTrailer( 2327): Processing gps loc row GpsLocationRow(timeMs=   20100421 11:15:23,latm=           -34590867,lonm=           -58374202,id=276)
+D/dalvikvm( 2327): GC_FOR_MALLOC freed 15155 objects / 531344 bytes in 33ms
+I/System.out( 2327): buuga
+E/GTG     ( 2327): ERROR: can't find cache row for id 61
+D
+
+D/GTG     ( 5872): 0 areapanels=118,total_points=4224,total_children=30,avg points=35.79661016949152,avg children=0.2542372881355932,max_points=291,min_points=0
+D/GTG     ( 5872): 1 areapanels=31,total_points=2340,total_children=37,avg points=75.48387096774194,avg children=1.1935483870967742,max_points=303,min_points=8
+D/GTG     ( 5872): 2 areapanels=25,total_points=1535,total_children=31,avg points=61.4,avg children=1.24,max_points=531,min_points=6
+D/GTG     ( 5872): 3 areapanels=15,total_points=2200,total_children=18,avg points=146.66666666666666,avg children=1.2,max_points=550,min_points=1
+D/GTG     ( 5872): 4 areapanels=1,total_points=35,total_children=4,avg points=35.0,avg children=4.0,max_points=35,min_points=35
+D/GTG     ( 5872): 5 areapanels=1,total_points=14,total_children=4,avg points=14.0,avg children=4.0,max_points=14,min_points=14
+
+D/GTG     ( 5912): depth_level 0 is 0
+D/GTG     ( 5912): depth_level 1 is 100
+D/GTG     ( 5912): depth_level 2 is 1000
+D/GTG     ( 5912): depth_level 3 is 10000
+D/GTG     ( 5912): depth_level 4 is 100000
+D/GTG     ( 5912): depth_level 5 is 1000000
+
+TODO 2: It's almost as if we should always join to the last point if available before
+even considering joining to points beforehand that have a time jump associated with
+them. 
+
+Whats to prevent a million point times from being formed? Nothing. So how do we 
+display the proper thing for infinite time?
+
+12/1
+
+What about counting the number of stories that display the *same* data pretty much?
+That will eliminate most irrelevant info and be different than just a volume counter.
+
+12/2
+
+GpsLocationRow(id=1162,timeMs=   20100526 06:32:06,latm=            41006110,lonm=            28980861,timeSec=1274826726)
+
+startTimeSEc is 1274706735
+
+
+The gap:
+
+D/GpsTrailer( 5038): tapped on row Point(id=132,minLatStart=-27410520.000000,latmHeight=-8824.000000,minLatEnd=-27419344.000000,minLonStart=-55901992.000000,lonmWidth=1856.000000,minLonEnd=-55900136.000000,numsegments=1,fatnessMd=0.000000,depth=0,length=9017.078906,startTimeSec=1271810403,endTimeSec=1271810486)
+
+
+D/GpsTrailer( 5038): tapped on row Point(id=183,minLatStart=-28325602.000000,latmHeight=-76014.000000,minLatEnd=-28401616.000000,minLonStart=-56105660.000000,lonmWidth=-1984.000000,minLonEnd=-56107644.000000,numsegments=1,fatnessMd=0.000000,depth=0,length=76039.888480,startTimeSec=1271816363,endTimeSec=1271816753)
+
+--
+
+previous to gap:
+D/GpsTrailer( 5132): Processing gps loc row GpsLocationRow(id=90,timeMs=   20100421 08:41:26,latm=           -27419343,lonm=           -55900138,timeSec=1271810486)
+
+
+D/GpsTrailer( 5424): Processing gps loc row GpsLocationRow(id=92,timeMs=   20100421 08:48:19,latm=           -27450966,lonm=           -55866938,timeSec=1271810899)
+
+D/GpsTrailer( 5424): Processing gps loc row GpsLocationRow(id=93,timeMs=   20100421 08:52:33,latm=           -27487535,lonm=           -55864218,timeSec=1271811153)
+
+Missing????
+
+PointMapping(newPoint=Point(id=133,minLatStart=-27450966.000000,latmHeight=-36569.000000,minLatEnd=-27487536.000000,minLonStart=-55866936.000000,lonmWidth=2720.000000,minLonEnd=-55864216.000000,numsegments=1,fatnessMd=0.000000,depth=0,length=36670.017398,startTimeSec=1271810899,endTimeSec=1271811153)
+-5.5866936E7 -2.7450966E7
+-5.5864216E7 -2.7487536E7
+-5.5864216E7 -2.7487536E7
+-5.5866936E7 -2.7450966E7
+-5.5866936E7 -2.7450966E7
+
+it changes
+
+D/GpsTrailer( 5038): tapped on row Point(id=132,minLatStart=-27410520.000000,latmHeight=-8824.000000,minLatEnd=-27419344.000000,minLonStart=-55901992.000000,lonmWidth=1856.000000,minLonEnd=-55900136.000000,numsegments=1,fatnessMd=0.000000,depth=0,length=9017.078906,startTimeSec=1271810403,endTimeSec=1271810486)
+D/GpsTrailer( 5487): tapped on row Point(id=130,minLatStart=-27410520.000000,latmHeight=-8824.000000,minLatEnd=-27419344.000000,minLonStart=-55901992.000000,lonmWidth=1856.000000,minLonEnd=-55900136.000000,numsegments=1,fatnessMd=0.000000,depth=0,length=9017.078906,startTimeSec=1271810403,endTimeSec=1271810486)
+
+gap is between 89 and 90
+
+Point(id=132,minLatStart=-27410520.000000,latmHeight=-8824.000000,minLatEnd=-27419344.000000,minLonStart=-55901992.000000,lonmWidth=1856.000000,minLonEnd=-55900136.000000,numsegments=1,fatnessMd=0.000000,depth=0,length=9017.078906,startTimeSec=1271810403,endTimeSec=1271810486)
+-5.5901992E7 -2.741052E7
+-5.5900136E7 -2.7419344E7
+-5.5900136E7 -2.7419344E7
+-5.5901992E7 -2.741052E7
+-5.5901992E7 -2.741052E7
+
+D/GpsTrailer( 5605): Processing gps loc row GpsLocationRow(id=89,timeMs=   20100421 08:40:03,latm=           -27410519,lonm=           -55901994,timeSec=1271810403)
+D/GpsTrailer( 5647): Processing gps loc row GpsLocationRow(id=90,timeMs=   20100421 08:41:26,latm=           -27419343,lonm=           -55900138,timeSec=1271810486)
+
+D/GpsTrailer( 5697): tapped on row Point(id=114,minLatStart=-27447548.000000,latmHeight=26452.000000,minLatEnd=-27421096.000000,minLonStart=-55870408.000000,lonmWidth=-29086.000000,minLonEnd=-55899496.000000,numsegments=1,fatnessMd=0.000000,depth=0,length=39315.438189,startTimeSec=1271807285,endTimeSec=1271807891)
+
+
+D/GpsTrailer( 5697): tapped on row Point(id=132,minLatStart=-27410520.000000,latmHeight=-8824.000000,minLatEnd=-27419344.000000,minLonStart=-55901992.000000,lonmWidth=1856.000000,minLonEnd=-55900136.000000,numsegments=1,fatnessMd=0.000000,depth=0,length=9017.078906,startTimeSec=1271810403,endTimeSec=1271810486)
+
+
+D/GpsTrailer( 5697): tapped on row Point(id=133,minLatStart=-27419344.000000,latmHeight=-14033.000000,minLatEnd=-27433376.000000,minLonStart=-55900136.000000,lonmWidth=13100.000000,minLonEnd=-55887036.000000,numsegments=1,fatnessMd=0.000000,depth=0,length=19197.268139,startTimeSec=1271810486,endTimeSec=1271810640)
+D/GpsTrailer( 5697): -5.5900136E7 -2.7419344E7
+D/GpsTrailer( 5697): Processing gps loc row GpsLocationRow(id=91,timeMs=   20100421 08:44:00,latm=           -27433376,lonm=           -55887038,timeSec=1271810640)
+
+
+#PointDiamond(depth=0,minLatm=-26341524.000000,minLonm=-54619352.000000,latmHeight=-12338.000000,lonmWidth=3219.000000,fatnessMd=0.000000)
+-5.4619352E7 -2.6341524E7
+-5.4616132E7 -2.6353862E7
+-5.4616132E7 -2.6353862E7
+-5.4619352E7 -2.6341524E7
+-5.4619352E7 -2.6341524E7
+
+Point(54146, -44161)
+Point(54010, -44679)
+
+
+---
+
+D/GpsTrailer( 9589): Processing gps loc row GpsLocationRow(id=90,timeMs=   20100421 08:41:26,latm=           -27419343,lonm=           -55900138,timeSec=1271810486)
+I/System.out( 9589): buuga buuga
+E/GTG     ( 9589): ERROR: ap #AreaPanel(id=18,maxDepth=0,isFake=f,numChildren=1,numPoints=38,lonmWidth=125413676,latmHeight=153973290,minLonm=-180000000,minLatm=-180000000)
+E/GTG     ( 9589): -1.8E8 -1.8E8
+E/GTG     ( 9589): -5.4586324E7 -1.8E8
+E/GTG     ( 9589): -5.4586324E7 -2.602671E7
+E/GTG     ( 9589): -1.8E8 -2.602671E7
+E/GTG     ( 9589): -1.8E8 -1.8E8
+E/GTG     ( 9589): 
+E/GTG     ( 9589):  p Point(id=128,minLatStart=-27402046.000000,latmHeight=-8474.702148,minLatEnd=-27410520.000000,minLonStart=-55914524.000000,lonmWidth=12533.406250,minLonEnd=-55901992.000000,numsegments=5,fatnessMd=649.279358,depth=2,length=15129.667809,startTimeSec=1271809786,endTimeSec=1271810403)
+E/GTG     ( 9589): -5.5914524E7 -2.7402046E7
+E/GTG     ( 9589): -5.5901992E7 -2.741052E7
+E/GTG     ( 9589): -5.590235568604186E7 -2.7411057862569287E7
+E/GTG     ( 9589): -5.591488768604186E7 -2.7402583862569287E7
+E/GTG     ( 9589): -5.5914524E7 -2.7402046E7
+E/GTG     ( 9589): 
+D/AndroidRuntime( 9589): Shutting down VM
+
+---
+D/GpsTrailer( 9870): Processing gps loc row GpsLocationRow(id=262,timeMs=   20100421 10:01:29,latm=           -34612244,lonm=           -58383021,timeSec=1271858489)
+
+
+
+E/AndroidRuntime( 9870): java.lang.IllegalAccessError
+E/AndroidRuntime( 9870):        at com.rareventure.gps2.database.TAssert.fail(TAssert.java:17)
+E/AndroidRuntime( 9870):        at com.rareventure.gps2.database.cache.CacheCreator.createChildPanel(CacheCreator.java:619)
+E/AndroidRuntime( 9870):        at com.rareventure.gps2.database.cache.CacheCreator.smashPanel(CacheCreator.java:481)
+E/AndroidRuntime( 9870):        at com.rareventure.gps2.database.cache.CacheCreator.updatePanelsRedux(CacheCreator.java:299)
+E/AndroidRuntime( 9870):        at com.rareventure.gps2.database.cache.CacheCreator.addSegment(CacheCreator.java:47)
+E/AndroidRuntime( 9870):        at com.rareventure.gps2.database.cachecreator.GpsTrailerCacheCreator.processGpsPoint(GpsTrailerCacheCreator.java:348)
+
+---
+
+
+#Point(id=354,minLatStart=-34480520.000000,latmHeight=4688.408203,minLatEnd=-34475832.000000,minLonStart=-58643308.000000,lonmWidth=-19865.728516,minLonEnd=-58663172.000000,numsegments=5,fatnessMd=971.864685,depth=2,length=20411.475988,startTimeSec=1271852785,endTimeSec=1271853057)
+-5.8643308E7 -3.448052E7
+-5.8663172E7 -3.4475832E7
+-5.866294876780931E7 -3.44748861203384E7
+-5.864308476780931E7 -3.44795741203384E7
+-5.8643308E7 -3.448052E7
+
+
+#AreaPanelSplitData(lonm=-180000000,latm=-180000000,midPointLonmWidth=121356028,midPointLatmHeight=146899658,lonmWidth=122014092,latmHeight=149603134)
+-1.8E8 -3.3100342E7
+-5.8643972E7 -3.3100342E7
+-5.7985908E7 -3.3100342E7
+
+
+-5.8643972E7 -1.8E8
+-5.8643972E7 -3.3100342E7
+-5.8643972E7 -3.0396866E7
+
+
+#AreaPanel(id=77,maxDepth=2,isFake=f,numChildren=4,numPoints=53,lonmWidth=122014092,latmHeight=149603134,minLonm=-180000000,minLatm=-180000000)
+-1.8E8 -1.8E8
+-5.7985908E7 -1.8E8
+-5.7985908E7 -3.0396866E7
+-1.8E8 -3.0396866E7
+-1.8E8 -1.8E8
+
+
+12/8/10
+
+View:
+Long time small 
+Long time medium
+Long time big 
+Medium small 
+Medium medium
+Medium big
+Short time small
+Short time medium
+Short time big
+
+Store:
+Long time small 
+Long time medium
+Long time big 
+Medium small 
+Medium medium
+Medium big
+Short time small
+Short time medium
+Short time big
+
+12/9/10
+
+We need to order by start time and end time... This is because a point could 
+extend past the beginning and past the end of the current time block given any
+timejump at all. And if it did that, I don't think that ordering by start and
+end would work anyway.
+
+I think what we need more is that of a change. So in other words at a given
+time did we add a point or remove one. Even that won't be good enough. We'd
+need to know the entire number of points for a given time. Urggh which would
+ be bad.
+
+Because we won't know. 
+
+If we went back to time jumps per point I think that we could solve this issue.
+but then we'd need both time jumps as well as point blocks.
+
+Can we eliminate time jumps in entirety? What is their purpose?
+
+It's to eliminate the number of points we have to go through for a long time
+period, say a month. However, this will only be effective at higher depth levels.
+At lower depth levels, there won't be much overlap anyway. At depth level 0
+it will have no effect.
+Depth level 0 is also where there will be a lot of points.
+
+I wonder. What is the purpose of this? It seems like this doesn't do anything
+that it was designed to do. It would be better just to go up a zoom level or two.
+However, here is the purpose. It's for homebodies. Home -> work -> home means that
+we will have time points even at the highest levels. So the idea is that for the
+highest levels, we would need to collapse the time points, so that when we view
+a large time period at a high depth, we don't need to go through thousands of points
+because the user is a homebody.
+
+So now I'm leaning towards every time a point changes, we print out all points and
+the time. So that we can see which points are being displayed at what time.
+
+Even down to zero time jump.
+
+And in general that would be manageable. The thing is, in certain scenarios, it's
+not managable. Like the case where maybe one guy out of 1000 overlaps. Actually
+maybe it is. We are not displaying all points from within +/- 1 day, but only that
+1 out of a thousand point that did overlap through it's entire length.
+
+The thing is that we have the right to give up for unrealistic scenarios. Like we
+would not display depth 0, time period infinity for an area panel with millions of
+points. We would go up in depth so that the point number is smaller. And because
+of that, there is no reason even to bother caching the data.
+
+Now, the only thing that leaves is that suppose we have that one out of million oddball
+points that do overlap, and most don't. It seems like a change to the depth level would
+be in order here, actually. But, ok, so the idea here is that the overlaps is supposed
+to save us processing time. If we don't have the time jump pb, then, we just need
+to go through more time points (a time point is a combination of a time range and
+a point that is being displayed)
+
+So the question is, at what point do we create a time jump point block? Once we 
+see a point overlaps? Or do we wait for several to overlap, seems tricky.
+
+Because otherwise we are making a nearly exact duplicate of the original point block
+data.
+
+I'm not sure that this will be a problem so we'll ignore it for now.
+
+--
+
+12/10/12
+
+So the thing is that we need to find the references in the zero time jump
+block in order to determine the necessary time jumps for a time block. 
+But once we find these references, we are already ready to modify the 
+point block. I suppose we can do it in two steps and just search for
+the old points twice. Hmm, but wouldn't the end time of each point 
+have to correspond to the last location within the time block?
+Hmm, but what if they overlap? 
+
+The other thing is that we will have infinity time jump before we 
+have a daily time jump. It is more likely that there will be the
+same daily time jump as no time jump because in the daily time jump
+we are *denying* time jumps. 
+
+Which I suppose is fine. 
+
+The other thing is that we will want to have as many points aligned
+as possible, so when we create the infinite one, we would basically
+just have a zero time and throw all the points in there, because their
+order doesn't matter.
+
+However, if we have a day repeater, then we wouldn't want this. If 
+we only have day repeater points than we can just have a day timejump.
+
+The other question is whether to have an infinite at all if there are
+x number of points. And it is true that we could kind of leave the points
+alone for periods where there are only new points.
+Because, for a certain time period... could we just promote the time periods
+themselves? So certain time periods would have time jump "parents" 
+while others did not.
+
+I think this is how it's going to go down. At the first overlap we'll
+create the other guys. Yes it sucks to have 3 or 4 copies of the same
+data, but we haven't got a choice. However, there is another issue here.
+Suppose we look at the data, but choose 2.5 years and they've been running
+it for 3?
+
+Then we couldn't use the infinite time period at all. We could use
+maybe about a month of data.
+
+12/11/10
+
+So the idea is that we have several layers of time jumps.
+We start out with zero time jumps, just the raw data.
+When a time jump would be useful, we create all
+time jump levels.
+
+Time jump levels will granualize the start time. This is ok
+because when we look at the points themselves, they will
+have the exact start time and end time. 
+
+So now we are thinking of keeping a count of unique points.
+When that count falls below a certain percentage compared
+to the total number of points, we split.
+
+Then we base the split based on the number of points.
+
+As far as representation, we will have time, then point. If multiple
+points occupy the same time, we will have
+time
+point1
+time
+point2
+...
+
+for example
+
+100
+1
+111
+2
+111
+3
+150
+4
+
+
+--
+
+Testing
+
+12/12
+
+What about a functional test?
+
+So methods reference other methods and objects.
+
+All we'd need to do is make some sort of annotation (not a java one which I don't
+understand) for each method saying there is a testing framework.
+Then we do something like:
+
+public class XTest extends XTestFramework
+{
+     public X()
+     {
+
+
+     }
+}
+
+Then in XTestFramework, we manually define all the crap...
+Hmm... except the class names, I mean... I don't know.
+
+Yea, it'd work.
+
+So, we'd just put //TIMTEST in front and in end
+
+We'd just put //TIMTEST # where # indicates which methods should
+be consolidated in one test
+
+Yea, but it's a pain to define everything.... don't know, tabled for now.
+
+---
+
+So the thing to remember is that the only savings we get is in the rounding
+of the instances of the time points. Because we round all the time points either 
+to the previous or the next month.
+
+12/15
+
+FACT: The time jumps really only need to be big enough to handle the amount of time
+people come back to familiar places. It's *only* for the home work home homebody.
+So having a day and a week time jump is just fine. 
+
+A fixed set of constants is just fine. Because 1) the behavior of the user might change.
+2) 
+
+
+2/21
+
+BC version 1.45
+null
+null
+null
+null
+[Alg.Alias.AlgorithmParameters.1.2.840.113549.1.12.1.1=PKCS12PBE, Alg.Alias.Mac.1.2.840.113549.2.9=HMACSHA256, Alg.Alias.Signature.SHA384withRSA=SHA384WithRSAEncryption, Alg.Alias.Signature.MD5withRSA=MD5WithRSAEncryption, Alg.Alias.AlgorithmParameters.PBEWITHSHAAND256BITAES-CBC-BC=PKCS12PBE, Alg.Alias.AlgorithmParameters.1.2.840.113549.1.12.1.4=PKCS12PBE, Alg.Alias.Signature.MD5/RSA=MD5WithRSAEncryption, Alg.Alias.AlgorithmParameters.1.2.840.113549.1.12.1.5=PKCS12PBE, Alg.Alias.AlgorithmParameters.1.3.6.1.4.1.22554.1.1.2.1.42=PKCS12PBE, Alg.Alias.AlgorithmParameters.1.2.840.113549.1.12.1.2=PKCS12PBE, Alg.Alias.AlgorithmParameters.1.2.840.113549.1.12.1.3=PKCS12PBE, Alg.Alias.Signature.1.3.14.3.2.26with1.2.840.113549.1.1.1=SHA1WithRSAEncryption, Cipher.PBEWITHSHAAND40BITRC4=org.bouncycastle.jce.provider.JCEStreamCipher$PBEWithSHAAnd40BitRC4, Alg.Alias.AlgorithmParameters.1.2.840.113549.1.12.1.6=PKCS12PBE, Alg.Alias.Signature.1.3.14.3.2.26with1.2.840.113549.1.1.5=SHA1WithRSAEncryption, Alg.Alias.Mac.1.2.840.113549.2.7=HMACSHA1, Alg.Alias.SecretKeyFactory.PBEWithSHAAnd3KeyTripleDES=PBEWITHSHAAND3-KEYTRIPLEDES-CBC, Cipher.RSA=org.bouncycastle.jce.provider.JCERSACipher$NoPadding, Alg.Alias.Signature.SHA512WITHRSAENCRYPTION=SHA512WithRSAEncryption, Alg.Alias.Mac.HMAC-SHA384=HMACSHA384, Alg.Alias.CertPathBuilder.RFC3280=PKIX, KeyPairGenerator.DH=org.bouncycastle.jce.provider.JDKKeyPairGenerator$DH, Signature.SHA384WithRSAEncryption=org.bouncycastle.jce.provider.JDKDigestSignature$SHA384WithRSAEncryption, Alg.Alias.SecretKeyFactory.PBEWITHSHA-1AND256BITAES-CBC-BC=PBEWITHSHAAND256BITAES-CBC-BC, Alg.Alias.SecretKeyFactory.PBEWITHSHA1ANDDES-CBC=PBEWITHSHA1ANDDES, Cipher.PBEWITHSHAAND40BITRC2-CBC=org.bouncycastle.jce.provider.JCEBlockCipher$PBEWithSHAAnd40BitRC2, Alg.Alias.AlgorithmParameters.PBEWITHSHA256AND128BITAES-CBC-BC=PKCS12PBE, Alg.Alias.Cipher.2.16.840.1.101.3.4.2=AES, KeyFactory.RSA=org.bouncycastle.jce.provider.JDKKeyFactory$RSA, Alg.Alias.AlgorithmParameters.PBEWITHSHA-1AND256BITAES-CBC-BC=PKCS12PBE, Mac.HMACSHA256=org.bouncycastle.jce.provider.JCEMac$SHA256, MessageDigest.SHA-256=org.bouncycastle.jce.provider.JDKMessageDigest$SHA256, Alg.Alias.SecretKeyFactory.1.2.840.113549.1.12.1.2=PBEWITHSHAAND40BITRC4, Alg.Alias.SecretKeyFactory.1.2.840.113549.1.12.1.3=PBEWITHSHAAND3-KEYTRIPLEDES-CBC, Alg.Alias.AlgorithmParameters.PBEWITHSHA1AND256BITAES-CBC-BC=PKCS12PBE, Alg.Alias.SecretKeyFactory.1.2.840.113549.1.12.1.1=PBEWITHSHAAND128BITRC4, Alg.Alias.SecretKeyFactory.1.2.840.113549.1.12.1.6=PBEWITHSHAAND40BITRC2-CBC, Mac.HMACSHA1=org.bouncycastle.jce.provider.JCEMac$SHA1, Alg.Alias.MessageDigest.SHA=SHA-1, Alg.Alias.SecretKeyFactory.1.2.840.113549.1.12.1.4=PBEWITHSHAAND2-KEYTRIPLEDES-CBC, Alg.Alias.SecretKeyFactory.1.2.840.113549.1.12.1.5=PBEWITHSHAAND128BITRC2-CBC, SecretKeyFactory.PBEWITHSHA256AND192BITAES-CBC-BC=org.bouncycastle.jce.provider.JCESecretKeyFactory$PBEWithSHA256And192BitAESBC, Alg.Alias.Cipher.PBEWITHSHA1AND256BITAES-CBC-BC=PBEWITHSHAAND256BITAES-CBC-BC, Alg.Alias.Cipher.PBEWITHSHA1AND40BITRC4=PBEWITHSHAAND40BITRC4, Alg.Alias.Cipher.1.3.6.1.4.1.22554.1.1.2.1.2=PBEWITHSHAAND128BITAES-CBC-BC, Alg.Alias.SecretKeyFactory.PBEWITHSHA1AND256BITAES-CBC-BC=PBEWITHSHAAND256BITAES-CBC-BC, Alg.Alias.Signature.SHA256withRSA=SHA256WithRSAEncryption, Alg.Alias.AlgorithmParameters.2.16.840.1.101.3.4.42=AES, Alg.Alias.AlgorithmParameters.PBEWITHSHAAND128BITRC4=PKCS12PBE, Alg.Alias.SecretKeyFactory.1.3.6.1.4.1.22554.1.1.2.1.22=PBEWITHSHAAND192BITAES-CBC-BC, SecretKeyFactory.PBEWITHSHAAND192BITAES-CBC-BC=org.bouncycastle.jce.provider.JCESecretKeyFactory$PBEWithSHAAnd192BitAESBC, Alg.Alias.AlgorithmParameterGenerator.DIFFIEHELLMAN=DH, Alg.Alias.Signature.1.2.840.10040.4.3=SHA1withDSA, AlgorithmParameters.DES=org.bouncycastle.jce.provider.JDKAlgorithmParameters$IVAlgorithmParameters, SecretKeyFactory.PBEWITHSHA1ANDRC2=org.bouncycastle.jce.provider.JCESecretKeyFactory$PBEWithSHA1AndRC2, Alg.Alias.AlgorithmParameters.1.3.6.1.4.1.22554.1.1.2.1.22=PKCS12PBE, Alg.Alias.Signature.1.2.840.113549.1.1.5=SHA1WithRSAEncryption, Alg.Alias.Signature.1.2.840.113549.1.1.4=MD5WithRSAEncryption, Alg.Alias.SecretKeyFactory.1.2.840.113549.1.5.11=PBEWITHSHA1ANDRC2, Alg.Alias.SecretKeyFactory.1.2.840.113549.1.5.10=PBEWITHSHA1ANDDES, Alg.Alias.MessageDigest.SHA256=SHA-256, Cipher.PBEWITHSHA1ANDDES=org.bouncycastle.jce.provider.JCEBlockCipher$PBEWithSHA1AndDES, Alg.Alias.KeyStore.BOUNCYCASTLE=BouncyCastle, Alg.Alias.Signature.SHA256WITHRSAENCRYPTION=SHA256WithRSAEncryption, Alg.Alias.Signature.SHA1WithRSA=SHA1WithRSAEncryption, Alg.Alias.Mac.1.3.6.1.5.5.8.1.2=HMACSHA1, Alg.Alias.Mac.1.3.6.1.5.5.8.1.1=HMACMD5, Alg.Alias.KeyGenerator.HMAC-MD5=HMACMD5, Alg.Alias.SecretKeyFactory.PBEWITHSHA-256AND256BITAES-CBC-BC=PBEWITHSHA256AND256BITAES-CBC-BC, KeyStore.PKCS12=org.bouncycastle.jce.provider.JDKPKCS12KeyStore$BCPKCS12KeyStore, Alg.Alias.AlgorithmParameters.2.16.840.1.101.3.4.2=AES, Cipher.PBEWITHMD5AND192BITAES-CBC-OPENSSL=org.bouncycastle.jce.provider.JCEBlockCipher$PBEWithAESCBC, Mac.PBEWITHHMACSHA1=org.bouncycastle.jce.provider.JCEMac$PBEWithSHA, MessageDigest.SHA-384=org.bouncycastle.jce.provider.JDKMessageDigest$SHA384, Signature.SHA256WithRSAEncryption=org.bouncycastle.jce.provider.JDKDigestSignature$SHA256WithRSAEncryption, Alg.Alias.KeyGenerator.HMAC/SHA256=HMACSHA256, Alg.Alias.Cipher.PBEWITHSHA1AND128BITRC2-CBC=PBEWITHSHAAND128BITRC2-CBC, Alg.Alias.MessageDigest.2.16.840.1.101.3.4.2.1=SHA-256, Alg.Alias.AlgorithmParameters.2.16.840.1.101.3.4.22=AES, Alg.Alias.Cipher.1.2.840.113549.3.4=ARC4, Alg.Alias.MessageDigest.2.16.840.1.101.3.4.2.3=SHA-512, Alg.Alias.MessageDigest.SHA384=SHA-384, Alg.Alias.MessageDigest.2.16.840.1.101.3.4.2.2=SHA-384, Alg.Alias.AlgorithmParameters.PBEWITHSHA-256AND192BITAES-CBC-BC=PKCS12PBE, MessageDigest.SHA-512=org.bouncycastle.jce.provider.JDKMessageDigest$SHA512, Alg.Alias.KeyStore.UBER=BouncyCastle, Alg.Alias.Cipher.RSA/RAW=RSA, Alg.Alias.AlgorithmParameters.PBEWITHSHA1ANDRC2=PKCS12PBE, AlgorithmParameterGenerator.DSA=org.bouncycastle.jce.provider.JDKAlgorithmParameterGenerator$DSA, Alg.Alias.Signature.MD5withRSAEncryption=MD5WithRSAEncryption, Alg.Alias.Signature.SHA1withRSA=SHA1WithRSAEncryption, Provider.id name=BC, Alg.Alias.KeyStore.bouncycastle=BouncyCastle, Alg.Alias.AlgorithmParameters.PBEWITHSHAAND128BITRC2-CBC=PKCS12PBE, Alg.Alias.Signature.SHA512withRSAEncryption=SHA512WithRSAEncryption, KeyGenerator.HMACMD5=org.bouncycastle.jce.provider.JCEKeyGenerator$MD5HMAC, Alg.Alias.AlgorithmParameters.PBEWITHSHA-256AND128BITAES-CBC-BC=PKCS12PBE, SecretKeyFactory.PBEWITHMD5AND256BITAES-CBC-OPENSSL=org.bouncycastle.jce.provider.JCESecretKeyFactory$PBEWithMD5And256BitAESCBCOpenSSL, Alg.Alias.SecretKeyFactory.PBEWITHSHA-256AND128BITAES-CBC-BC=PBEWITHSHA256AND128BITAES-CBC-BC, Alg.Alias.SecretKeyFactory.1.3.6.1.4.1.22554.1.1.2.1.42=PBEWITHSHAAND256BITAES-CBC-BC, Cipher.PBEWITHSHAANDTWOFISH-CBC=org.bouncycastle.jce.provider.JCEBlockCipher$PBEWithSHAAndTwofish, Alg.Alias.KeyGenerator.1.2.840.113549.2.7=HMACSHA1, Alg.Alias.KeyGenerator.1.2.840.113549.2.9=HMACSHA256, Cipher.PBEWITHSHAAND128BITAES-CBC-BC=org.bouncycastle.jce.provider.JCEBlockCipher$PBEWithAESCBC, SecretKeyFactory.PBEWITHMD5ANDRC2=org.bouncycastle.jce.provider.JCESecretKeyFactory$PBEWithMD5AndRC2, Alg.Alias.Mac.HMAC/SHA512=HMACSHA512, AlgorithmParameters.BLOWFISH=org.bouncycastle.jce.provider.JDKAlgorithmParameters$IVAlgorithmParameters, KeyStore.BouncyCastle=org.bouncycastle.jce.provider.JDKKeyStore$BouncyCastleStore, Alg.Alias.Cipher.2.16.840.1.101.3.4.1.25=AESWRAP, Alg.Alias.Cipher.2.16.840.1.101.3.4.1.24=AES, Alg.Alias.Cipher.2.16.840.1.101.3.4.1.23=AES, KeyFactory.DH=org.bouncycastle.jce.provider.JDKKeyFactory$DH, Alg.Alias.Cipher.PBEWITHSHA1ANDDESEDE=PBEWITHSHAAND3-KEYTRIPLEDES-CBC, Alg.Alias.Signature.SHA512WithRSAEncryption=SHA512WithRSAEncryption, AlgorithmParameterGenerator.DH=org.bouncycastle.jce.provider.JDKAlgorithmParameterGenerator$DH, CertPathValidator.PKIX=org.bouncycastle.jce.provider.PKIXCertPathValidatorSpi, Alg.Alias.Signature.DSAWITHSHA1=SHA1withDSA, Alg.Alias.AlgorithmParameters.PBEWITHSHAAND128BITAES-CBC-BC=PKCS12PBE, Signature.SHA512WithRSAEncryption=org.bouncycastle.jce.provider.JDKDigestSignature$SHA512WithRSAEncryption, Alg.Alias.KeyGenerator.HMAC/SHA384=HMACSHA384, Alg.Alias.Cipher.1.3.6.1.4.1.22554.1.1.2.1.42=PBEWITHSHAAND256BITAES-CBC-BC, Alg.Alias.KeyGenerator.HMAC/MD5=HMACMD5, SecretKeyFactory.PBEWITHSHAAND128BITAES-CBC-BC=org.bouncycastle.jce.provider.JCESecretKeyFactory$PBEWithSHAAnd128BitAESBC, Alg.Alias.SecretKeyFactory.1.3.14.3.2.26=PBEWITHHMACSHA1, Alg.Alias.Mac.HMAC/MD5=HMACMD5, Alg.Alias.SecretKeyFactory.PBEWITHSHA-256AND192BITAES-CBC-BC=PBEWITHSHA256AND192BITAES-CBC-BC, Alg.Alias.SecretKeyFactory.PBEWITHSHA1ANDRC2-CBC=PBEWITHSHA1ANDRC2, Alg.Alias.Cipher.PBEWITHSHA-1AND192BITAES-CBC-BC=PBEWITHSHAAND192BITAES-CBC-BC, Alg.Alias.MessageDigest.1.3.14.3.2.26=SHA-1, Cipher.PBEWITHSHAAND3-KEYTRIPLEDES-CBC=org.bouncycastle.jce.provider.JCEBlockCipher$PBEWithSHAAndDES3Key, SecretKeyFactory.PBKDF2WithHmacSHA1=org.bouncycastle.jce.provider.JCESecretKeyFactory$PBKDF2WithHmacSHA1, SecretKeyFactory.PBEWITHSHAAND128BITRC4=org.bouncycastle.jce.provider.JCESecretKeyFactory$PBEWithSHAAnd128BitRC4, Alg.Alias.AlgorithmParameters.1.3.6.1.4.1.3029.1.2=BLOWFISH, Alg.Alias.Cipher.PBEWITHSHA-1AND128BITAES-CBC-BC=PBEWITHSHAAND128BITAES-CBC-BC, Alg.Alias.Cipher.2.16.840.1.101.3.4.1.21=AES, MessageDigest.SHA-1=org.bouncycastle.jce.provider.JDKMessageDigest$SHA1, AlgorithmParameters.PKCS12PBE=org.bouncycastle.jce.provider.JDKAlgorithmParameters$PKCS12PBE, Alg.Alias.Cipher.2.16.840.1.101.3.4.1.22=AES, SecretKeyFactory.PBEWITHHMACSHA1=org.bouncycastle.jce.provider.JCESecretKeyFactory$PBEWithSHA, Alg.Alias.AlgorithmParameters.PBEWITHSHA-256AND256BITAES-CBC-BC=PKCS12PBE, Alg.Alias.AlgorithmParameters.PBEWithSHAAnd3KeyTripleDES=PKCS12PBE, Alg.Alias.KeyGenerator.HMAC/SHA512=HMACSHA512, KeyFactory.DSA=org.bouncycastle.jce.provider.JDKKeyFactory$DSA...
+BouncyCastle Security Provider v1.45
+null
+X.509
+CertificateFactory
+null
+[Provider BC Service SecretKeyFactory.PBEWITHSHA1ANDDES org.bouncycastle.jce.provider.JCESecretKeyFactory$PBEWithSHA1AndDES
+Aliases [PBEWITHSHA1ANDDES-CBC, 1.2.840.113549.1.5.10]
+Attributes {}, Provider BC Service KeyGenerator.DESEDE org.bouncycastle.jce.provider.JCEKeyGenerator$DESede
+Aliases []
+Attributes {}, Provider BC Service KeyPairGenerator.RSA org.bouncycastle.jce.provider.JDKKeyPairGenerator$RSA
+Aliases [1.2.840.113549.1.1.1]
+Attributes {}, Provider BC Service KeyGenerator.BLOWFISH org.bouncycastle.jce.provider.JCEKeyGenerator$Blowfish
+Aliases [1.3.6.1.4.1.3029.1.2]
+Attributes {}, Provider BC Service Cipher.PBEWITHSHAAND192BITAES-CBC-BC org.bouncycastle.jce.provider.JCEBlockCipher$PBEWithAESCBC
+Aliases [PBEWITHSHA-1AND192BITAES-CBC-BC, 1.3.6.1.4.1.22554.1.1.2.1.22, PBEWITHSHA1AND192BITAES-CBC-BC]
+Attributes {}, Provider BC Service KeyGenerator.RC4 org.bouncycastle.jce.provider.JCEKeyGenerator$RC4
+Aliases [ARC4, ARCFOUR]
+Attributes {}, Provider BC Service Cipher.PBEWITHSHAAND40BITRC2-CBC org.bouncycastle.jce.provider.JCEBlockCipher$PBEWithSHAAnd40BitRC2
+Aliases [1.2.840.113549.1.12.1.6, PBEWITHSHA1AND40BITRC2-CBC]
+Attributes {}, Provider BC Service MessageDigest.SHA-384 org.bouncycastle.jce.provider.JDKMessageDigest$SHA384
+Aliases [SHA384, 2.16.840.1.101.3.4.2.2]
+Attributes {}, Provider BC Service SecretKeyFactory.PBEWITHSHAAND40BITRC2-CBC org.bouncycastle.jce.provider.JCESecretKeyFactory$PBEWithSHAAnd40BitRC2
+Aliases [1.2.840.113549.1.12.1.6]
+Attributes {}, Provider BC Service Cipher.AESWRAP org.bouncycastle.jce.provider.symmetric.AES$Wrap
+Aliases [2.16.840.1.101.3.4.1.25, 2.16.840.1.101.3.4.1.5, 2.16.840.1.101.3.4.1.45]
+Attributes {}, Provider BC Service KeyGenerator.HMACSHA256 org.bouncycastle.jce.provider.JCEKeyGenerator$HMACSHA256
+Aliases [HMAC/SHA256, 1.2.840.113549.2.9, HMAC-SHA256]
+Attributes {}, Provider BC Service Cipher.AES org.bouncycastle.jce.provider.symmetric.AES$ECB
+Aliases [2.16.840.1.101.3.4.2, 2.16.840.1.101.3.4.1.24, 2.16.840.1.101.3.4.1.23, 2.16.840.1.101.3.4.1.21, 2.16.840.1.101.3.4.1.22, 2.16.840.1.101.3.4.1.4, 2.16.840.1.101.3.4.1.3, 2.16.840.1.101.3.4.1.2, 2.16.840.1.101.3.4.1.1, 2.16.840.1.101.3.4.1.44, 2.16.840.1.101.3.4.1.43, 2.16.840.1.101.3.4.1.42, 2.16.840.1.101.3.4.1.41, 2.16.840.1.101.3.4.42, 2.16.840.1.101.3.4.22]
+Attributes {}, Provider BC Service CertPathBuilder.PKIX org.bouncycastle.jce.provider.PKIXCertPathBuilderSpi
+Aliases [RFC3280]
+Attributes {}, Provider BC Service Cipher.PBEWITHSHA1ANDDES org.bouncycastle.jce.provider.JCEBlockCipher$PBEWithSHA1AndDES
+Aliases []
+Attributes {}, Provider BC Service Cipher.PBEWITHSHA256AND256BITAES-CBC-BC org.bouncycastle.jce.provider.JCEBlockCipher$PBEWithAESCBC
+Aliases [1.3.6.1.4.1.22554.1.2.1.2.1.42, PBEWITHSHA-256AND256BITAES-CBC-BC]
+Attributes {}, Provider BC Service Cipher.PBEWITHSHAANDTWOFISH-CBC org.bouncycastle.jce.provider.JCEBlockCipher$PBEWithSHAAndTwofish
+Aliases []
+Attributes {}, Provider BC Service Signature.SHA256WithRSAEncryption org.bouncycastle.jce.provider.JDKDigestSignature$SHA256WithRSAEncryption
+Aliases [SHA256withRSA, SHA256WITHRSAENCRYPTION, SHA256withRSAEncryption, SHA256WithRSA, SHA256WithRSAEncryption, 1.2.840.113549.1.1.11]
+Attributes {}, Provider BC Service Cipher.PBEWITHMD5AND256BITAES-CBC-OPENSSL org.bouncycastle.jce.provider.JCEBlockCipher$PBEWithAESCBC
+Aliases []
+Attributes {}, Provider BC Service Cipher.PBEWITHMD5AND128BITAES-CBC-OPENSSL org.bouncycastle.jce.provider.JCEBlockCipher$PBEWithAESCBC
+Aliases []
+Attributes {}, Provider BC Service Cipher.PBEWITHSHAAND256BITAES-CBC-BC org.bouncycastle.jce.provider.JCEBlockCipher$PBEWithAESCBC
+Aliases [PBEWITHSHA1AND256BITAES-CBC-BC, 1.3.6.1.4.1.22554.1.1.2.1.42, PBEWITHSHA-1AND256BITAES-CBC-BC]
+Attributes {}, Provider BC Service SecretKeyFactory.PBEWITHMD5AND192BITAES-CBC-OPENSSL org.bouncycastle.jce.provider.JCESecretKeyFactory$PBEWithMD5And192BitAESCBCOpenSSL
+Aliases []
+Attributes {}, Provider BC Service MessageDigest.SHA-1 org.bouncycastle.jce.provider.JDKMessageDigest$SHA1
+Aliases [SHA, 1.3.14.3.2.26, SHA1]
+Attributes {}, Provider BC Service Mac.PBEWITHHMACSHA1 org.bouncycastle.jce.provider.JCEMac$PBEWithSHA
+Aliases []
+Attributes {}, Provider BC Service SecretKeyFactory.PBEWITHMD5AND256BITAES-CBC-OPENSSL org.bouncycastle.jce.provider.JCESecretKeyFactory$PBEWithMD5And256BitAESCBCOpenSSL
+Aliases []
+Attributes {}, Provider BC Service Signature.SHA1withDSA org.bouncycastle.jce.provider.JDKDSASigner$stdDSA
+Aliases [1.2.840.10040.4.3, DSAWITHSHA1, SHA1WITHDSA, DSAWithSHA1, DSA, SHA/DSA, SHA1WithDSA, 1.3.14.3.2.26with1.2.840.10040.4.3, 1.3.14.3.2.26with1.2.840.10040.4.1, DSAwithSHA1]
+Attributes {}, Provider BC Service SecretKeyFactory.PBEWITHSHAANDTWOFISH-CBC org.bouncycastle.jce.provider.JCESecretKeyFactory$PBEWithSHAAndTwofish
+Aliases []
+Attributes {}, Provider BC Service Cipher.PBEWITHMD5AND192BITAES-CBC-OPENSSL org.bouncycastle.jce.provider.JCEBlockCipher$PBEWithAESCBC
+Aliases []
+Attributes {}, Provider BC Service SecretKeyFactory.PBEWITHSHAAND3-KEYTRIPLEDES-CBC org.bouncycastle.jce.provider.JCESecretKeyFactory$PBEWithSHAAndDES3Key
+Aliases [PBEWithSHAAnd3KeyTripleDES, 1.2.840.113549.1.12.1.3]
+Attributes {}, Provider BC Service KeyGenerator.HMACSHA512 org.bouncycastle.jce.provider.JCEKeyGenerator$HMACSHA512
+Aliases [HMAC/SHA512, 1.2.840.113549.2.11, HMAC-SHA512]
+Attributes {}, Provider BC Service CertPathValidator.PKIX org.bouncycastle.jce.provider.PKIXCertPathValidatorSpi
+Aliases [RFC3280]
+Attributes {}, Provider BC Service Cipher.DESEDE org.bouncycastle.jce.provider.JCEBlockCipher$DESede
+Aliases []
+Attributes {}, Provider BC Service Signature.SHA512WithRSAEncryption org.bouncycastle.jce.provider.JDKDigestSignature$SHA512WithRSAEncryption
+Aliases [SHA512WITHRSAENCRYPTION, SHA512withRSAEncryption, SHA512WithRSAEncryption, SHA512WithRSA, SHA512withRSA, 1.2.840.113549.1.1.13]
+Attributes {}, Provider BC Service SecretKeyFactory.PBEWITHSHAAND2-KEYTRIPLEDES-CBC org.bouncycastle.jce.provider.JCESecretKeyFactory$PBEWithSHAAndDES2Key
+Aliases [1.2.840.113549.1.12.1.4]
+Attributes {}, Provider BC Service AlgorithmParameters.AES org.bouncycastle.jce.provider.symmetric.AES$AlgParams
+Aliases [2.16.840.1.101.3.4.42, 2.16.840.1.101.3.4.2, 2.16.840.1.101.3.4.22, 2.16.840.1.101.3.4.1.22, 2.16.840.1.101.3.4.1.42, 2.16.840.1.101.3.4.1.2]
+Attributes {}, Provider BC Service SecretKeyFactory.PBEWITHSHAAND128BITAES-CBC-BC org.bouncycastle.jce.provider.JCESecretKeyFactory$PBEWithSHAAnd128BitAESBC
+Aliases [PBEWITHSHA1AND128BITAES-CBC-BC, 1.3.6.1.4.1.22554.1.1.2.1.2, PBEWITHSHA-1AND128BITAES-CBC-BC]
+Attributes {}, Provider BC Service Cipher.PBEWITHSHA256AND128BITAES-CBC-BC org.bouncycastle.jce.provider.JCEBlockCipher$PBEWithAESCBC
+Aliases [1.3.6.1.4.1.22554.1.2.1.2.1.2, PBEWITHSHA-256AND128BITAES-CBC-BC]
+Attributes {}, Provider BC Service AlgorithmParameterGenerator.DSA org.bouncycastle.jce.provider.JDKAlgorithmParameterGenerator$DSA
+Aliases []
+Attributes {}, Provider BC Service SecretKeyFactory.PBKDF2WithHmacSHA1 org.bouncycastle.jce.provider.JCESecretKeyFactory$PBKDF2WithHmacSHA1
+Aliases []
+Attributes {}, Provider BC Service SecretKeyFactory.PBEWITHSHAAND128BITRC4 org.bouncycastle.jce.provider.JCESecretKeyFactory$PBEWithSHAAnd128BitRC4
+Aliases [1.2.840.113549.1.12.1.1]
+Attributes {}, Provider BC Service KeyGenerator.HMACSHA1 org.bouncycastle.jce.provider.JCEKeyGenerator$HMACSHA1
+Aliases [1.2.840.113549.2.7, HMAC/SHA1, HMAC-SHA1, 1.3.6.1.5.5.8.1.2]
+Attributes {}, Provider BC Service Mac.HMACSHA256 org.bouncycastle.jce.provider.JCEMac$SHA256
+Aliases [1.2.840.113549.2.9, HMAC-SHA256, HMAC/SHA256]
+Attributes {}, Provider BC Service Mac.HMACSHA384 org.bouncycastle.jce.provider.JCEMac$SHA384
+Aliases [HMAC-SHA384, 1.2.840.113549.2.10, HMAC/SHA384]
+Attributes {}, Provider BC Service SecretKeyFactory.PBEWITHMD5AND128BITAES-CBC-OPENSSL org.bouncycastle.jce.provider.JCESecretKeyFactory$PBEWithMD5And128BitAESCBCOpenSSL
+Aliases []
+Attributes {}, Provider BC Service Cipher.BLOWFISH org.bouncycastle.jce.provider.JCEBlockCipher$Blowfish
+Aliases []
+Attributes {}, Provider BC Service AlgorithmParameterGenerator.DH org.bouncycastle.jce.provider.JDKAlgorithmParameterGenerator$DH
+Aliases [DIFFIEHELLMAN]
+Attributes {}, Provider BC Service SecretKeyFactory.PBEWITHSHA256AND256BITAES-CBC-BC org.bouncycastle.jce.provider.JCESecretKeyFactory$PBEWithSHA256And256BitAESBC
+Aliases [PBEWITHSHA-256AND256BITAES-CBC-BC, 1.3.6.1.4.1.22554.1.2.1.2.1.42]
+Attributes {}, Provider BC Service Mac.HMACSHA1 org.bouncycastle.jce.provider.JCEMac$SHA1
+Aliases [1.2.840.113549.2.7, 1.3.6.1.5.5.8.1.2, HMAC/SHA1, HMAC-SHA1]
+Attributes {}, Provider BC Service Signature.MD5WithRSAEncryption org.bouncycastle.jce.provider.JDKDigestSignature$MD5WithRSAEncryption
+Aliases [MD5withRSA, MD5/RSA, 1.2.840.113549.1.1.4, MD5withRSAEncryption, MD5WithRSA, 1.2.840.113549.2.5with1.2.840.113549.1.1.1, MD5WITHRSAENCRYPTION, MD5WITHRSA]
+Attributes {}, Provider BC Service Cipher.PBEWITHSHA1ANDRC2 org.bouncycastle.jce.provider.JCEBlockCipher$PBEWithSHA1AndRC2
+Aliases []
+Attributes {}, Provider BC Service SecretKeyFactory.PBEWITHSHA256AND192BITAES-CBC-BC org.bouncycastle.jce.provider.JCESecretKeyFactory$PBEWithSHA256And192BitAESBC
+Aliases [PBEWITHSHA-256AND192BITAES-CBC-BC, 1.3.6.1.4.1.22554.1.2.1.2.1.22]
+Attributes {}, Provider BC Service Cipher.PBEWITHSHA256AND192BITAES-CBC-BC org.bouncycastle.jce.provider.JCEBlockCipher$PBEWithAESCBC
+Aliases [PBEWITHSHA-256AND192BITAES-CBC-BC, 1.3.6.1.4.1.22554.1.2.1.2.1.22]
+Attributes {}, Provider BC Service Cipher.PBEWITHMD5ANDRC2 org.bouncycastle.jce.provider.JCEBlockCipher$PBEWithMD5AndRC2
+Aliases []
+Attributes {}, Provider BC Service Cipher.PBEWITHSHAAND128BITAES-CBC-BC org.bouncycastle.jce.provider.JCEBlockCipher$PBEWithAESCBC
+Aliases [1.3.6.1.4.1.22554.1.1.2.1.2, PBEWITHSHA-1AND128BITAES-CBC-BC, PBEWITHSHA1AND128BITAES-CBC-BC]
+Attributes {}, Provider BC Service SecretKeyFactory.PBEWITHMD5ANDDES org.bouncycastle.jce.provider.JCESecretKeyFactory$PBEWithMD5AndDES
+Aliases [PBEWITHMD5ANDDES-CBC, 1.2.840.113549...
+null
+353
+BC
+{KeyGeneratorHMAC-SHA1=Provider BC Service KeyGenerator.HMACSHA1 org.bouncycastle.jce.provider.JCEKeyGenerator$HMACSHA1
+Aliases [1.2.840.113549.2.7, HMAC/SHA1, HMAC-SHA1, 1.3.6.1.5.5.8.1.2]
+Attributes {}, Cipher1.3.6.1.4.1.22554.1.1.2.1.22=Provider BC Service Cipher.PBEWITHSHAAND192BITAES-CBC-BC org.bouncycastle.jce.provider.JCEBlockCipher$PBEWithAESCBC
+Aliases [PBEWITHSHA-1AND192BITAES-CBC-BC, 1.3.6.1.4.1.22554.1.1.2.1.22, PBEWITHSHA1AND192BITAES-CBC-BC]
+Attributes {}, Signature1.2.840.113549.1.1.4=Provider BC Service Signature.MD5WithRSAEncryption org.bouncycastle.jce.provider.JDKDigestSignature$MD5WithRSAEncryption
+Aliases [MD5withRSA, MD5/RSA, 1.2.840.113549.1.1.4, MD5withRSAEncryption, MD5WithRSA, 1.2.840.113549.2.5with1.2.840.113549.1.1.1, MD5WITHRSAENCRYPTION, MD5WITHRSA]
+Attributes {}, AlgorithmParametersPBEWITHSHAAND128BITAES-CBC-BC=Provider BC Service AlgorithmParameters.PKCS12PBE org.bouncycastle.jce.provider.JDKAlgorithmParameters$PKCS12PBE
+Aliases [1.2.840.113549.1.12.1.1, PBEWITHSHAAND256BITAES-CBC-BC, 1.2.840.113549.1.12.1.4, 1.2.840.113549.1.12.1.5, 1.3.6.1.4.1.22554.1.1.2.1.42, 1.2.840.113549.1.12.1.2, 1.2.840.113549.1.12.1.3, 1.2.840.113549.1.12.1.6, PBEWITHSHA256AND128BITAES-CBC-BC, PBEWITHSHA-1AND256BITAES-CBC-BC, PBEWITHSHA1AND256BITAES-CBC-BC, PBEWITHSHAAND128BITRC4, 1.3.6.1.4.1.22554.1.1.2.1.22, PBEWITHSHA-256AND192BITAES-CBC-BC, PBEWITHSHA1ANDRC2, PBEWITHSHAAND128BITRC2-CBC, PBEWITHSHA-256AND128BITAES-CBC-BC, PBEWITHSHAAND128BITAES-CBC-BC, PBEWITHSHA-256AND256BITAES-CBC-BC, PBEWithSHAAnd3KeyTripleDES, PBEWITHSHAAND3-KEYTRIPLEDES-CBC, PBEWITHSHAAND2-KEYTRIPLEDES-CBC, PBEWITHSHA1AND192BITAES-CBC-BC, PBEWITHSHA1AND128BITAES-CBC-BC, PBEWITHSHA-1AND128BITAES-CBC-BC, PBEWITHSHA256AND256BITAES-CBC-BC, 1.3.6.1.4.1.22554.1.1.2.1.2, PBEWITHSHAANDTWOFISH-CBC, 1.3.6.1.4.1.22554.1.2.1.2.1.42, PBEWITHSHAAND40BITRC4, PBEWITHSHAANDTWOFISH, 1.3.6.1.4.1.22554.1.2.1.2.1.22, PBEWITHSHA256AND192BITAES-CBC-BC, PBEWITHSHA-1AND192BITAES-CBC-BC, 1.3.6.1.4.1.22554.1.2.1.2.1.2, PBEWITHSHAAND192BITAES-CBC-BC, PBEWITHSHAAND40BITRC2-CBC]
+Attributes {}, Signature1.2.840.113549.1.1.5=Provider BC Service Signature.SHA1WithRSAEncryption org.bouncycastle.jce.provider.JDKDigestSignature$SHA1WithRSAEncryption
+Aliases [1.3.14.3.2.26with1.2.840.113549.1.1.1, 1.3.14.3.2.26with1.2.840.113549.1.1.5, 1.2.840.113549.1.1.5, SHA1WithRSA, SHA1withRSA, SHA1withRSAEncryption, SHA1/RSA, SHA1WITHRSAENCRYPTION, SHA1WITHRSA, SHA-1/RSA, 1.3.14.3.2.29]
+Attributes {}, Cipher1.2.840.113549.1.9.16.3.6=Provider BC Service Cipher.DESEDEWRAP org.bouncycastle.jce.provider.WrapCipherSpi$DESEDEWrap
+Aliases [1.2.840.113549.1.9.16.3.6]
+Attributes {}, AlgorithmParameters1.2.840.113549.3.7=Provider BC Service AlgorithmParameters.DESEDE org.bouncycastle.jce.provider.JDKAlgorithmParameters$IVAlgorithmParameters
+Aliases [1.2.840.113549.3.7]
+Attributes {}, AlgorithmParameters2.16.840.1.101.3.4.2=Provider BC Service AlgorithmParameters.AES org.bouncycastle.jce.provider.symmetric.AES$AlgParams
+Aliases [2.16.840.1.101.3.4.42, 2.16.840.1.101.3.4.2, 2.16.840.1.101.3.4.22, 2.16.840.1.101.3.4.1.22, 2.16.840.1.101.3.4.1.42, 2.16.840.1.101.3.4.1.2]
+Attributes {}, SecretKeyFactoryPBEWITHHMACSHA=Provider BC Service SecretKeyFactory.PBEWITHHMACSHA1 org.bouncycastle.jce.provider.JCESecretKeyFactory$PBEWithSHA
+Aliases [1.3.14.3.2.26, PBEWITHHMACSHA]
+Attributes {}, Cipher1.3.6.1.4.1.22554.1.1.2.1.2=Provider BC Service Cipher.PBEWITHSHAAND128BITAES-CBC-BC org.bouncycastle.jce.provider.JCEBlockCipher$PBEWithAESCBC
+Aliases [1.3.6.1.4.1.22554.1.1.2.1.2, PBEWITHSHA-1AND128BITAES-CBC-BC, PBEWITHSHA1AND128BITAES-CBC-BC]
+Attributes {}, KeyStorePKCS12-3DES-40RC2=Provider BC Service KeyStore.PKCS12 org.bouncycastle.jce.provider.JDKPKCS12KeyStore$BCPKCS12KeyStore
+Aliases [PKCS12-3DES-40RC2, BCPKCS12]
+Attributes {}, Mac1.3.6.1.5.5.8.1.1=Provider BC Service Mac.HMACMD5 org.bouncycastle.jce.provider.JCEMac$MD5
+Aliases [1.3.6.1.5.5.8.1.1, HMAC/MD5, HMAC-MD5]
+Attributes {}, Mac1.3.6.1.5.5.8.1.2=Provider BC Service Mac.HMACSHA1 org.bouncycastle.jce.provider.JCEMac$SHA1
+Aliases [1.2.840.113549.2.7, 1.3.6.1.5.5.8.1.2, HMAC/SHA1, HMAC-SHA1]
+Attributes {}, KeyFactory1.2.840.113549.1.1.1=Provider BC Service KeyFactory.RSA org.bouncycastle.jce.provider.JDKKeyFactory$RSA
+Aliases [1.2.840.113549.1.1.1]
+Attributes {}, SecretKeyFactoryPBEWITHSHA-1AND192BITAES-CBC-BC=Provider BC Service SecretKeyFactory.PBEWITHSHAAND192BITAES-CBC-BC org.bouncycastle.jce.provider.JCESecretKeyFactory$PBEWithSHAAnd192BitAESBC
+Aliases [1.3.6.1.4.1.22554.1.1.2.1.22, PBEWITHSHA-1AND192BITAES-CBC-BC, PBEWITHSHA1AND192BITAES-CBC-BC]
+Attributes {}, Cipher1.2.840.113549.3.4=Provider BC Service Cipher.ARC4 org.bouncycastle.jce.provider.JCEStreamCipher$RC4
+Aliases [1.2.840.113549.3.4, RC4, ARCFOUR]
+Attributes {}, MacHMAC/SHA1=Provider BC Service Mac.HMACSHA1 org.bouncycastle.jce.provider.JCEMac$SHA1
+Aliases [1.2.840.113549.2.7, 1.3.6.1.5.5.8.1.2, HMAC/SHA1, HMAC-SHA1]
+Attributes {}, SignatureSHA256WITHRSA=Provider BC Service Signature.SHA256WithRSAEncryption org.bouncycastle.jce.provider.JDKDigestSignature$SHA256WithRSAEncryption
+Aliases [SHA256withRSA, SHA256WITHRSAENCRYPTION, SHA256withRSAEncryption, SHA256WithRSA, SHA256WithRSAEncryption, 1.2.840.113549.1.1.11]
+Attributes {}, AlgorithmParameters1.3.6.1.4.1.22554.1.1.2.1.42=Provider BC Service AlgorithmParameters.PKCS12PBE org.bouncycastle.jce.provider.JDKAlgorithmParameters$PKCS12PBE
+Aliases [1.2.840.113549.1.12.1.1, PBEWITHSHAAND256BITAES-CBC-BC, 1.2.840.113549.1.12.1.4, 1.2.840.113549.1.12.1.5, 1.3.6.1.4.1.22554.1.1.2.1.42, 1.2.840.113549.1.12.1.2, 1.2.840.113549.1.12.1.3, 1.2.840.113549.1.12.1.6, PBEWITHSHA256AND128BITAES-CBC-BC, PBEWITHSHA-1AND256BITAES-CBC-BC, PBEWITHSHA1AND256BITAES-CBC-BC, PBEWITHSHAAND128BITRC4, 1.3.6.1.4.1.22554.1.1.2.1.22, PBEWITHSHA-256AND192BITAES-CBC-BC, PBEWITHSHA1ANDRC2, PBEWITHSHAAND128BITRC2-CBC, PBEWITHSHA-256AND128BITAES-CBC-BC, PBEWITHSHAAND128BITAES-CBC-BC, PBEWITHSHA-256AND256BITAES-CBC-BC, PBEWithSHAAnd3KeyTripleDES, PBEWITHSHAAND3-KEYTRIPLEDES-CBC, PBEWITHSHAAND2-KEYTRIPLEDES-CBC, PBEWITHSHA1AND192BITAES-CBC-BC, PBEWITHSHA1AND128BITAES-CBC-BC, PBEWITHSHA-1AND128BITAES-CBC-BC, PBEWITHSHA256AND256BITAES-CBC-BC, 1.3.6.1.4.1.22554.1.1.2.1.2, PBEWITHSHAANDTWOFISH-CBC, 1.3.6.1.4.1.22554.1.2.1.2.1.42, PBEWITHSHAAND40BITRC4, PBEWITHSHAANDTWOFISH, 1.3.6.1.4.1.22554.1.2.1.2.1.22, PBEWITHSHA256AND192BITAES-CBC-BC, PBEWITHSHA-1AND192BITAES-CBC-BC, 1.3.6.1.4.1.22554.1.2.1.2.1.2, PBEWITHSHAAND192BITAES-CBC-BC, PBEWITHSHAAND40BITRC2-CBC]
+Attributes {}, AlgorithmParameters2.16.840.1.101.3.4.1.42=Provider BC Service AlgorithmParameters.AES org.bouncycastle.jce.provider.symmetric.AES$AlgParams
+Aliases [2.16.840.1.101.3.4.42, 2.16.840.1.101.3.4.2, 2.16.840.1.101.3.4.22, 2.16.840.1.101.3.4.1.22, 2.16.840.1.101.3.4.1.42, 2.16.840.1.101.3.4.1.2]
+Attributes {}, KeyGeneratorHMAC-MD5=Provider BC Service KeyGenerator.HMACMD5 org.bouncycastle.jce.provider.JCEKeyGenerator$MD5HMAC
+Aliases [HMAC-MD5, HMAC/MD5, 1.3.6.1.5.5.8.1.1]
+Attributes {}, AlgorithmParametersPBEWITHSHA1AND128BITAES-CBC-BC=Provider BC Service AlgorithmParameters.PKCS12PBE org.bouncycastle.jce.provider.JDKAlgorithmParameters$PKCS12PBE
+Aliases [1.2.840.113549.1.12.1.1, PBEWITHSHAAND256BITAES-CBC-BC, 1.2.840.113549.1.12.1.4, 1.2.840.113549.1.12.1.5, 1.3.6.1.4.1.22554.1.1.2.1.42, 1.2.840.113549.1.12.1.2, 1.2.840.113549.1.12.1.3, 1.2.840.113549.1.12.1.6, PBEWITHSHA256AND128BITAES-CBC-BC, PBEWITHSHA-1AND256BITAES-CBC-BC, PBEWITHSHA1AND256BITAES-CBC-BC, PBEWITHSHAAND128BITRC4, 1.3.6.1.4.1.22554.1.1.2.1.22, PBEWITHSHA-256AND192BITAES-CBC-BC, PBEWITHSHA1ANDRC2, PBEWITHSHAAND128BITRC2-CBC, PBEWITHSHA-256AND128BITAES-CBC-BC, PBEWITHSHAAND128BITAES-CBC-BC, PBEWITHSHA-256AND256BITAES-CBC-BC, PBEWithSHAAnd3KeyTripleDES, PBEWITHSHAAND3-KEYTRIPLEDES-CBC, PBEWITHSHAAND2-KEYTRIPLEDES-CBC, PBEWITHSHA1AND192BITAES-CBC-BC, PBEWITHSHA1AND128BITAES-CBC-BC, PBEWITHSHA-1AND128BITAES-CBC-BC, PBEWITHSHA256AND256BITAES-CBC-BC, 1.3.6.1.4.1.22554.1.1.2.1.2, PBEWITHSHAANDTWOFISH-CBC, 1.3.6.1.4.1.22554.1.2.1.2.1.42, PBEWITHSHAAND40BITRC4, PBEWITHSHAANDTWOFISH, 1.3.6.1.4.1.22554.1.2.1.2.1.22, PBEWITHSHA256AND192BITAES-CBC-BC, PBEWITHSHA-1AND192BITAES-CBC-BC, 1.3.6.1.4.1.22554.1.2.1.2.1.2, PBEWITHSHAAND192BITAES-CBC-BC, PBEWITHSHAAND40BITRC2-CBC]
+Attributes {}, SecretKeyFactoryPBEWITHSHAAND3KEYTRIPLEDES=Provider BC Service SecretKeyFactory.PBEWITHSHAAND3-KEYTRIPLEDES-CBC org.bouncycastle.jce.provider.JCESecretKeyFactory$PBEWithSHAAndDES3Key
+Aliases [PBEWithSHAAnd3KeyTripleDES, 1.2.840.113549.1.12.1.3]
+Attributes {}, Cipher1.3.6.1.4.1.22554.1.1.2.1.42=Provider BC Service Cipher.PBEWITHSHAAND256BITAES-CBC-BC org.bouncycastle.jce.provider.JCEBlockCipher$PBEWithAESCBC
+Aliases [PBEWITHSHA1AND256BITAES-CBC-BC, 1.3.6.1.4.1.22554.1.1.2.1.42, PBEWITHSHA-1AND256BITAES-CBC-BC]
+Attributes {}, MacHMAC/SHA256=Provider BC Service Mac.HMACSHA256 org.bouncycastle.jce.provider.JCEMac$SHA256
+Aliases [1.2.840.113549.2.9, HMAC-SHA256, HMAC/SHA256]
+Attributes {}, Signature1.3.14.3.2.26WITH1.2.840.10040.4.1=Provider BC Service Signature.SHA1withDSA org.bouncycastle.jce.provider.JDKDSASigner$stdDSA
+Aliases [1.2.840.10040.4.3, DSAWITHSHA1, SHA1WITHDSA, DSAWithSHA1, DSA, SHA/DSA, SHA1WithDSA, 1.3.14.3.2.26with1.2.840.10040.4.3, 1.3.14.3.2.26with1.2.840.10040.4.1, DSAwithSHA1]
+Attributes {}, SignatureSHA1WITHRSAENCRYPTION=Provider BC Service Signature.SHA1WithRSAEncryption org.bouncycastle.jce.provider.JDKDigestSignature$SHA1WithRSAEncryption
+Aliases [1.3.14.3.2.26with1.2.840.113549.1.1.1, 1.3.14.3.2.26with1.2.840.113549.1.1.5, 1.2.840.113549.1.1.5, SHA1WithRSA, SHA1withRSA, SHA1withRSAEncryption, SHA1/RSA, SHA1WITHRSAENCRYPTION, SHA1WITHRSA, SHA-1/RSA, 1.3.14.3.2.29]
+Attributes {}, KeyGenerator1.3.14.3.2.7=Provider BC Service KeyGenerator.DES org.bouncycastle.jce.provider.JCEKeyGenerator$DES
+Aliases [1.3.14.3.2.7]
+Attributes {}, SecretKeyFactoryPBEWITHSHA-256AND128BITAES-CBC-BC=Provider BC Service SecretKeyFactory.PBEWITHSHA256AND128BITAES-CBC-BC org....
+{SecretKeyFactoryPBEWITHSHAAND128BITRC4=Provider BC Service SecretKeyFactory.PBEWITHSHAAND128BITRC4 org.bouncycastle.jce.provider.JCESecretKeyFactory$PBEWithSHAAnd128BitRC4
+Aliases [1.2.840.113549.1.12.1.1]
+Attributes {}, CipherPBEWITHSHAAND3-KEYTRIPLEDES-CBC=Provider BC Service Cipher.PBEWITHSHAAND3-KEYTRIPLEDES-CBC org.bouncycastle.jce.provider.JCEBlockCipher$PBEWithSHAAndDES3Key
+Aliases [PBEWITHSHA1ANDDESEDE, 1.2.840.113549.1.12.1.3, PBEWithSHAAnd3KeyTripleDES, PBEWITHSHA1AND3-KEYTRIPLEDES-CBC]
+Attributes {}, CipherPBEWITHSHA1ANDDES=Provider BC Service Cipher.PBEWITHSHA1ANDDES org.bouncycastle.jce.provider.JCEBlockCipher$PBEWithSHA1AndDES
+Aliases []
+Attributes {}, KeyPairGeneratorDH=Provider BC Service KeyPairGenerator.DH org.bouncycastle.jce.provider.JDKKeyPairGenerator$DH
+Aliases [DIFFIEHELLMAN]
+Attributes {}, MacHMACSHA1=Provider BC Service Mac.HMACSHA1 org.bouncycastle.jce.provider.JCEMac$SHA1
+Aliases [1.2.840.113549.2.7, 1.3.6.1.5.5.8.1.2, HMAC/SHA1, HMAC-SHA1]
+Attributes {}, KeyGeneratorHMACSHA384=Provider BC Service KeyGenerator.HMACSHA384 org.bouncycastle.jce.provider.JCEKeyGenerator$HMACSHA384
+Aliases [HMAC/SHA384, 1.2.840.113549.2.10, HMAC-SHA384]
+Attributes {}, KeyPairGeneratorRSA=Provider BC Service KeyPairGenerator.RSA org.bouncycastle.jce.provider.JDKKeyPairGenerator$RSA
+Aliases [1.2.840.113549.1.1.1]
+Attributes {}, CipherPBEWITHSHA256AND192BITAES-CBC-BC=Provider BC Service Cipher.PBEWITHSHA256AND192BITAES-CBC-BC org.bouncycastle.jce.provider.JCEBlockCipher$PBEWithAESCBC
+Aliases [PBEWITHSHA-256AND192BITAES-CBC-BC, 1.3.6.1.4.1.22554.1.2.1.2.1.22]
+Attributes {}, CipherPBEWITHSHAAND256BITAES-CBC-BC=Provider BC Service Cipher.PBEWITHSHAAND256BITAES-CBC-BC org.bouncycastle.jce.provider.JCEBlockCipher$PBEWithAESCBC
+Aliases [PBEWITHSHA1AND256BITAES-CBC-BC, 1.3.6.1.4.1.22554.1.1.2.1.42, PBEWITHSHA-1AND256BITAES-CBC-BC]
+Attributes {}, AlgorithmParametersDESEDE=Provider BC Service AlgorithmParameters.DESEDE org.bouncycastle.jce.provider.JDKAlgorithmParameters$IVAlgorithmParameters
+Aliases [1.2.840.113549.3.7]
+Attributes {}, SecretKeyFactoryPBEWITHSHA1ANDDES=Provider BC Service SecretKeyFactory.PBEWITHSHA1ANDDES org.bouncycastle.jce.provider.JCESecretKeyFactory$PBEWithSHA1AndDES
+Aliases [PBEWITHSHA1ANDDES-CBC, 1.2.840.113549.1.5.10]
+Attributes {}, SecretKeyFactoryPBEWITHSHAAND3-KEYTRIPLEDES-CBC=Provider BC Service SecretKeyFactory.PBEWITHSHAAND3-KEYTRIPLEDES-CBC org.bouncycastle.jce.provider.JCESecretKeyFactory$PBEWithSHAAndDES3Key
+Aliases [PBEWithSHAAnd3KeyTripleDES, 1.2.840.113549.1.12.1.3]
+Attributes {}, CipherPBEWITHSHAAND40BITRC2-CBC=Provider BC Service Cipher.PBEWITHSHAAND40BITRC2-CBC org.bouncycastle.jce.provider.JCEBlockCipher$PBEWithSHAAnd40BitRC2
+Aliases [1.2.840.113549.1.12.1.6, PBEWITHSHA1AND40BITRC2-CBC]
+Attributes {}, KeyPairGeneratorDSA=Provider BC Service KeyPairGenerator.DSA org.bouncycastle.jce.provider.JDKKeyPairGenerator$DSA
+Aliases []
+Attributes {}, CipherDESEDE=Provider BC Service Cipher.DESEDE org.bouncycastle.jce.provider.JCEBlockCipher$DESede
+Aliases []
+Attributes {}, SecretKeyFactoryPBEWITHSHA256AND192BITAES-CBC-BC=Provider BC Service SecretKeyFactory.PBEWITHSHA256AND192BITAES-CBC-BC org.bouncycastle.jce.provider.JCESecretKeyFactory$PBEWithSHA256And192BitAESBC
+Aliases [PBEWITHSHA-256AND192BITAES-CBC-BC, 1.3.6.1.4.1.22554.1.2.1.2.1.22]
+Attributes {}, SecretKeyFactoryPBEWITHSHAAND256BITAES-CBC-BC=Provider BC Service SecretKeyFactory.PBEWITHSHAAND256BITAES-CBC-BC org.bouncycastle.jce.provider.JCESecretKeyFactory$PBEWithSHAAnd256BitAESBC
+Aliases [PBEWITHSHA-1AND256BITAES-CBC-BC, PBEWITHSHA1AND256BITAES-CBC-BC, 1.3.6.1.4.1.22554.1.1.2.1.42]
+Attributes {}, KeyGeneratorHMACSHA1=Provider BC Service KeyGenerator.HMACSHA1 org.bouncycastle.jce.provider.JCEKeyGenerator$HMACSHA1
+Aliases [1.2.840.113549.2.7, HMAC/SHA1, HMAC-SHA1, 1.3.6.1.5.5.8.1.2]
+Attributes {}, SecretKeyFactoryPBEWITHSHAAND40BITRC2-CBC=Provider BC Service SecretKeyFactory.PBEWITHSHAAND40BITRC2-CBC org.bouncycastle.jce.provider.JCESecretKeyFactory$PBEWithSHAAnd40BitRC2
+Aliases [1.2.840.113549.1.12.1.6]
+Attributes {}, SecretKeyFactoryDESEDE=Provider BC Service SecretKeyFactory.DESEDE org.bouncycastle.jce.provider.JCESecretKeyFactory$DESede
+Aliases []
+Attributes {}, KeyStoreBOUNCYCASTLE=Provider BC Service KeyStore.BouncyCastle org.bouncycastle.jce.provider.JDKKeyStore$BouncyCastleStore
+Aliases [BOUNCYCASTLE, UBER, bouncycastle]
+Attributes {}, CipherPBEWITHSHAANDTWOFISH-CBC=Provider BC Service Cipher.PBEWITHSHAANDTWOFISH-CBC org.bouncycastle.jce.provider.JCEBlockCipher$PBEWithSHAAndTwofish
+Aliases []
+Attributes {}, MacPBEWITHHMACSHA=Provider BC Service Mac.PBEWITHHMACSHA org.bouncycastle.jce.provider.JCEMac$PBEWithSHA
+Aliases [1.3.14.3.2.26]
+Attributes {}, SignatureSHA256WITHRSAENCRYPTION=Provider BC Service Signature.SHA256WithRSAEncryption org.bouncycastle.jce.provider.JDKDigestSignature$SHA256WithRSAEncryption
+Aliases [SHA256withRSA, SHA256WITHRSAENCRYPTION, SHA256withRSAEncryption, SHA256WithRSA, SHA256WithRSAEncryption, 1.2.840.113549.1.1.11]
+Attributes {}, MessageDigestSHA-256=Provider BC Service MessageDigest.SHA-256 org.bouncycastle.jce.provider.JDKMessageDigest$SHA256
+Aliases [SHA256, 2.16.840.1.101.3.4.2.1]
+Attributes {}, KeyGeneratorAES=Provider BC Service KeyGenerator.AES org.bouncycastle.jce.provider.symmetric.AES$KeyGen
+Aliases []
+Attributes {}, CipherPBEWITHSHAAND2-KEYTRIPLEDES-CBC=Provider BC Service Cipher.PBEWITHSHAAND2-KEYTRIPLEDES-CBC org.bouncycastle.jce.provider.JCEBlockCipher$PBEWithSHAAndDES2Key
+Aliases [PBEWITHSHA1AND2-KEYTRIPLEDES-CBC, 1.2.840.113549.1.12.1.4]
+Attributes {}, SignatureSHA384WITHRSAENCRYPTION=Provider BC Service Signature.SHA384WithRSAEncryption org.bouncycastle.jce.provider.JDKDigestSignature$SHA384WithRSAEncryption
+Aliases [SHA384withRSA, SHA384WITHRSAENCRYPTION, SHA384withRSAEncryption, 1.2.840.113549.1.1.12, SHA384WithRSAEncryption, SHA384WithRSA]
+Attributes {}, SecretKeyFactoryPBEWITHSHAANDTWOFISH-CBC=Provider BC Service SecretKeyFactory.PBEWITHSHAANDTWOFISH-CBC org.bouncycastle.jce.provider.JCESecretKeyFactory$PBEWithSHAAndTwofish
+Aliases []
+Attributes {}, MessageDigestSHA-384=Provider BC Service MessageDigest.SHA-384 org.bouncycastle.jce.provider.JDKMessageDigest$SHA384
+Aliases [SHA384, 2.16.840.1.101.3.4.2.2]
+Attributes {}, SignatureMD5WITHRSAENCRYPTION=Provider BC Service Signature.MD5WithRSAEncryption org.bouncycastle.jce.provider.JDKDigestSignature$MD5WithRSAEncryption
+Aliases [MD5withRSA, MD5/RSA, 1.2.840.113549.1.1.4, MD5withRSAEncryption, MD5WithRSA, 1.2.840.113549.2.5with1.2.840.113549.1.1.1, MD5WITHRSAENCRYPTION, MD5WITHRSA]
+Attributes {}, KeyFactoryDH=Provider BC Service KeyFactory.DH org.bouncycastle.jce.provider.JDKKeyFactory$DH
+Aliases [DIFFIEHELLMAN]
+Attributes {}, SecretKeyFactoryPBEWITHSHAAND2-KEYTRIPLEDES-CBC=Provider BC Service SecretKeyFactory.PBEWITHSHAAND2-KEYTRIPLEDES-CBC org.bouncycastle.jce.provider.JCESecretKeyFactory$PBEWithSHAAndDES2Key
+Aliases [1.2.840.113549.1.12.1.4]
+Attributes {}, KeyFactoryRSA=Provider BC Service KeyFactory.RSA org.bouncycastle.jce.provider.JDKKeyFactory$RSA
+Aliases [1.2.840.113549.1.1.1]
+Attributes {}, CipherPBEWITHSHAAND128BITRC2-CBC=Provider BC Service Cipher.PBEWITHSHAAND128BITRC2-CBC org.bouncycastle.jce.provider.JCEBlockCipher$PBEWithSHAAnd128BitRC2
+Aliases [PBEWITHSHA1AND128BITRC2-CBC, 1.2.840.113549.1.12.1.5]
+Attributes {}, KeyFactoryDSA=Provider BC Service KeyFactory.DSA org.bouncycastle.jce.provider.JDKKeyFactory$DSA
+Aliases [1.2.840.10040.4.1]
+Attributes {}, KeyGeneratorDES=Provider BC Service KeyGenerator.DES org.bouncycastle.jce.provider.JCEKeyGenerator$DES
+Aliases [1.3.14.3.2.7]
+Attributes {}, KeyStoreBKS=Provider BC Service KeyStore.BKS org.bouncycastle.jce.provider.JDKKeyStore
+Aliases []
+Attributes {}, CipherPBEWITHMD5AND192BITAES-CBC-OPENSSL=Provider BC Service Cipher.PBEWITHMD5AND192BITAES-CBC-OPENSSL org.bouncycastle.jce.provider.JCEBlockCipher$PBEWithAESCBC
+Aliases []
+Attributes {}, SecretKeyFactoryPBEWITHSHAAND128BITRC2-CBC=Provider BC Service SecretKeyFactory.PBEWITHSHAAND128BITRC2-CBC org.bouncycastle.jce.provider.JCESecretKeyFactory$PBEWithSHAAnd128BitRC2
+Aliases [1.2.840.113549.1.12.1.5]
+Attributes {}, KeyGeneratorBLOWFISH=Provider BC Service KeyGenerator.BLOWFISH org.bouncycastle.jce.provider.JCEKeyGenerator$Blowfish
+Aliases [1.3.6.1.4.1.3029.1.2]
+Attributes {}, AlgorithmParametersDH=Provider BC Service AlgorithmParameters.DH org.bouncycastle.jce.provider.JDKAlgorithmParameters$DH
+Aliases [DIFFIEHELLMAN]
+Attributes {}, SecretKeyFactoryPBEWITHMD5AND192BITAES-CBC-OPENSSL=Provider BC Service SecretKeyFactory.PBEWITHMD5AND192BITAES-CBC-OPENSSL org.bouncycastle.jce.provider.JCESecretKeyFactory$PBEWithMD5And192BitAESCBCOpenSSL
+Aliases []
+Attributes {}, CipherRSA=Provider BC Service Cipher.RSA org.bouncycastle.jce.provider.JCERSACipher$NoPadding
+Aliases [RSA/RAW, RSA//RAW, RSA//NOPADDING]
+Attributes {}, SecretKeyFactoryPBEWITHHMACSHA1=Provider BC Service SecretKeyFactory.PBEWITHHMACSHA1 org.bouncycastle.jce.provider.JCESecretKeyFactory$PBEWithSHA
+Aliases [1.3.14.3.2.26, PBEWITHHMACSHA]
+Attributes {}, CipherPBEWITHMD5AND128BITAES-CBC-OPENSSL=Provider BC Service Cipher.PBEWITHMD5AND128BITAES-CBC-OPENSSL org.bouncycastle.jce.provider.JCEBlockCipher$PBEWithAESCBC
+Aliases []
+Attributes {}, AlgorithmParametersDSA=Provider BC Service AlgorithmParameters.DSA org.bouncycastle.jce.provider.JDKAlgorithmParameters$DSA
+Aliases []
+Attributes {}, CertPathBuilderPKIX=Provider BC Service CertPathBuilder.PKIX org.bouncycastle.jce.provider.PKIXCertPathBuilderSpi
+Aliases [RFC3280]
+Attributes {}, CipherPBEWITHMD5ANDRC2=Provider BC Service Cipher.PBEWITHMD5ANDRC2 org.bouncycastle.jce.provider.JCEBlockCipher$PBEWithMD5AndRC2
+Aliases []
+Attributes {}, CipherPBEWITHSHAAND192BITAES-CBC-BC=Provider BC Service Cipher.PBEWITHSHAAND192BITAES-CBC-BC org.bouncycastle.jce.provider.JCEBlockCipher$PBEWithAESCBC
+Aliases [PBEWITHSHA-1AND192BITAES-CBC-BC, 1.3.6.1.4.1.22554.1.1.2.1.22, PBEWITHSHA1AND192BITAES-CBC-BC]
+Attributes {}, MacHMACMD5=Provid...
+3
+Provider BC Service CertificateFactory.X.509 org.bouncycastle.jce.provider.JDKX509CertificateFactory
+Aliases [X509]
+Attributes {}
+null
+353
+[null, Alg.Alias.AlgorithmParameters.1.2.840.113549.1.12.1.1=PKCS12PBE, Alg.Alias.Mac.1.2.840.113549.2.9=HMACSHA256, Alg.Alias.Signature.SHA384withRSA=SHA384WithRSAEncryption, Alg.Alias.AlgorithmParameters.PBEWITHSHAAND256BITAES-CBC-BC=PKCS12PBE, Alg.Alias.Signature.MD5/RSA=MD5WithRSAEncryption, Alg.Alias.AlgorithmParameters.1.3.6.1.4.1.22554.1.1.2.1.42=PKCS12PBE, Alg.Alias.AlgorithmParameters.1.2.840.113549.1.12.1.3=PKCS12PBE, Alg.Alias.Signature.1.3.14.3.2.26with1.2.840.113549.1.1.1=SHA1WithRSAEncryption, null, Alg.Alias.AlgorithmParameters.1.2.840.113549.1.12.1.6=PKCS12PBE, null, Alg.Alias.Signature.1.3.14.3.2.26with1.2.840.113549.1.1.5=SHA1WithRSAEncryption, Cipher.RSA=org.bouncycastle.jce.provider.JCERSACipher$NoPadding, Alg.Alias.Signature.SHA512WITHRSAENCRYPTION=SHA512WithRSAEncryption, null, null, Alg.Alias.Mac.HMAC-SHA384=HMACSHA384, null, null, null, Alg.Alias.CertPathBuilder.RFC3280=PKIX, null, null, null, KeyPairGenerator.DH=org.bouncycastle.jce.provider.JDKKeyPairGenerator$DH, Signature.SHA384WithRSAEncryption=org.bouncycastle.jce.provider.JDKDigestSignature$SHA384WithRSAEncryption, Alg.Alias.SecretKeyFactory.PBEWITHSHA-1AND256BITAES-CBC-BC=PBEWITHSHAAND256BITAES-CBC-BC, Alg.Alias.AlgorithmParameters.PBEWITHSHA256AND128BITAES-CBC-BC=PKCS12PBE, KeyFactory.RSA=org.bouncycastle.jce.provider.JDKKeyFactory$RSA, Alg.Alias.AlgorithmParameters.PBEWITHSHA-1AND256BITAES-CBC-BC=PKCS12PBE, null, null, Mac.HMACSHA256=org.bouncycastle.jce.provider.JCEMac$SHA256, null, null, MessageDigest.SHA-256=org.bouncycastle.jce.provider.JDKMessageDigest$SHA256, Alg.Alias.SecretKeyFactory.1.2.840.113549.1.12.1.3=PBEWITHSHAAND3-KEYTRIPLEDES-CBC, Alg.Alias.AlgorithmParameters.PBEWITHSHA1AND256BITAES-CBC-BC=PKCS12PBE, Alg.Alias.SecretKeyFactory.1.2.840.113549.1.12.1.1=PBEWITHSHAAND128BITRC4, Alg.Alias.SecretKeyFactory.1.2.840.113549.1.12.1.6=PBEWITHSHAAND40BITRC2-CBC, Mac.HMACSHA1=org.bouncycastle.jce.provider.JCEMac$SHA1, Alg.Alias.MessageDigest.SHA=SHA-1, Alg.Alias.SecretKeyFactory.1.2.840.113549.1.12.1.5=PBEWITHSHAAND128BITRC2-CBC, SecretKeyFactory.PBEWITHSHA256AND192BITAES-CBC-BC=org.bouncycastle.jce.provider.JCESecretKeyFactory$PBEWithSHA256And192BitAESBC, null, Alg.Alias.Cipher.PBEWITHSHA1AND40BITRC4=PBEWITHSHAAND40BITRC4, null, null, null, Alg.Alias.Cipher.1.3.6.1.4.1.22554.1.1.2.1.2=PBEWITHSHAAND128BITAES-CBC-BC, null, Alg.Alias.SecretKeyFactory.PBEWITHSHA1AND256BITAES-CBC-BC=PBEWITHSHAAND256BITAES-CBC-BC, null, null, Alg.Alias.Signature.SHA256withRSA=SHA256WithRSAEncryption, null, Alg.Alias.AlgorithmParameters.2.16.840.1.101.3.4.42=AES, Alg.Alias.AlgorithmParameters.PBEWITHSHAAND128BITRC4=PKCS12PBE, null, Alg.Alias.SecretKeyFactory.1.3.6.1.4.1.22554.1.1.2.1.22=PBEWITHSHAAND192BITAES-CBC-BC, Alg.Alias.Signature.1.2.840.10040.4.3=SHA1withDSA, null, SecretKeyFactory.PBEWITHSHA1ANDRC2=org.bouncycastle.jce.provider.JCESecretKeyFactory$PBEWithSHA1AndRC2, Alg.Alias.AlgorithmParameters.1.3.6.1.4.1.22554.1.1.2.1.22=PKCS12PBE, null, Alg.Alias.Signature.1.2.840.113549.1.1.5=SHA1WithRSAEncryption, Alg.Alias.Signature.1.2.840.113549.1.1.4=MD5WithRSAEncryption, Alg.Alias.SecretKeyFactory.1.2.840.113549.1.5.11=PBEWITHSHA1ANDRC2, Alg.Alias.SecretKeyFactory.1.2.840.113549.1.5.10=PBEWITHSHA1ANDDES, Alg.Alias.MessageDigest.SHA256=SHA-256, null, null, null, null, null, Alg.Alias.Signature.SHA256WITHRSAENCRYPTION=SHA256WithRSAEncryption, null, Alg.Alias.Signature.SHA1WithRSA=SHA1WithRSAEncryption, null, Alg.Alias.Mac.1.3.6.1.5.5.8.1.2=HMACSHA1, Alg.Alias.Mac.1.3.6.1.5.5.8.1.1=HMACMD5, null, null, Alg.Alias.KeyGenerator.HMAC-MD5=HMACMD5, KeyStore.PKCS12=org.bouncycastle.jce.provider.JDKPKCS12KeyStore$BCPKCS12KeyStore, Alg.Alias.AlgorithmParameters.2.16.840.1.101.3.4.2=AES, null, null, null, null, null, Cipher.PBEWITHMD5AND192BITAES-CBC-OPENSSL=org.bouncycastle.jce.provider.JCEBlockCipher$PBEWithAESCBC, null, Mac.PBEWITHHMACSHA1=org.bouncycastle.jce.provider.JCEMac$PBEWithSHA, null, MessageDigest.SHA-384=org.bouncycastle.jce.provider.JDKMessageDigest$SHA384, Signature.SHA256WithRSAEncryption=org.bouncycastle.jce.provider.JDKDigestSignature$SHA256WithRSAEncryption, Alg.Alias.MessageDigest.2.16.840.1.101.3.4.2.1=SHA-256, Alg.Alias.Cipher.1.2.840.113549.3.4=ARC4, Alg.Alias.MessageDigest.2.16.840.1.101.3.4.2.3=SHA-512, Alg.Alias.MessageDigest.2.16.840.1.101.3.4.2.2=SHA-384, null, MessageDigest.SHA-512=org.bouncycastle.jce.provider.JDKMessageDigest$SHA512, Alg.Alias.Cipher.RSA/RAW=RSA, null, null, AlgorithmParameterGenerator.DSA=org.bouncycastle.jce.provider.JDKAlgorithmParameterGenerator$DSA, Alg.Alias.Signature.MD5withRSAEncryption=MD5WithRSAEncryption, Alg.Alias.Signature.SHA1withRSA=SHA1WithRSAEncryption, Provider.id name=BC, null, Alg.Alias.KeyStore.bouncycastle=BouncyCastle, Alg.Alias.AlgorithmParameters.PBEWITHSHAAND128BITRC2-CBC=PKCS12PBE, null, Alg.Alias.Signature.SHA512withRSAEncryption=SHA512WithRSAEncryption, null, null, null, KeyGenerator.HMACMD5=org.bouncycastle.jce.provider.JCEKeyGenerator$MD5HMAC, Alg.Alias.AlgorithmParameters.PBEWITHSHA-256AND128BITAES-CBC-BC=PKCS12PBE, null, SecretKeyFactory.PBEWITHMD5AND256BITAES-CBC-OPENSSL=org.bouncycastle.jce.provider.JCESecretKeyFactory$PBEWithMD5And256BitAESCBCOpenSSL, null, null, Alg.Alias.SecretKeyFactory.PBEWITHSHA-256AND128BITAES-CBC-BC=PBEWITHSHA256AND128BITAES-CBC-BC, Alg.Alias.SecretKeyFactory.1.3.6.1.4.1.22554.1.1.2.1.42=PBEWITHSHAAND256BITAES-CBC-BC, null, null, null, Cipher.PBEWITHSHAANDTWOFISH-CBC=org.bouncycastle.jce.provider.JCEBlockCipher$PBEWithSHAAndTwofish, null, Alg.Alias.KeyGenerator.1.2.840.113549.2.7=HMACSHA1, null, Alg.Alias.KeyGenerator.1.2.840.113549.2.9=HMACSHA256, Cipher.PBEWITHSHAAND128BITAES-CBC-BC=org.bouncycastle.jce.provider.JCEBlockCipher$PBEWithAESCBC, SecretKeyFactory.PBEWITHMD5ANDRC2=org.bouncycastle.jce.provider.JCESecretKeyFactory$PBEWithMD5AndRC2, null, null, Alg.Alias.Mac.HMAC/SHA512=HMACSHA512, null, KeyStore.BouncyCastle=org.bouncycastle.jce.provider.JDKKeyStore$BouncyCastleStore, Alg.Alias.Cipher.2.16.840.1.101.3.4.1.24=AES, Alg.Alias.Cipher.2.16.840.1.101.3.4.1.23=AES, null, KeyFactory.DH=org.bouncycastle.jce.provider.JDKKeyFactory$DH, Alg.Alias.Cipher.PBEWITHSHA1ANDDESEDE=PBEWITHSHAAND3-KEYTRIPLEDES-CBC, null, Alg.Alias.Signature.SHA512WithRSAEncryption=SHA512WithRSAEncryption, AlgorithmParameterGenerator.DH=org.bouncycastle.jce.provider.JDKAlgorithmParameterGenerator$DH, null, null, CertPathValidator.PKIX=org.bouncycastle.jce.provider.PKIXCertPathValidatorSpi, null, null, null, null, Alg.Alias.AlgorithmParameters.PBEWITHSHAAND128BITAES-CBC-BC=PKCS12PBE, Signature.SHA512WithRSAEncryption=org.bouncycastle.jce.provider.JDKDigestSignature$SHA512WithRSAEncryption, Alg.Alias.KeyGenerator.HMAC/SHA384=HMACSHA384, Alg.Alias.KeyGenerator.HMAC/MD5=HMACMD5, Alg.Alias.SecretKeyFactory.1.3.14.3.2.26=PBEWITHHMACSHA1, null, Alg.Alias.Mac.HMAC/MD5=HMACMD5, null, Alg.Alias.SecretKeyFactory.PBEWITHSHA-256AND192BITAES-CBC-BC=PBEWITHSHA256AND192BITAES-CBC-BC, Alg.Alias.Cipher.PBEWITHSHA-1AND192BITAES-CBC-BC=PBEWITHSHAAND192BITAES-CBC-BC, Alg.Alias.MessageDigest.1.3.14.3.2.26=SHA-1, null, null, null, null, null, null, null, null, null, SecretKeyFactory.PBKDF2WithHmacSHA1=org.bouncycastle.jce.provider.JCESecretKeyFactory$PBKDF2WithHmacSHA1, Alg.Alias.Cipher.2.16.840.1.101.3.4.1.21=AES, MessageDigest.SHA-1=org.bouncycastle.jce.provider.JDKMessageDigest$SHA1, null, SecretKeyFactory.PBEWITHHMACSHA1=org.bouncycastle.jce.provider.JCESecretKeyFactory$PBEWithSHA, Alg.Alias.AlgorithmParameters.PBEWITHSHA-256AND256BITAES-CBC-BC=PKCS12PBE, null, null, null, Alg.Alias.AlgorithmParameters.PBEWithSHAAnd3KeyTripleDES=PKCS12PBE, null, Alg.Alias.KeyGenerator.HMAC/SHA512=HMACSHA512, null, KeyFactory.DSA=org.bouncycastle.jce.provider.JDKKeyFactory$DSA, null, Alg.Alias.Signature.MD5WithRSA=MD5WithRSAEncryption, null, null, null, Alg.Alias.SecretKeyFactory.1.3.6.1.4.1.22554.1.2.1.2.1.42=PBEWITHSHA256AND256BITAES-CBC-BC, null, Alg.Alias.KeyGenerator.1.3.6.1.4.1.3029.1.2=BLOWFISH, Alg.Alias.KeyPairGenerator.DIFFIEHELLMAN=DH, null, Alg.Alias.Cipher.PBEWITHSHA-256AND192BITAES-CBC-BC=PBEWITHSHA256AND192BITAES-CBC-BC, AlgorithmParameters.DH=org.bouncycastle.jce.provider.JDKAlgorithmParameters$DH, null, Alg.Alias.Signature.SHA1WITHDSA=SHA1withDSA, null, null, Alg.Alias.SecretKeyFactory.PBEWITHSHA-1AND192BITAES-CBC-BC=PBEWITHSHAAND192BITAES-CBC-BC, null, null, null, null, null, null, null, null, null, null, MessageDigest.MD5=org.bouncycastle.jce.provider.JDKMessageDigest$MD5, null, Alg.Alias.SecretKeyFactory.PBEWITHMD5ANDDES-CBC=PBEWITHMD5ANDDES, Alg.Alias.Cipher.1.3.6.1.4.1.22554.1.1.2.1.22=PBEWITHSHAAND192BITAES-CBC-BC, Alg.Alias.AlgorithmParameters.PBEWITHSHA1AND192BITAES-CBC-BC=PKCS12PBE, Alg.Alias.Cipher.PBEWITHSHA-256AND128BITAES-CBC-BC=PBEWITHSHA256AND128BITAES-CBC-BC, null, null, Alg.Alias.AlgorithmParameters.DIFFIEHELLMAN=DH, Alg.Alias.Cipher.1.2.840.113549.1.9.16.3.6=DESEDEWRAP, null, null, null, Alg.Alias.Signature.SHA512WithRSA=SHA512WithRSAEncryption, Alg.Alias.AlgorithmParameters.2.16.840.1.101.3.4.1.22=AES, Alg.Alias.AlgorithmParameters.1.3.14.3.2.7=DES, Alg.Alias.CertPathValidator.RFC3280=PKIX, null, Alg.Alias.AlgorithmParameters.PBEWITHSHA1AND128BITAES-CBC-BC=PKCS12PBE, null, null, null, Alg.Alias.KeyPairGenerator.1.2.840.113549.1.1.1=RSA, null, Alg.Alias.Signature.SHA1withRSAEncryption=SHA1WithRSAEncryption, Alg.Alias.CertificateFactory.X509=X.509, Alg.Alias.Mac.1.2.840.113549.2.11=HMACSHA512, Alg.Alias.Mac.1.2.840.113549.2.10=HMACSHA384, Alg.Alias.AlgorithmParameters.1.2.840.113549.1.1.7=OAEP, Alg.Alias.Signature.DSAWithSHA1=SHA1withDSA, null, null, Cipher.PBEWITHSHA256AND256BITAES-CBC-BC=org.bouncycastle.jce.provider.JCEBlockCipher$PBEWithAESCBC, CertificateFactory.X.509=org.bouncycastle.jce.provider.JDKX509CertificateFactory, null, null, null, null, null, null, null, Alg.Alias.AlgorithmParameters.PBEWITHSHA-1AND128BITAES-CBC-BC=PKCS12PBE, null, SecretKeyFactory.PBEWITHSHAAND40BITRC4=org.bouncycastle.jce.provider.JCESecretKeyFactory$PBEWithSHAAnd40BitRC4, null, null, null,...
+384
+null
+1.45
+1.45
+
+provider	BouncyCastleProvider  (id=830004142272)	
+	aliasTable	null	
+	builder	null	
+	changedProperties	null	
+	defaults	null	
+	entrySet	Hashtable$EntrySet  (id=830006672792)	
+	info	"BouncyCastle Security Provider v1.45" (id=830004141976)	
+	keySet	null	
+	lastAlgorithm	"X.509" (id=830004915360)	
+	lastServiceName	"CertificateFactory" (id=830004539872)	
+	lastServicesByType	null	
+	lastServicesSet	Collections$UnmodifiableSet  (id=830004467032)	
+	lastType	null	
+	modCount	353	
+	name	"BC" (id=830004142104)	
+	propertyAliasTable	TwoKeyHashMap  (id=830004322008)	
+	propertyServiceTable	TwoKeyHashMap  (id=830004320896)	
+	providerNumber	3	
+	returnedService	Provider$Service  (id=830004401944)	
+	serviceTable	null	
+	size	353	
+	table	Hashtable$HashtableEntry[512]  (id=830004252640)	
+	threshold	384	
+	values	null	
+	version	1.45	
+	versionString	"1.45" (id=830004142488)	
+
+
+The secret key:
+[88, 21, 98, -91, 124, 88, 21, -107, 70, -43, 39, -41, 33, 30, 78, -36]
+
+
+Ok so here is the deal:
+
+We encrypt everything with user_data_key.
+
+
+User_data_key has an encrypted key which is encrypted by
+signing it with the public key.
+
+So all we need to do is decrypt all the user_data_key entries
+using the single private key, and then reencrypt them with the
+public key generated by the new way.
+
+
+Hold on a second. The public key is NOT encrypted. Only the private key.
+So all we need to do is decrypt the old way, and reencrypt the new way.
+Then we are set to deencrypt the new way. It can all be done to the
+encrypted private key. Since we have the private key, all we need to 
+is reencrypt it, using the new method.
+
+Ok, one more thing. Crypt is generating a key based on the random data we give
+it from user_data_key.
+
+So at the end of the day, we have the secret key used to decrypt the rows
+in the other tables, if we just pass our decrypted user_data_key stuff through
+crypt.
+
+So here is the plan. 
+
+1. For the prefs private key. We decrypt it and reencrypt it the new way. *DONE*
+
+2. For the user data, we decrypt it using the private key, pass it through crypt,
+   and then take the output of crypt, sign it with our private key and stick
+   it back in the database.
+
+3. Update the code so that when we create new user-data-keys, we will do so
+   using a new method where the actual key gets stored in the database and not
+   the pre-crypt sludge we have now.
+4. TEST the thing by spitting out all new rows of data after we collect some more.
+
+*sigh*
+
+Note that we have to do this on the emulator, because we have to decrypt the 
+user data keys the old way.
+
+--
+
+Ok so the other problem is that we weren't using the salt correctly.
+
+Unfortunately, we have to fix that, too, and by going into the actual
+user tables this time. WAit... I'm confused..
+Because we have a salt per row. And it's done a different way.
+
+It's to prevent seeing the same data twice for the same unencrypted data,
+right?
+
+2/22
+
+[25, -36, 21, 83, -54, 127, 72, 16, -72, -117, 60, -41, -37, -26, 98, -108, 41, 5, -16, 104, 78, 17, -125, -117, 104, 91, -8, -119, -21, -16, -107, -41, 102, -20, 63, 52, 60, 40, -81, -28, 116, 84, -13, 31, 52, 95, -35, 25, 18, -27, -51, -81, 44, 0, -106, -37, 21, -68, 110, -108, -17, -90, -64, 103, 73, -13, 47, -13, 48, 40, -121, -28, -4, 106, 38, -70, -47, -67, -55, 1, 45, 54, 59, -76, 38, -28, 42, 55, 125, 77, 104, -108, -118, 33, 3, 100, 105, -66, 77, 14, -58, 14, -5, 22, 99, 111, 118, 13, -113, 21, 109, 37, 73, 123, -34, -88, -125, 126, -118, 33, 119, -57, 43, -22, -14, -20, 125, 66, 126, -122, -18, 111, -48, 39, 38, -117, 25, 69, 127, -99, -12, 100, 6, -100, 101, -89, -50, -64, 45, 71, 77, 55, 123, -74, 88, 109, -55, -16, -122, 93, -47, 86, -14, 101, -3, -15, -31, 85, 77, -12, 119, -18, -35, 127, -50, -11, 28, -26, -39, 18, -81, 15, 59, 96, -73, 18, -30, 23, -14, 66, 80, -72, -4, 101, -112, -29, 126, 32, -82, 6, 10, -39, 22, 113, -27, 49, -34, 91, 66, 114, 56, 105, -125, -105, 31, -118, 34, -91, 114, 106, -87, -103, -33, -76, 112, -39, -113, 27, 53, -62, -4, -95, -55, -26, 115, 45, 113, -102, 98, -69, -98, -43, -115, -48, 89, -38, 2, -116, 70, 38, -3, 39, 107, -73, 63, 120, -92, -10, -27, -1, 32, -6, -124, 48, 116, -84, 79, -11, -11, 32, 56, 61, -70, 75, -52, 22, -29, 60, -68, -78, -125, -42, 79, 101, 102, 50, 109, -79, -22, 121, 87, -8, -26, 14, -84, -109, 17, 96, 14, 119, 57, -43, -73, 27, -84, -66, 43, 68, 45, 21, 43, -57, -20, 98, 80, -122, 113, 124, -23, -34, -55, -28, 126, 5, -84, 92, 64, 69, -46, -100, -30, 10, 17, 20, 29, -128, 16, 56, -95, -84, -65, 103, -54, 15, -35, -121, -125, 56, -111, -49, 76, -78, -66, 51, 88, -126, 77, -98, 74, -9, 56, -49, 86, 2, 61, -41, -89, 40, -11, -114, 78, -95, 104, -126, -91, -44, 1, 121, -98, -65, -37, -18, 20, 112, 56, 35, 104, 111, -104, -101, 32, -44, 2, -46, 90, -59, -76, 102, 31, -89, -1, -83, -128, -98, -98, -19, 69, -50, -13, 11, -109, -99, 126, -38, -92, -66, -77, 75, -48, -120, 32, 14, -52, -104, 110, 93, 34, 17, 44, -96, -21, 87, -101, 91, -18, -6, 22, 95, 63, -53, 27, -35, 4, -25, -56, 61, 91, 46, 25, 90, -55, 31, 11, 86, -77, -4, -93, 18, -104, 85, 54, 12, 54, -74, 20, 81, 59, -85, -31, -16, -25, -45, 66, -24, 23, 38, -76, 80, -79, 39, 5, 78, 35, -39, 81, -107, 42, -13, -80, 24, 26, -38, -59, -115, -32, 58, -70, 114, 89, -42, -125, 117, 125, -7, -109, 124, 12, 19, 115, -117, 52, -128, -82, -46, -45, 94, -11, -13, -17, -79, -102, 121, -2, 54, 9, -90, -44, -113, 34, -83, -99, 6, -101, 111, 22, 119, -16, -25, -32, 28, -27, -16, -36, 107, -101, -13, -74, -76, 20, 71, 11, -28, -109, -108, -15, -86, 87, 6, -44, -3, -6, -126, -56, -9, -62, 84, 93, -23, -54, 50, 120, 70, 51, 94, 26, 2, 41, 103, 17, -122, -97, -101, -110, 8, 16, 20, 8, -81, -51, -50, 9, -83, -109, -79, -91, -66, 37, -17, 26, 122, 47, -105, 52, 0, 111, 49, 40, -61, -66, 1, -116, 103, -116, -37, -11, 47, 99, 119, 12, -75, 120, 1, 74, 28, 119, 40, -11, 18, 75, 90, 81, -1, -49, -84, -23, 0, 114, -41, -112, 34, -2, 12, 23, 35, 15, 14, -75, -21, 41, 32, -111, -37, -91, 46, 53, -96, -20, 71, 97, -26, 71, -102, -50, 54, -7, -13, 104, -106, -101, 54, -68, -104, 54, -18, 71, 38, 118, -58, 113, 89, 19, -9, -62, -115, -3, 39, -8, 5, -63, 68, 5, 106, 92, 116, 112, 57, -112, 104, -19, -68, 59, 54, -98, 78, -97, -89, 79, -83, 55, -75, 98, -104, 12, 85, 111, -73, 62, 106, 0, -87, -80, -122, 123, 66, -51, -83, -75, -46, -100, 3, 37, -42, -57, 2, -112, 45, -53, -15, -91, 45, 41, 0, -28, 81, -84, -51, 98, -99, 17, -86, 99, 11, -35, 115, -84, 45, -26, -31, 99, 85, 127, -55, 20, 17, 23, 110, 122, -19, -38, 14, -119, -16, 107, -122, 57, 114, 25, -21, -94, 107, -115, 106, -60, 13, -67, -26, -17, 12, -118, -64, -20, -63, 76, 117, -83, -98, -67, 9, -92, -50, -103, -65, 22, -51, -29, 70, 7, 44, 22, 47, 44, 17, 80, -19, 119, -55, 10, 12, -110, -13, -127, -108, -90, 37, 8, -31, -59, 17, -37, -54, -106, -124, -10, 92, -81, -54, -95, 14, -95, 58, -88, -59, 9, -113, 27, 68, 9, -25, 36, 60, -118, 83, 75, 80, -45, 126, -87, 113, 46, -59, 98, -112, -60, -5, 73, 53, -78, 14, -12, -116, 9, -99, 124, 88, 73, 26, -5, -14, 91, 123, -17, -106, 31, 47, -37, 64, 34, 90, -126, -30, 85, -117, -26, -111, 72, 2, -107, -83, -21, 8, 31, -25, -123, 49, -101, -44, -65, 29, -30, 6, 118, 58, -59, 110, 125, -27, 81, 87, 39, -124, -72, -31, -36, 13, 28, 40, -35, -119, 110, -12, 82, 47, -44, 78, 5, -93, 112, -61, 60, 1, 126, -79, 104, 109, -109, -60, 22, -80, -73, -83, 62, 61, -69, -117, 74, 9, -96, -7, 103, -65, 127, 108, -52, -103, 66, 1, -28, 25, 51, -22, 86, 65, -30, -29, -1, -56, -82, 91, -55, -99, -50, 107, 58, 51, 92, -43, -72, -17, 6, -14, 124, -55, 118, 77, 50, 104, 120, 74, -1, 97, 12, -75, -44, 106, -128, -31, 112, 107, -110, -62, -115, 9, 0, 32, 110, -5, -13, -105, -49, 78, -7, 110, -71, 26, -91, -86, 61, -36, -5, 24, 6, -43, -96, 49, 92, 1, -35, -57, -121, 95, 71, 20, -85, -36, 15, 92, 27, 90, -85, 0, 72, -82, -60, -33, 87, -75, -30, -58, 38, 43, 111, -110, 78, -73, 88, 24, -121, -52, -81, -16, -55, -127, 18, 64, -100, -78, 51, 19, -39, -107, 113, 80, 124, -2, 107, -110, 63, -60, -26, -40, -44, 79, -99, 65, 28, -127, 87, 33, -124, -15, 67, -121, 5, -79, -25, -108, -45, 124, 23, -58, 57, 40, -47, -18, -10, 6, -75, 10, -11, 69, 120, -70, 69, -85, -105, 41, -73, -73, 127, -25, -111, 105, 31, -67, -4, -54, -20, 64, 71, -60, 6, -63, -114, -62, -94, 62, 116, 123, 23, -9, -53, -37, 41, 14, 87, 73, 80, -34, 43, -54, 104, 98, -19, 90, 13, 23, -21, 34, -114, 84, -67, 23, 103, -27, -124, 35, -30, 44, 95, -50, 73, 70, 16, 47, 86, -4, -66, -110, -86, -79, 37, -23, -68, -28, -71, -35, -111, -121, -31, -34, -115, 53, -32, -86, -41, 118, 125, -24, 36, -78, -103, 60, -11, 44, 50, 54, 45, -23, -92, 32, -42, -108, 113, 17, 51, -2, -1, 111, -115, -8, -14, -92, 98, 3, -48, -84, -79, -28, -27, -39, 122, 115, 107, -125, -109, -3, -21, -100]
+
+com.rareventure.gps2.GpsTrailerCrypt.Preferences.encryptedPrivateKey|19DC1553CA7F4810B88B3CD7DBE662942905F0684E11838B685BF889EBF095D766EC3F343C28AFE47454F31F345FDD1912E5CDAF2C0096DB15BC6E94EFA6C06749F32FF3302887E4FC6A26BAD1BDC9012D363BB426E42A377D4D68948A21036469BE4D0EC60EFB16636F760D8F156D25497BDEA8837E8A2177C72BEAF2EC7D427E86EE6FD027268B19457F9DF464069C65A7CEC02D474D377BB6586DC9F0865DD156F265FDF1E1554DF477EEDD7FCEF51CE6D912AF0F3B60B712E217F24250B8FC6590E37E20AE060AD91671E531DE5B4272386983971F8A22A5726AA999DFB470D98F1B35C2FCA1C9E6732D719A62BB9ED58DD059DA028C4626FD276BB73F78A4F6E5FF20FA843074AC4FF5F520383DBA4BCC16E33CBCB283D64F6566326DB1EA7957F8E60EAC9311600E7739D5B71BACBE2B442D152BC7EC625086717CE9DEC9E47E05AC5C4045D29CE20A11141D801038A1ACBF67CA0FDD87833891CF4CB2BE3358824D9E4AF738CF56023DD7A728F58E4EA16882A5D401799EBFDBEE14703823686F989B20D402D25AC5B4661FA7FFAD809E9EED45CEF30B939D7EDAA4BEB34BD088200ECC986E5D22112CA0EB579B5BEEFA165F3FCB1BDD04E7C83D5B2E195AC91F0B56B3FCA3129855360C36B614513BABE1F0E7D342E81726B450B127054E23D951952AF3B0181ADAC58DE03ABA7259D683757DF9937C0C13738B3480AED2D35EF5F3EFB19A79FE3609A6D48F22AD9D069B6F1677F0E7E01CE5F0DC6B9BF3B6B414470BE49394F1AA5706D4FDFA82C8F7C2545DE9CA327846335E1A02296711869F9B9208101408AFCDCE09AD93B1A5BE25EF1A7A2F9734006F3128C3BE018C678CDBF52F63770CB578014A1C7728F5124B5A51FFCFACE90072D79022FE0C17230F0EB5EB292091DBA52E35A0EC4761E6479ACE36F9F368969B36BC9836EE472676C6715913F7C28DFD27F805C144056A5C7470399068EDBC3B369E4E9FA74FAD37B562980C556FB73E6A00A9B0867B42CDADB5D29C0325D6C702902DCBF1A52D2900E451ACCD629D11AA630BDD73AC2DE6E163557FC91411176E7AEDDA0E89F06B86397219EBA26B8D6AC40DBDE6EF0C8AC0ECC14C75AD9EBD09A4CE99BF16CDE346072C162F2C1150ED77C90A0C92F38194A62508E1C511DBCA9684F65CAFCAA10EA13AA8C5098F1B4409E7243C8A534B50D37EA9712EC56290C4FB4935B20EF48C099D7C58491AFBF25B7BEF961F2FDB40225A82E2558BE691480295ADEB081FE785319BD4BF1DE206763AC56E7DE551572784B8E1DC0D1C28DD896EF4522FD44E05A370C33C017EB1686D93C416B0B7AD3E3DBB8B4A09A0F967BF7F6CCC994201E41933EA5641E2E3FFC8AE5BC99DCE6B3A335CD5B8EF06F27CC9764D3268784AFF610CB5D46A80E1706B92C28D0900206EFBF397CF4EF96EB91AA5AA3DDCFB1806D5A0315C01DDC7875F4714ABDC0F5C1B5AAB0048AEC4DF57B5E2C6262B6F924EB7581887CCAFF0C98112409CB23313D99571507CFE6B923FC4E6D8D44F9D411C81572184F1438705B1E794D37C17C63928D1EEF606B50AF54578BA45AB9729B7B77FE791691FBDFCCAEC4047C406C18EC2A23E747B17F7CBDB290E574950DE2BCA6862ED5A0D17EB228E54BD1767E58423E22C5FCE4946102F56FCBE92AAB125E9BCE4B9DD9187E1DE8D35E0AAD7767DE824B2993CF52C32362DE9A420D694711133FEFF6F8DF8F2A46203D0ACB1E4E5D97A736B8393FDEB9C
+
+The funky chicken did its thing
+
+
+---
+
+
+We store data as if we have a bunch of movies. Let's start out with the idea of just using pixels, no shapes.
+
+Then we create a number of high level pixels that link to interval trees. The interval trees will keep track of time jumps,
+and will go downwards all the way to the 1 second time level.
+
+We split everything up based on levels, and each pixel has a density that reveals the number of points it holds.
+So if a point is visible, and it has a low density, the viewer can automatically zoom down to a lower depth
+to get the pixels below it for the lower density.
+
+And so on, and so on, like a tree.
+
+Q: But we don't have points, we have segments. If we jump from one location to another, we need to be able to show that. How do we do that?
+
+Q: 	public PointDiamond getPointDiamondWithNewPoint(CPoint newPoint, int maxDepth) {
+			//TODO: How does this make sense? what if the point only goes half way , represents the 
+			//center, etc... of the point diamond?
+
+---
+
+Q: What should line point to? If it points to the area id, then we'll need to create line elements in the sub-areas. If we point the line to the point,
+then we'd need to create multiple lines per point.
+
+We will use the area id. For sub-blobs along the line between the blobs of the endpoints of the line, we do not need to represent the line.
+This is because when we drill down on a sub-blob, we can remember that the line exists at a higher level. So then we know at least one line must also
+exist at the lower level somewhere. So if we drill down from level 10 to 9, we will gather all lines that fit in the end points of level 10.
+Then if we need to drill down further, we know the line(s) that cross the current area(s) we're looking at.
+
+So we continue the process, testing each sub line to see if it passes through the area(s) were interested in.
+
+Q: Why don't we put the line into the time interval tree?
+
+The line only will appear for specific circumstances, from n1 to n3. It would not appear when we go from n1 to n2. So it wouldn't
+really fit 1-to-1 with an element in the tree. Also, there could potentially be a lot of lines.
+
+Q: Why don't we merge the time intervals for sublines and parent lines?
+
+The parent line could not benefit, because the tree time interval of each subline would have
+to be merged to get a correct result for the parent tree.
+
+Linking the child line into the parent would be a little weird, but we could do it.
+We'd have to link from the parent to the children.
+
+
+
+----
+
+Each area will contain:
+  x,y 
+  time-interval tree
+    time-interval node: tj, time length, left, right
+  sub-area-ids, sub-line-ids, and point-ids
+    Each sub element will contain 2 bits type, 30 bits id
+    sub-line
+      starting area id (line is assumed to the next point)
+      time-interval tree
+
+Adding a segment:
+
+For p2: At highest level. create empty area if necessary.
+  add to area, add to time-interval tree
+
+For line: if p1 and p2 are far enough apart, add line. 
+If the line is added, the sub areas do not have to add it
+for sub areas where p1 and p2 do not appear (but the line crosses)
+
+If p1 and p2 areas are different
+  Add line to p1 and p2 area (and crossing area if line is not
+  added to current area).
+If the same, repeat as if at highest level
+
+At lowest level, record point id with sub-area. Otherwise, were
+done.
+
+Deleting a segment: --for later
+
+Drill down according to lat/lon, and remove it at each level.
+
+---
+
+Q: Why don't we store points using areapanel coordinates? 
+
+Because when we use map view, we have to convert to latm/lonm
+anyway
+
+Q: If we place a point where a line was located, does that
+mean we eliminate the line?
+
+No, because lines have a time dimension as well, so that
+any new point could not affect it anyway.
+
+Q: Do lines go from center of area panels, or from the actual location?
+
+The center of the area panel. This is because more than one actual traveling
+event can be represented by a single line. If we went from the actual location,
+we could have hundreds or thousands of lines if the user went home to work
+via subway for example.
+
+Q: Should we store points directly in areapanels if the point count is under
+some maximum, say 50?
+
+No. Suppose that the root area panel has 4 sub panels, and they each have 50
+points. That means we need to display 200 points. Now think that we have
+1024 descendents, each containing 50 points and it becomes an issue if we
+are displaying the top row.
+
+But what if the number of points was like 5? Not sure. It could still be
+a thing, though. I dunno. We could use 9 children instead as well. 
+
+Q: Should we have a 1 to 1 link between point and very small area panels?
+
+Yes. This is to support lines. If we have an endpoint of lines at the center
+of each area panel, we would never be able to display it properly for the lowest
+level of area panel
+
+
+----
+

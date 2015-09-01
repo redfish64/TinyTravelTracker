@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<item name="perc_time_gps_on_min_value" format="integer" type="dimen">1</item>
+	<item name="perc_time_gps_on_max_value" format="integer" type="dimen">100</item>
+	<item name="perc_time_gps_on_steps" format="integer" type="dimen">99</item>
+	<item name="perc_time_gps_on_log_scale" format="integer" type="dimen">25</item>
+	
+	<item name="min_battery_level_min_value" format="integer" type="dimen">0</item>
+	<item name="min_battery_level_max_value" format="integer" type="dimen">75</item>
+	<item name="min_battery_level_steps" format="integer" type="dimen">75</item>
+	<item name="min_battery_level_log_scale" format="integer" type="dimen">0</item>
+	<string name="seekbar_perc_printf_format">%.0f %%</string>
+
+	<item name="map_font_size_min_value" format="integer" type="dimen">1</item>
+	<item name="map_font_size_max_value" format="integer" type="dimen">5</item>
+	<item name="map_font_size_steps" format="integer" type="dimen">5</item>
+	<item name="map_font_size_log_scale" format="integer" type="dimen">0</item>
+</resources>

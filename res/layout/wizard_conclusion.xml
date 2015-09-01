@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/relativeLayout1"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+	
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/wizard_conclusion_text"
+        android:layout_marginBottom="10dp" />
+
+    <TextView
+        android:id="@+id/help_menu_tip"
+        android:layout_height="0dip"
+        android:layout_weight="1.00"
+        android:layout_width="wrap_content"
+        android:text="If you would like to check out the manual, press menu, and select &quot;Help&quot;"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+    
+    <include layout="@layout/wizard_buttons" />
+
+</LinearLayout>
+    

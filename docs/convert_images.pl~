@@ -1,0 +1,15 @@
+#!/usr/bin/perl
+
+if(@ARGV == 0)
+{
+    print "
+Usage: $0 <outpu directory> <images_desc_file>
+Converts an image to android directories: 
+res/drawable-ldpi res/drawable-mdpi res/drawable-hdpi res/drawable-xhdpi 
+according to screen size
+";
+
+    exit 0;
+}
+
+while(<>)
