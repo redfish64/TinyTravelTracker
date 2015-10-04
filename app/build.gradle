@@ -1,0 +1,27 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 'Google Inc.:Google APIs:19'
+    buildToolsVersion "23.0.1"
+
+    defaultConfig {
+        applicationId "com.rareventure.gps2"
+        minSdkVersion 10
+        targetSdkVersion 10
+
+        testApplicationId "com.rareventure.gps2.test"
+        testInstrumentationRunner "android.test.InstrumentationTestRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-project.txt'
+        }
+    }
+}
+
+dependencies {
+    compile 'com.android.support:support-v4:19.1.0'
+    compile 'ch.acra:acra:4.7.0-RC.1'
+}

@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- WARNING if you want to use android_install_frozen_version, do not use the shorthand notation (ex ".GpsTrailerService") or it will not work -->
+
+    <!-- NOTE, below, sharedUserId enables the premium installation to tell the trial installation to give it its preferences -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.rareventure.gps2"
+    android:versionCode="33"
+    android:sharedUserId="com.rareventure.gps2" 
+    android:versionName="1.0.8" >
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" >
+    </uses-permission>
+    <!-- <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" >
+    </uses-permission> -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.WAKE_LOCK" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.VIBRATE" >
+    </uses-permission>
+    <!-- <uses-permission android:name="android.permission.VIBRATE" /> -->
+	<!-- <uses-permission android:name="android.permission.GET_TASKS" />  --> 
+    <!-- Required permission to use in-app billing. 
+    <uses-permission android:name="com.android.vending.BILLING" />-->
+    <!--  for lvl -->
+    <uses-permission android:name="com.android.vending.CHECK_LICENSE"/>
+    
+    <!-- to get a  unique id 
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" /> -->
+    
+    <supports-screens
+        android:anyDensity="true"
+        android:largeScreens="true"
+        android:normalScreens="true"
+        android:smallScreens="true" />
+
+    <uses-sdk
+        android:minSdkVersion="10"
+        android:targetSdkVersion="10" />
+
+    <application
+        android:name="com.rareventure.gps2.GpsTrailerReviewerApplication"
+        android:icon="@drawable/icon_trial"
+        android:label="@string/app_name" >
+
+	    <!-- <activity android:name="com.google.ads.AdActivity"
+              android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"/> -->
+	    <activity android:name="com.google.ads.AdActivity"
+              />
+	    <activity
+	        android:name="com.rareventure.gps2.reviewer.map.OsmMapGpsTrailerReviewerMapActivity"
+            android:label="@string/reviewer_app_name"
+            android:configChanges="orientation|keyboardHidden"
+            android:screenOrientation="portrait" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+	    <activity android:name="org.acra.CrashReportDialog"
+	        android:theme="@android:style/Theme.Dialog"
+	        android:launchMode="singleInstance"
+	        android:excludeFromRecents="true"
+	        android:finishOnTaskLaunch="true" />
+        <!--
+            co: a local service might actually save memory, really
+        <service
+            android:name="com.rareventure.gps2.GpsTrailerService"
+            android:exported="false"
+            android:process=":remote" >
+        -->
+        <service
+            android:exported="false"
+            android:name="com.rareventure.gps2.GpsTrailerService">
+            <intent-filter>
+                <action android:name="com.rareventure.gps2.IGpsTrailerService" />
+                <!--
+                     This is an action code you can use to select the service
+                     without explicitly supplying the implementation class.
+                -->
+                <action android:name="com.rareventure.gps2.GPS_TRAILER" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:exported="false"
+            android:name="com.rareventure.gps2.TrialService">
+            <intent-filter>
+                <action android:name="com.rareventure.gps2.ITrialService" />
+            </intent-filter>
+        </service>
+
+       <receiver android:name="com.rareventure.gps2.bootup.GpsTrailerReceiver" >
+
+            <!--
+            screen on and screen off intents will not fire from the manifest,
+		    neither will media mount for external apps, so we use user_present et al
+		    since that seems to be the only way to start our app if externally mounted
+			<intent-filter>
+				<action android:name="android.intent.action.SCREEN_ON" />
+			</intent-filter><intent-filter>
+				<action android:name="android.intent.action.SCREEN_OFF" />
+			</intent-filter>
+            -->
+            <intent-filter>
+                <action android:name="android.intent.action.USER_PRESENT" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_EJECT" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_MOUNTED" />
+
+                <data android:scheme="file" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.rareventure.gps2.bootup.GpsTrailerReceiver" />
+            </intent-filter>
+            </receiver>
+
+        <activity android:name="com.rareventure.gps2.reviewer.wizard.WelcomePage" 
+            android:screenOrientation="portrait" >
+        </activity>
+       <!-- TODO 3 portrait because the progress dialog screws up when switching orientations -->
+        <activity android:name="com.rareventure.gps2.reviewer.wizard.ShouldHavePasswordPage" android:screenOrientation="portrait" >
+        </activity>
+        <activity android:name="com.rareventure.gps2.reviewer.wizard.BatteryLifePage" android:screenOrientation="portrait"  >
+        </activity>
+        <activity android:name="com.rareventure.gps2.reviewer.wizard.ConclusionPage" android:screenOrientation="portrait" >
+        </activity>
+        <activity android:name="com.rareventure.gps2.reviewer.wizard.EnterNewPasswordPage" android:screenOrientation="portrait"  android:launchMode="singleTop">
+        </activity>
+        <activity android:name="com.rareventure.gps2.reviewer.SettingsActivity" android:screenOrientation="portrait"
+             android:launchMode="singleTop"
+            >
+        </activity>
+        <activity android:name="com.rareventure.gps2.reviewer.password.EnterPasswordActivity" 
+            android:windowSoftInputMode="stateAlwaysVisible"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity android:name="com.rareventure.gps2.reviewer.wizard.TurnOnGpsPage" android:screenOrientation="portrait" >
+        </activity>
+        <activity android:name="com.rareventure.gps2.reviewer.wizard.HelpDeveloperPage" android:screenOrientation="portrait" >
+        </activity>
+        <activity android:name="com.rareventure.gps2.reviewer.map.FullMediaGalleryActivity"  android:screenOrientation="portrait">
+        </activity>
+        <activity android:name="com.rareventure.gps2.reviewer.DbDoesntExistActivity"  android:screenOrientation="portrait">
+        </activity>
+        <activity android:name="com.rareventure.gps2.reviewer.TimmyCorruptActivity" android:screenOrientation="portrait" >
+        </activity>
+        <activity android:name="com.rareventure.gps2.reviewer.TrialExpiredActivity" android:screenOrientation="portrait" >
+        </activity>
+        <activity android:name="com.rareventure.gps2.reviewer.TimmyNeedsUpgradeActivity"  android:screenOrientation="portrait">
+        </activity>
+        <activity android:name="com.rareventure.gps2.reviewer.TimmyNeedsProcessingActivity"  android:screenOrientation="portrait">
+        </activity>
+        <activity android:name="com.rareventure.android.FatalErrorActivity"  android:screenOrientation="portrait">
+        </activity>
+        <activity android:name="com.rareventure.gps2.reviewer.imageviewer.ViewImage" >
+        </activity>
+        <activity android:name="com.rareventure.gps2.reviewer.AboutScreen" >
+        </activity>
+        <activity android:name="com.rareventure.gps2.reviewer.ShowManual" >
+        </activity>
+        <activity android:name="com.rareventure.gps2.reviewer.ChooseColorsScreen"  android:screenOrientation="portrait">
+        </activity>
+        <activity android:name="com.rareventure.gps2.reviewer.EnterFromDateToToDateActivity"  android:screenOrientation="portrait"  android:launchMode="singleTop">
+        </activity>
+        <!-- portrait because the progress dialog screws up when switching orientations -->
+        <activity android:name="com.rareventure.gps2.gpx.CreateGpxBackup"
+            android:screenOrientation="portrait"
+            android:launchMode="singleTask"
+              >
+        </activity>
+        <!-- portrait because the progress dialog screws up when switching orientations -->
+        <activity android:name="com.rareventure.gps2.gpx.RestoreGpxBackup"
+            android:screenOrientation="portrait" 
+            android:launchMode="singleTask"
+             >
+        </activity>
+        <activity android:name="com.lamerman.FileDialog" >
+        </activity>
+        
+    </application>
+
+</manifest>
