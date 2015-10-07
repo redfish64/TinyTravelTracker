@@ -19,10 +19,11 @@
 #   public *;
 #}
 #-keep class ** implements com.rareventure.android.AndroidPreferenceSet$AndroidPreferences {*;}
-
+-dontobfuscate
 -keep class com.rareventure.gps2.ITrialService
 
 -keep class com.rareventure.gps2.bootup.GpsTrailerReceiver
+
 
 #ACRA specifics
 # we need line numbers in our stack traces otherwise they are pretty useless
