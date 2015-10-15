@@ -19,12 +19,6 @@
 */
 package com.rareventure.gps2;
 
-import java.nio.channels.IllegalSelectorException;
-import java.util.ArrayList;
-import java.util.HashSet;
-
-import org.acra.ErrorReporter;
-
 import com.rareventure.android.FatalErrorActivity;
 import com.rareventure.gps2.GTG.Requirement;
 import com.rareventure.gps2.gpx.RestoreGpxBackup;
@@ -38,11 +32,8 @@ import com.rareventure.gps2.reviewer.wizard.EnterNewPasswordPage;
 import com.rareventure.gps2.reviewer.wizard.WelcomePage;
 
 import android.app.Activity;
-import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.util.Log;
 
 public class GTGActivityHelper {
 	private Activity activity;
@@ -334,7 +325,7 @@ public class GTGActivityHelper {
 
 			if (Requirement.PASSWORD_ENTERED.isOn(requirementsDiff)) {
 				//we don't want the user to have to retype their password right after creating it
-				if (!GTG.requirePasswordEntered(EnterNewPasswordPage.passwordInitializedWith)) {
+				if (!GTG.requirePasswordEntered(EnterNewPasswordPage.passwordInitializedWith, GTG.lastGtgClosedMS)) {
 					if(!isBackAction)
 						startInternalActivity(
 							new Intent(activity, EnterPasswordActivity.class)

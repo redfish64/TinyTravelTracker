@@ -35,17 +35,21 @@ import android.view.ViewTreeObserver;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 
 import com.rareventure.android.SeekBarDialogPreference;
+import com.rareventure.android.widget.SeekBarWithText;
 import com.rareventure.gps2.GTG;
 import com.rareventure.gps2.GTG.GTGAction;
 import com.rareventure.gps2.GTGPreferenceActivity;
 import com.rareventure.gps2.GpsTrailerCrypt;
 import com.rareventure.gps2.GpsTrailerGpsStrategy;
 import com.rareventure.gps2.GpsTrailerService;
+import com.rareventure.gps2.IGTGActivity;
 import com.rareventure.gps2.R;
 import com.rareventure.gps2.gpx.CreateGpxBackup;
 import com.rareventure.gps2.gpx.RestoreGpxBackup;
 import com.rareventure.gps2.reviewer.map.OsmMapGpsTrailerReviewerMapActivity;
 import com.rareventure.gps2.reviewer.password.EnterPasswordActivity;
+
+import java.util.Arrays;
 
 public class SettingsActivity extends GTGPreferenceActivity implements OnPreferenceChangeListener, OnPreferenceClickListener, OnDismissListener {
 	private final Runnable SAVE_PREFS_AND_RESTART_COLLECTOR = new Runnable() 
@@ -69,6 +73,7 @@ public class SettingsActivity extends GTGPreferenceActivity implements OnPrefere
 	private Preference changePassword;
 	private SeekBarDialogPreference percTimeGpsOn;
 	private SeekBarDialogPreference minBatteryLife;
+	private SeekBarDialogPreference passwordTimeout;
 
 	private CheckBoxPreference useMetricUnits;
 
@@ -85,7 +90,29 @@ public class SettingsActivity extends GTGPreferenceActivity implements OnPrefere
 	private CheckBoxPreference allowErrorReporting;
 
 	private SeekBarDialogPreference mapFontSize;
-	
+
+	private static final String[] passwordTimeoutStrs =
+			{ "Off" ,
+			"30 seconds",
+					"1 minute",
+			"3 minutes",
+					"5 minutes",
+					"10 minutes",
+					"15 minutes",
+					"30 minutes",
+					"1 hour"};
+	private static final long[] passwordTimeoutValues =
+			{ 0 ,
+					30*1000,
+					60*1000,
+			180*1000,
+					300 * 1000,
+					10 * 60 * 1000,
+					15 * 60 * 1000,
+					30 * 60 * 1000,
+					60 * 60 * 1000};
+
+
 	@Override
 	public void doOnCreate(Bundle savedInstanceState) {
 		super.doOnCreate(savedInstanceState);
@@ -112,7 +139,8 @@ public class SettingsActivity extends GTGPreferenceActivity implements OnPrefere
     			getResources().getInteger(R.dimen.perc_time_gps_on_max_value), 
     			getResources().getInteger(R.dimen.perc_time_gps_on_steps), 
     			getResources().getInteger(R.dimen.perc_time_gps_on_log_scale),
-    			getText(R.string.seekbar_perc_printf_format).toString());
+    			getText(R.string.seekbar_perc_printf_format).toString(),
+				null);
         percTimeGpsOn.setOnPreferenceChangeListener(this);
         root.addPreference(percTimeGpsOn);
         
@@ -123,7 +151,8 @@ public class SettingsActivity extends GTGPreferenceActivity implements OnPrefere
     			getResources().getInteger(R.dimen.min_battery_level_max_value), 
     			getResources().getInteger(R.dimen.min_battery_level_steps), 
     			getResources().getInteger(R.dimen.min_battery_level_log_scale),
-    			getText(R.string.seekbar_perc_printf_format).toString());
+    			getText(R.string.seekbar_perc_printf_format).toString(),
+				null);
         minBatteryLife.setOnPreferenceChangeListener(this);
         root.addPreference(minBatteryLife);
         
@@ -157,7 +186,8 @@ public class SettingsActivity extends GTGPreferenceActivity implements OnPrefere
     			getResources().getInteger(R.dimen.map_font_size_max_value), 
     			getResources().getInteger(R.dimen.map_font_size_steps), 
     			getResources().getInteger(R.dimen.map_font_size_log_scale),
-    			"%1.0f");
+    			"%1.0f",
+				null);
         mapFontSize.setOnPreferenceChangeListener(this);
         root.addPreference(mapFontSize);
         
@@ -173,8 +203,25 @@ public class SettingsActivity extends GTGPreferenceActivity implements OnPrefere
         root.addPreference(changePassword);
         changePassword.setDependency("enable_password");
         changePassword.setOnPreferenceClickListener(this);
-        
-        createBackupFilePref = getPreferenceManager().createPreferenceScreen(this);
+
+		passwordTimeout = new SeekBarDialogPreference(this,
+				getText(R.string.title_password_timeout),
+				getText(R.string.desc_password_timeout),
+				0,
+				passwordTimeoutStrs.length-1,
+				passwordTimeoutStrs.length,
+				0,
+				null,
+				new SeekBarWithText.CustomUpdateTextView() {
+					@Override
+					public String updateText(float value) {
+						return passwordTimeoutStrs[(int)value];
+					}
+				});
+		passwordTimeout.setOnPreferenceChangeListener(this);
+		root.addPreference(passwordTimeout);
+
+		createBackupFilePref = getPreferenceManager().createPreferenceScreen(this);
         createBackupFilePref.setTitle(R.string.create_backup_pref);
         root.addPreference(createBackupFilePref);
         createBackupFilePref.setOnPreferenceClickListener(this);
@@ -200,7 +247,7 @@ public class SettingsActivity extends GTGPreferenceActivity implements OnPrefere
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
     	menu.clear();
-    	menu.add(R.string.back_to_main);
+    	menu.add(R.string.go_to_main);
     	
 		return super.onPrepareOptionsMenu(menu);
 	}
@@ -209,8 +256,9 @@ public class SettingsActivity extends GTGPreferenceActivity implements OnPrefere
     public boolean onOptionsItemSelected(MenuItem item) {
         GTG.ccRwtm.registerReadingThread();
         try {
-        if(item.getTitle().equals(getText(R.string.back_to_main)))
+        if(item.getTitle().equals(getText(R.string.go_to_main)))
         {
+			startInternalActivity(new Intent(this, OsmMapGpsTrailerReviewerMapActivity.class));
         	finish();
             return true;
         }
@@ -229,10 +277,13 @@ public class SettingsActivity extends GTGPreferenceActivity implements OnPrefere
         super.doOnResume();
         enablePassword.setChecked(!GpsTrailerCrypt.prefs.isNoPassword);
         isCollectData.setChecked(GTG.prefs.isCollectData);
-        percTimeGpsOn.setValue(GpsTrailerGpsStrategy.prefs.batteryGpsOnTimePercentage*100);
+        percTimeGpsOn.setValue(GpsTrailerGpsStrategy.prefs.batteryGpsOnTimePercentage * 100);
         minBatteryLife.setValue(GTG.prefs.minBatteryPerc*100);
         enableToolTips.setChecked(OsmMapGpsTrailerReviewerMapActivity.prefs.enableToolTips);
-        mapFontSize.setValue(OsmMapGpsTrailerReviewerMapActivity.prefs.panelScale);
+		mapFontSize.setValue(OsmMapGpsTrailerReviewerMapActivity.prefs.panelScale);
+		passwordTimeout.setValue(getPasswordTimeoutFromMS(GTG.prefs.passwordTimeoutMS));
+
+		passwordTimeout.setEnabled(enablePassword.isChecked());
 
         //co: we no longer allow access to application after expiry (so we can justify not
         // serving tiles without a valid license)
@@ -271,8 +322,13 @@ public class SettingsActivity extends GTGPreferenceActivity implements OnPrefere
 
     }
 
-    
-    
+	private float getPasswordTimeoutFromMS(long passwordTimeoutMS) {
+		int res = Arrays.binarySearch(passwordTimeoutValues, passwordTimeoutMS);
+		if(res >= 0)
+			return res;
+		return 0;
+	}
+
 
 	private void savePrefs()
 	{
@@ -326,6 +382,11 @@ public class SettingsActivity extends GTGPreferenceActivity implements OnPrefere
 			OsmMapGpsTrailerReviewerMapActivity.prefs.panelScale = (int)(mapFontSize.getValue()+.5);
 			//GTG.savePreferences(SettingsActivity.this);
 		}
+		else if(preference == passwordTimeout)
+		{
+			GTG.prefs.passwordTimeoutMS = passwordTimeoutValues[(int)(passwordTimeout.getValue())];
+			//GTG.savePreferences(SettingsActivity.this);
+		}
 		return false;
 	}
 
@@ -348,6 +409,7 @@ public class SettingsActivity extends GTGPreferenceActivity implements OnPrefere
 	@Override
 	public void onDismiss(DialogInterface dialog) {
 		enablePassword.setChecked(!GpsTrailerCrypt.prefs.isNoPassword);
+		passwordTimeout.setEnabled(enablePassword.isChecked());
 	}
 
 	@Override

@@ -38,8 +38,19 @@ public class SeekBarWithText extends RelativeLayout {
 	private SeekBar seekBar;
 	private TextView textView;
 	private double logScale;
+	private CustomUpdateTextView customUpdateTextView;
+
+	public static interface CustomUpdateTextView
+	{
+
+		String updateText(float value);
+	}
 
 	public SeekBarWithText(Context context, AttributeSet attrs, int defStyle) {
+		this(context,attrs,defStyle,null);
+	}
+
+	public SeekBarWithText(Context context, AttributeSet attrs, int defStyle, CustomUpdateTextView customUpdateTextView) {
 		super(context, attrs, defStyle);
 		
 		View.inflate(context, R.layout.seek_bar_with_text, this);
@@ -54,11 +65,13 @@ public class SeekBarWithText extends RelativeLayout {
         printfFormat = a.getString(R.styleable.com_rareventure_android_widget_SeekBarWithText_printfFormat);
         if(printfFormat == null)
         	printfFormat = "%.1f";
+
+		this.customUpdateTextView = customUpdateTextView;
         
         seekBar = ((SeekBar)findViewById(R.id.seekBar));
         textView = ((TextView)findViewById(R.id.textView));
         
-        seekBar.setMax(divisions);
+        seekBar.setMax(divisions-1);
         
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 			
@@ -83,16 +96,20 @@ public class SeekBarWithText extends RelativeLayout {
 	private void updateTextView()
 	{
 		float value = calcValue(seekBar.getProgress());
-		
-		textView.setText(String.format(printfFormat, value));
+
+		if(customUpdateTextView != null)
+			textView.setText(customUpdateTextView.updateText(value));
+		else
+			textView.setText(String.format(printfFormat, value));
 	}
 	
 	private float calcValue(int progress)
 	{
 		if(logScale == 0)
-			return minValue + (maxValue - minValue) * progress / divisions;
+			return minValue + (maxValue - minValue) * progress / (divisions-1);
 		else
-			return (float) (minValue + (maxValue - minValue) * (Math.exp((double)progress / logScale)-1) / (Math.exp((double)divisions/logScale)-1));
+			return (float) (minValue + (maxValue - minValue) * (Math.exp((double)progress / logScale)-1) /
+					(Math.exp((double)(divisions-1)/logScale)-1));
 	}
 	
 	public float getValue()
@@ -107,7 +124,7 @@ public class SeekBarWithText extends RelativeLayout {
 	public void setValue(float value)
 	{
 		if(logScale == 0)
-			seekBar.setProgress(Math.round((value - minValue) * divisions / (maxValue - minValue)));
+			seekBar.setProgress(Math.round((value - minValue) * (divisions-1) / (maxValue - minValue)));
 		else
 		{
 //			(float) (minValue + (maxValue - minValue) * (Math.exp((double)progress / logScale)-1) / (Math.exp((double)divisions/logScale)-1));
@@ -126,12 +143,12 @@ public class SeekBarWithText extends RelativeLayout {
 //			(x - m) * ((e^(d/l))-1) / (n - m) + 1 = e^(p/l)
 //			lg((x - m) * ((e^(d/l))-1) / (n - m) + 1) = p/l
 //			lg((x - m) * ((e^(d/l))-1) / (n - m) + 1) * l = p
-			seekBar.setProgress((int) Math.round((Math.log((value - minValue) * (Math.exp(divisions/logScale)-1)/ (maxValue - minValue) + 1)) * logScale));
+			seekBar.setProgress((int) Math.round((Math.log((value - minValue) * (Math.exp((divisions-1)/logScale)-1)/ (maxValue - minValue) + 1)) * logScale));
 		}
 	}
 
 	public SeekBarWithText(Context context, AttributeSet attrs) {
-		this(context, attrs,0);
+		this(context, attrs,0,null);
 	}
 
 	public SeekBarWithText(Context context) {
@@ -139,13 +156,16 @@ public class SeekBarWithText extends RelativeLayout {
 	}
 
 	public void setAttrs(float minValue, float maxValue, int divisions,		
-			float logScale, CharSequence printfFormat) {
-		this.printfFormat = printfFormat.toString();
+			float logScale, CharSequence printfFormat, CustomUpdateTextView customUpdateTextView) {
+		if(printfFormat != null)
+			this.printfFormat = printfFormat.toString();
 		this.minValue = minValue;
 		this.maxValue = maxValue;
 		this.divisions = divisions;
 		this.logScale = logScale;
-        seekBar.setMax(divisions);
+		this.customUpdateTextView = customUpdateTextView;
+
+        seekBar.setMax(divisions-1);
         updateTextView();
 	}
 

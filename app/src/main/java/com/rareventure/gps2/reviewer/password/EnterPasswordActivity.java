@@ -19,7 +19,6 @@
 */
 package com.rareventure.gps2.reviewer.password;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
@@ -31,7 +30,6 @@ import android.widget.TextView.OnEditorActionListener;
 
 import com.rareventure.gps2.GTG;
 import com.rareventure.gps2.GTGActivity;
-import com.rareventure.gps2.GpsTrailerCrypt;
 import com.rareventure.gps2.R;
 import com.rareventure.gps2.database.TAssert;
 
@@ -118,7 +116,7 @@ public class EnterPasswordActivity extends GTGActivity {
 			}
 			//else we just need to verify the password, decrypt is already done
 			
-			if (!GTG.requirePasswordEntered(password)) {
+			if (!GTG.requirePasswordEntered(password, GTG.lastGtgClosedMS)) {
 				passwordIncorrectText.setVisibility(
 						View.VISIBLE);
 	

@@ -23,13 +23,11 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.WeakHashMap;
 
 import org.acra.ACRA;
 
-import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -38,13 +36,9 @@ import android.content.SharedPreferences.Editor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Environment;
-import android.os.Handler;
 import android.os.StatFs;
 import android.util.Log;
 
-import com.google.android.vending.licensing.LicenseChecker;
-import com.google.android.vending.licensing.LicenseCheckerCallback;
-import com.google.android.vending.licensing.ResponseData;
 import com.rareventure.android.AndroidPreferenceSet;
 import com.rareventure.android.AndroidPreferenceSet.AndroidPreferences;
 import com.rareventure.android.SuperThreadManager;
@@ -79,8 +73,7 @@ import com.rareventure.util.ReadWriteThreadManager;
  */
 public class GTG {
 	//TODO 2 put autozoom and gps buttons behind location/time window
-	//TODO 2 open source and release TimmyTables
-	//TODO 2 create blog and make a lot of interesting articles... get a following, and make an article on ttt, maybe 
+	//TODO 2 create blog and make a lot of interesting articles... get a following, and make an article on ttt, maybe
 	// even what if you build it and they never come?
 	//TODO 2.1 add wifi back
 	//TODO 2.1 add magnetic readings
@@ -272,8 +265,16 @@ public class GTG {
 	public static Intent BUY_PREMIUM_INTENT = new Intent(Intent.ACTION_VIEW);
 	
 	public static ReadWriteThreadManager initRwtm = new ReadWriteThreadManager();
-	
-	
+
+	/**
+	 * The timestamp of when the user last did an action where we would want them to
+	 * reenter their password normally.
+	 *
+	 * Used by password timeout functionality.
+	 */
+	public static long lastGtgClosedMS;
+
+
 	//TODO 2.01 Z make video??
 	
 	//TODO 2 Z make sure that market link works for BUY_PREMIUM_INTENT	
@@ -597,17 +598,20 @@ public class GTG {
 	/**
 	 * Require that the password be entered since the last time the app was entered
 	 * or there is none. 
-	 * 
+	 *
 	 * @param password if user entered a password, the password that was entered, otherwise
-	 *   should be null 
+	 *   should be null
+	 * @param lastGtgClosedMS
 	 */
-	public static boolean requirePasswordEntered(String password)
+	public static boolean requirePasswordEntered(String password, long lastGtgClosedMS)
 	{
 		if(Requirement.PASSWORD_ENTERED.isFulfilledAndAssertPriorRequirements())
 			return true;
 
 		boolean status;
-		if(password == null)
+		if(GTG.prefs.passwordTimeoutMS != 0 && lastGtgClosedMS + GTG.prefs.passwordTimeoutMS > System.currentTimeMillis())
+			status = true;
+		else if(password == null)
 			status = GpsTrailerCrypt.prefs.isNoPassword;
 		else
 			status = GpsTrailerCrypt.verifyPassword(password);
@@ -787,7 +791,9 @@ public class GTG {
 				GTG.prefs.compassData = Integer.parseInt(value);
 			else if(name.equals(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.GTG.Preferences.useMetric"))
 				GTG.prefs.useMetric = Boolean.parseBoolean(value);
-			
+			else if(name.equals(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.GTG.Preferences.passwordTimeoutMS"))
+				GTG.prefs.passwordTimeoutMS = Long.parseLong(value);
+
 			else if(name.equals(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.reviewer.map.OsmMapGpsTrailerReviewerMapActivity.Preferences.currX"))
 				OsmMapGpsTrailerReviewerMapActivity.prefs.currX = Double.parseDouble(value);
 			else if(name.equals(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.reviewer.map.OsmMapGpsTrailerReviewerMapActivity.Preferences.currY"))
@@ -1014,7 +1020,6 @@ public class GTG {
 	 * <p> 
 	 * Note that thread handling must be handled by the listener
 	 * 
-	 * @param detail error detail
 	 * @param obj object to set into event. If set, alert will always run, otherwise
 	 *   it will be ignored if the event is already on
 	 */
@@ -1296,6 +1301,11 @@ public class GTG {
 		 */
 		public int compassData = COMPASS_DATA_XOR;
 
+		/**
+		 * If not zero, represents the amount of time before the password times out when
+		 * not inside the app
+		 */
+		public long passwordTimeoutMS;
 	}
 	
 	public static int COMPASS_DATA_XOR = -1016932754;
@@ -1492,6 +1502,9 @@ public class GTG {
 
 
 	public static void setAppPasswordNotEntered() {
+		if(Requirement.PASSWORD_ENTERED.isFulfilled())
+			GTG.lastGtgClosedMS = System.currentTimeMillis();
+
 		Requirement.PASSWORD_ENTERED.reset();
 	}
 

@@ -4,7 +4,7 @@
 	<item name="perc_time_gps_on_max_value" format="integer" type="dimen">100</item>
 	<item name="perc_time_gps_on_steps" format="integer" type="dimen">99</item>
 	<item name="perc_time_gps_on_log_scale" format="integer" type="dimen">25</item>
-	
+
 	<item name="min_battery_level_min_value" format="integer" type="dimen">0</item>
 	<item name="min_battery_level_max_value" format="integer" type="dimen">75</item>
 	<item name="min_battery_level_steps" format="integer" type="dimen">75</item>

@@ -72,6 +72,8 @@
     <string name="desc_perc_time_gps_on">Percentage of time GPS is turned on. This will affect battery usage.</string>
     <string name="title_min_battery_life_perc">Min Battery Life</string>
     <string name="desc_min_battery_life_perc">If the battery falls below this value, GPS reading will be automatically turned off.</string>
+    <string name="title_password_timeout">Password timeout</string>
+    <string name="desc_password_timeout">If app is exited, or phone is turned off, the timeout before asking for the password again. (Note, if phone is heavily used, password may be asked for again before timeout)</string>
     <string name="title_map_font_size">Map Font Size</string>
     <string name="desc_map_font_size">Determines the size of the labels of streets, cities, etc. within the map</string>
     <string name="error_password_cant_be_empty">Please specify a password</string>
@@ -90,7 +92,7 @@
     <string name="time_view">Time View</string>
     <string name="time_and_date_format">yyyy, MMM dd, EEE, h:mm a</string>
     <string name="date_format">yyyy, MMM dd, EEE</string>
-    <string name="back_to_main">Back to main screen</string>
+    <string name="go_to_main">Go to main screen</string>
     <string name="from">From</string>
     <string name="to">To</string>
     <string name="about">About</string>

@@ -47,6 +47,7 @@ public class SeekBarDialogPreference extends DialogPreference {
 	private float logScale;
 	//when the dialog is not being shown
 	private OnPreferenceChangeListener onPreferenceChangeListener;
+	private SeekBarWithText.CustomUpdateTextView customUpdateTextView;
 
 	public SeekBarDialogPreference(Context context, AttributeSet attrs,
 			int defStyle) {
@@ -71,7 +72,7 @@ public class SeekBarDialogPreference extends DialogPreference {
 
     public SeekBarDialogPreference(Context context,
 			CharSequence title, CharSequence desc, int minValue, int maxValue,
-			int divisions, float logScale, String printfFormat) {
+			int divisions, float logScale, String printfFormat, SeekBarWithText.CustomUpdateTextView customUpdateTextView) {
     	super(context, null);
 		this.title = title;
 		this.desc = desc;
@@ -80,6 +81,7 @@ public class SeekBarDialogPreference extends DialogPreference {
 		this.divisions = divisions;
 		this.logScale = logScale;
 		this.printfFormat = printfFormat;
+		this.customUpdateTextView = customUpdateTextView;
 
     	setDialogTitle(title);
 		setSummary(desc);
@@ -91,8 +93,9 @@ public class SeekBarDialogPreference extends DialogPreference {
     	
     	this.textView = (TextView)dialogView.findViewById(R.id.textView);
     	this.seekBarWithText = (SeekBarWithText)dialogView.findViewById(R.id.seekBarWithText);
-    	
-    	seekBarWithText.setAttrs(minValue, maxValue, divisions, logScale, printfFormat);
+
+		
+		seekBarWithText.setAttrs(minValue, maxValue, divisions, logScale, printfFormat, customUpdateTextView);
     	textView.setText(desc);
     	seekBarWithText.setValue(value);
     	
@@ -107,7 +110,10 @@ public class SeekBarDialogPreference extends DialogPreference {
 	}
 
 	private void updateTitle() {
-		setTitle(title+" - "+String.format(printfFormat,value));
+		if(customUpdateTextView != null)
+			setTitle(title+" - "+customUpdateTextView.updateText(value));
+		else
+			setTitle(title+" - "+String.format(printfFormat,value));
 	}
 
 	public float getValue() {
