@@ -19,6 +19,7 @@
 */
 package com.rareventure.gpx;
 
+import java.util.Locale;
 import java.util.TimeZone;
 
 import org.joda.time.DateTimeZone;
@@ -100,10 +101,11 @@ public class GpxWriter
 	{
 		String timeStr = XML_DATE_TIME_FORMAT.print(time);
 		
-		write(String.format("\t\t\t<trkpt lat=\"%f\" lon=\"%f\" >\n"+
+		write(String.format(Locale.ENGLISH,"\t\t\t<trkpt lat=\"%f\" lon=\"%f\" >\n"+
 				"\t\t\t\t<ele>%f</ele>\n"+
 				"\t\t\t\t<time>%s</time>\n"+
 				(tz == null ? "" :
+
 					"\t\t\t\t<extensions><rareventure:"+GpxReader.TAG_NEW_TIME_ZONE+" id=\""+(tz.getTimeZone() == null ? "UNKNOWN" : tz.getTimeZone().getID())+"\" />" +
 							"</extensions>\n")+
 				"\t\t\t</trkpt>\n", lat, lon, alt, timeStr
