@@ -380,12 +380,12 @@ public class SettingsActivity extends GTGPreferenceActivity implements OnPrefere
 		else if(preference == mapFontSize)
 		{
 			OsmMapGpsTrailerReviewerMapActivity.prefs.panelScale = (int)(mapFontSize.getValue()+.5);
-			//GTG.savePreferences(SettingsActivity.this);
+			GTG.savePreferences(SettingsActivity.this);
 		}
 		else if(preference == passwordTimeout)
 		{
 			GTG.prefs.passwordTimeoutMS = passwordTimeoutValues[(int)(passwordTimeout.getValue())];
-			//GTG.savePreferences(SettingsActivity.this);
+			GTG.savePreferences(SettingsActivity.this);
 		}
 		return false;
 	}

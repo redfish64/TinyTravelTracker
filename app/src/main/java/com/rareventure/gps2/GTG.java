@@ -739,9 +739,10 @@ public class GTG {
 					GTG.prefs.minBatteryPerc);
 			res.put(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.GTG.Preferences.compassData", 
 					GTG.prefs.compassData);
-			res.put(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.GTG.Preferences.useMetric", 
+			res.put(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.GTG.Preferences.useMetric",
 					GTG.prefs.useMetric);
-
+			res.put(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.GTG.Preferences.passwordTimeoutMS",
+					GTG.prefs.passwordTimeoutMS);
 			
 			res.put(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.reviewer.map.OsmMapGpsTrailerReviewerMapActivity.Preferences.currX", 
 					OsmMapGpsTrailerReviewerMapActivity.prefs.currX);
@@ -759,7 +760,9 @@ public class GTG {
 					OsmMapGpsTrailerReviewerMapActivity.prefs.selectedColorRangesBitmap);
 			res.put(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.reviewer.map.OsmMapGpsTrailerReviewerMapActivity.Preferences.enableToolTips", 
 					OsmMapGpsTrailerReviewerMapActivity.prefs.enableToolTips);
-			
+			res.put(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.reviewer.map.OsmMapGpsTrailerReviewerMapActivity.Preferences.panelScale",
+					OsmMapGpsTrailerReviewerMapActivity.prefs.panelScale);
+
 			res.put(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.GpsTrailerGpsStrategy.Preferences.batteryGpsOnTimePercentage", 
 					GpsTrailerGpsStrategy.prefs.batteryGpsOnTimePercentage);
 			
@@ -810,13 +813,12 @@ public class GTG {
 				OsmMapGpsTrailerReviewerMapActivity.prefs.selectedColorRangesBitmap = Integer.parseInt(value);
 			else if(name.equals(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.reviewer.map.OsmMapGpsTrailerReviewerMapActivity.Preferences.enableToolTips"))
 				OsmMapGpsTrailerReviewerMapActivity.prefs.enableToolTips = Boolean.parseBoolean(value);
-			
+			else if(name.equals(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.reviewer.map.OsmMapGpsTrailerReviewerMapActivity.Preferences.panelScale"))
+				OsmMapGpsTrailerReviewerMapActivity.prefs.panelScale = Integer.parseInt(value);
+
 			else if(name.equals(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.GpsTrailerGpsStrategy.Preferences.batteryGpsOnTimePercentage"))
 				GpsTrailerGpsStrategy.prefs.batteryGpsOnTimePercentage = Float.parseFloat(value);
-
-			
-			
-			else 
+			else
 				Log.e(GTG.TAG,"ignoring pref: "+name);
 		}};
 	public static GpsTrailerCrypt crypt;
