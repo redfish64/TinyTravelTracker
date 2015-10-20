@@ -30,3 +30,10 @@ proguard/
 
 #my tmp files
 tmp/
+
+#android studio junk
+.gradle/
+app/build/
+build/
+import-summary.txt
+
