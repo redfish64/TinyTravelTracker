@@ -30,6 +30,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebView.PictureListener;
+import android.webkit.WebViewClient;
 
 public class ShowManual extends GTGActivity {
 	
@@ -56,14 +57,15 @@ public class ShowManual extends GTGActivity {
 	@Override
 	public void doOnResume() {
 		//from http://stackoverflow.com/questions/9392031/webview-scrollto-is-not-working
-		webView.setPictureListener(new PictureListener() {
-
-	        @Override
-	        public void onNewPicture(WebView view, Picture picture) {
-				webView.scrollTo(lastScrollX, lastScrollY);
-	        }
-
-	    });
+		//co: makes hyperlinks not work
+//		webView.setPictureListener(new PictureListener() {
+//
+//	        @Override
+//	        public void onNewPicture(WebView view, Picture picture) {
+//				webView.scrollTo(lastScrollX, lastScrollY);
+//	        }
+//
+//	    });
 				
 	}
 	
