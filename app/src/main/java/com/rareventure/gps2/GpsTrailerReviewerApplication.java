@@ -35,7 +35,7 @@ import android.content.Intent;
 @ReportsCrashes(
 //		formKey="dFp0X2pTTTV1am5kNHczbk1lTE5rYVE6MQ",
 //		formKey="",
-		formUri = "http://rareventure.com:3127/reportCrash",
+		formUri = "https://collector.tracepot.com/c38489a7",
 //		formUri = "http://10.32.13.200:3127/reportCrash",
 //        mode = ReportingInteractionMode.DIALOG,
 		//we need silent here because of the way we forward from one activity to another in case of an
