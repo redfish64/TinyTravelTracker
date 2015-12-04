@@ -437,7 +437,8 @@ public class MediaLocTimeMap {
 						
 						//TODO 2.5 is this threadsafe? If no?
 						Bitmap x = mlt.getThumbnailBitmap(contentResolver, true);
-						x.recycle();
+						if(x != null)
+							x.recycle();
 					}
 					
 					//get the next item from the db

@@ -308,7 +308,7 @@ public class MediaGalleryFragment extends Fragment
 				ImageView videoMarkerView = (ImageView) fl
 						.findViewById(R.id.video_indicator);
 
-				if (mlt.isClean(context)) {
+				if (!mlt.isDeleted() && mlt.isClean(context)) {
 					Bitmap b = mltArray.get(position).getThumbnailBitmap(
 							contentResolver, true);
 
