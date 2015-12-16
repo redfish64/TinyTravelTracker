@@ -168,7 +168,9 @@ public class EnterFromDateToToDateActivity extends GTGActivity {
 						toScrollerData.mTime.getTimeInMillis() - MIN_TIME_PERIOD);
 				timeScroller.setMaxTime(
 						toScrollerData.mTime.getTimeInMillis() - MIN_TIME_PERIOD);
-                mTime.setTimeInMillis(toScrollerData.mTime.getTimeInMillis() - MIN_TIME_PERIOD);
+
+                mTime.setTimeInMillis(Math.min(toScrollerData.mTime.getTimeInMillis() - MIN_TIME_PERIOD,
+                        mTime.getTimeInMillis()));
 			}
 			else
 			{
@@ -178,7 +180,8 @@ public class EnterFromDateToToDateActivity extends GTGActivity {
 						fromScrollerData.mTime.getTimeInMillis() + MIN_TIME_PERIOD);
 				timeScroller.setMinTime(
 						fromScrollerData.mTime.getTimeInMillis() + MIN_TIME_PERIOD);
-                mTime.setTimeInMillis(fromScrollerData.mTime.getTimeInMillis() + MIN_TIME_PERIOD);
+                mTime.setTimeInMillis(Math.max(fromScrollerData.mTime.getTimeInMillis() + MIN_TIME_PERIOD,
+                        mTime.getTimeInMillis()));
 			}
             
 		}
