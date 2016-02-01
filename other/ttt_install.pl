@@ -68,17 +68,25 @@ print "Creating $pt package (ignore omitting directory errors)\n";
 
 run("rm -rf $temp_dir");
 run("mkdir $temp_dir");
+run("mkdir $temp_dir/app");
 
-run("cp -r $proj_dir/libs $temp_dir");
-run("cp -r $proj_dir/src $temp_dir");
-run("cp -r $proj_dir/res $temp_dir");
-run("cp -r $proj_dir/gen $temp_dir");
-run("cp -r $proj_dir/assets $temp_dir");
-system("cp $proj_dir/* $temp_dir");
+run("cp -r $proj_dir/app/libs $temp_dir/app");
+run("cp -r $proj_dir/app/src $temp_dir/app");
+run("cp -r $proj_dir/gradle $temp_dir/gradle");
+system("cp $proj_dir/app/* $temp_dir/app");
+system("cp $proj_dir/* $temp_dir/");
 
-my @src_files = get_files("$temp_dir/src","*.java");
-my @xml_files = get_files("$temp_dir/res","*.xml");
-my @libs = get_files("$temp_dir/libs","*jar");
+
+
+my @rv_src_files = (get_files("$temp_dir/app/src/main/java/com/rareventure","*.java"),
+		    get_files("$temp_dir/app/src/main/java/com/lamerman","*.java"),
+		    get_files("$temp_dir/app/src/main/java/com/codeslap","*.java"));
+my @xml_files = get_files("$temp_dir/app/src/main/res","*.xml");
+my @libs = get_files("$temp_dir/app/libs","*jar");
+my @gradle_files = get_files("$temp_dir/","build.gradle");
+
+replace_in_files(\@gradle_files,
+		 ['com.rareventure.gps2','$chosen_package']);
 
 replace_in_files(\@xml_files,
 		 ['xmlns:app="http:\/\/schemas.android.com\/apk\/res\/.*?"', 'xmlns:app="http:\/\/schemas.android.com\/apk\/res\/$chosen_package"'],
@@ -86,7 +94,7 @@ replace_in_files(\@xml_files,
 		 [".*ttt_installer:${pt}_disable_comment\\s*-->", '']
 );
 
-replace_in_files(["$temp_dir/AndroidManifest.xml"], ['package=".*?"','package="$chosen_package"'],
+replace_in_files(["$temp_dir/app/src/main/AndroidManifest.xml"], ['package=".*?"','package="$chosen_package"'],
     ['android:sharedUserId=".*?"', 'android:sharedUserId="$premium_pkg"'],
 
 		 #if there are any items that begin with ".", it will mess up the installer, 
@@ -97,13 +105,15 @@ replace_in_files(["$temp_dir/AndroidManifest.xml"], ['package=".*?"','package="$
 
 #<application android:icon="@drawable/icon" android:label="
 replace_in_files(
-    ["$temp_dir/res/values/strings.xml"],
+    ["$temp_dir/app/src/main/res/values/strings.xml"],
     ['<string name="app_name">.*?<\/string>', '<string name="app_name">$chosen_name<\/string>'],
     ['<string name="reviewer_app_name">.*?<\/string>', '<string name="reviewer_app_name">${chosen_name}<\/string>']
     );
 
-replace_in_files(\@src_files,
+replace_in_files(\@rv_src_files,
 		 ['import com\.rareventure.*\.R;',""],
+		 ['import com\.rareventure\.gps2\.R\.(.*?);','import $chosen_package.R.$1;'],
+#		 ['import com\.rareventure\.gps2\.R\;','import $chosen_package.R;'],
 		 ['^(package .*;)','$1;import $chosen_package.R;',""],
 #		 ['\/\*android_install_frozen_version:external_dir\*\/"\/(.*)?\/"', '\/*android_install_frozen_version:external_dir*\/"\/TinyTravelTracker_$chosen_package\/"'],
 		 ['\/\* ttt_installer:premium_neg42 \*\/-?\d+', $is_premium ? -42 : -89 ],
@@ -121,57 +131,28 @@ replace_in_files(\@src_files,
 
 chdir $temp_dir;
 
-#we do release so that we can test proguard
-#if($real) {
-  run("ant release");
-#}
-#else {
-  #as opposed to release, this signs with a debug key and does not use proguard
-#  run("ant debug");
-#}
-
-
-
-run("mkdir -p $temp_dir/gen/$slash_package");
-
-#to really sign, jarsigner and zipalign as follows:
-
 if($real)
 {
-    run("rm -f $temp_dir/real.apk");
+    use Term::ReadKey;
+    print "Type your password:";
+    ReadMode('noecho'); # don't echo
+    chomp(my $password = <STDIN>);
+    ReadMode(0);        # back to normal
 
-    run("rm -r -f $proj_dir/proguard_bin_${pt}");
-
-    run("cp -r $temp_dir/bin/proguard $proj_dir/proguard_bin_${pt}");
-
+    system("./gradlew","assembleRelease","-Pandroid.injected.signing.store.file=/home/tim/notes/llc/rareventure.keystore","-Pandroid.injected.signing.key.alias=rareventure","-Pandroid.injected.signing.store.password=$password","-Pandroid.injected.signing.key.password=$password");
     print <<EoF ;
-To really sign, run:
+#To install, run:
 
-jarsigner -keystore ~/notes/llc/rareventure.keystore -verbose -sigalg MD5withRSA -digestalg SHA1  $temp_dir/bin/GpsTrailerReviewerStart-release-unsigned.apk rareventure
-zipalign -v 4 $temp_dir/bin/GpsTrailerReviewerStart-release-unsigned.apk $temp_dir/real.apk
-cp $temp_dir/real.apk $proj_dir/proguard_bin_${pt}/
-
-#Then to install, run:
-
-adb -d install -r $temp_dir/real.apk
+adb -d install -r $temp_dir/app/build/outputs/apk/app-release.apk
 
 EoF
 
     exit 0;
 }
-
-
-
-
-#co: we are using "ant debug" which should do this for us
-run("jarsigner -storepass android -keystore ~/.android/debug.keystore bin/GpsTrailerReviewerStart-release-unsigned.apk androiddebugkey");
-
-
-run("zipalign -v 4 bin/GpsTrailerReviewerStart-release-unsigned.apk foo2.apk");
-
-print "Run:\n\nadb -d install -r $temp_dir/foo2.apk\n";
-#print "Run:\n\nadb -d install -r /tmp/android_install/bin/GpsTrailerReviewerStart-debug.apk\n";
-
+else
+{
+    system("./gradlew","assembleRelease");
+}
 
 
 sub get_files
