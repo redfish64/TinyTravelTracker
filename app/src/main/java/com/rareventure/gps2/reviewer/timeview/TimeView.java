@@ -1148,10 +1148,11 @@ public class TimeView extends View {
 		//FIXES bug #26
 		//Somehow the prefs.currTimePeriodSec gets set to zero, which causes yPos to
 		//be infinite. Since its saved that way, crashes on boot
-		if(endTimeSec - startTimeSec < stripData[stripData.length - 1].yPos)
+		//60 is, of course, meaningless, but I don't want to bother
+		//figuring out a more sane value for such a one-off case.
+		if(endTimeSec - startTimeSec < 60)
 		{
-			endTimeSec = startTimeSec + 60; //60 is, of course, meaningless, but I don't want to bother
-			//figuring out a more sane value for such a one-off case.
+			endTimeSec = startTimeSec + 60;
 		}
 
 		centerTimeSec = startTimeSec / 2 + endTimeSec / 2;
