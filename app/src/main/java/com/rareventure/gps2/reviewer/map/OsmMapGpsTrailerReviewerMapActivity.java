@@ -23,6 +23,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
+import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -90,6 +91,8 @@ public class OsmMapGpsTrailerReviewerMapActivity extends ProgressDialogActivity 
 GTGEventListener
 {
 
+	private ImageButton menuButton;
+
 	private static enum SasPanelState { GONE, TAB, FULL;
 	
 	};
@@ -108,7 +111,7 @@ GTGEventListener
 	public void doOnCreate(Bundle savedInstanceState)
     {
         super.doOnCreate(savedInstanceState);
-        
+
         startService(new Intent(this, GpsTrailerService.class));
 
         timeAndDateSdf = new SimpleDateFormat(getString(R.string.time_and_date_format));
@@ -440,12 +443,12 @@ GTGEventListener
 			}
 		});
         zoomControls.setOnZoomOutClickListener(new OnClickListener() {
-			
+
 			@Override
 			public void onClick(View v) {
 				//we need to check because sometimes the disable doesn't happen fast enough
 				//and the user can click faster than it gets disabled
-				if(maplessView.zoom8bitPrec > prefs.minZoom)
+				if (maplessView.zoom8bitPrec > prefs.minZoom)
 					maplessView.zoomOut();
 
 				updatePlusMinusButtonsForNewZoom();
@@ -468,7 +471,10 @@ GTGEventListener
         autoZoom = (ImageView)this.findViewById(R.id.AutoZoom);
         autoZoom.setOnClickListener(this);
 
-    	updatePlusMinusButtonsForNewZoom();
+		menuButton = (ImageButton) findViewById(R.id.menu_button);
+		menuButton.setOnClickListener(this);
+
+		updatePlusMinusButtonsForNewZoom();
     	
 		datePicker = findViewById(R.id.date_picker);
 		datePicker.setOnClickListener(this);
@@ -775,6 +781,10 @@ GTGEventListener
 
 			toolTip.setAction(ToolTipFragment.UserAction.AUTOZOOM_BUTTON);
         }
+		else if(v == menuButton)
+		{
+			openOptionsMenu();
+		}
 		else if(v == sasPanelButton)
 		{
 			if(sasPanelState == SasPanelState.FULL)
