@@ -57,7 +57,7 @@
     </declare-styleable>
     
     <declare-styleable name="SeekBarDialogPreference">
-        <attr name="title" format="string"/>
+        <attr name="title1" format="string"/>
         <attr name="desc" format="string"/>
         <attr name="minValue"/>
         <attr name="maxValue"/>

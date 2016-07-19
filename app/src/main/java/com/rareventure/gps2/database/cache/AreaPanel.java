@@ -54,7 +54,9 @@ public class AreaPanel extends EncryptedRow {
 	public static final int NUM_SUB_PANELS = NUM_SUB_PANELS_PER_SIDE*NUM_SUB_PANELS_PER_SIDE;
 	
 	public static final int [] DEPTH_TO_WIDTH;
-	
+
+	public static final double LATLON_TO_LATLONM = 1000000;
+
 	static {
 		//we use 26 because its the max depth of opernstreetmaps
 		//trying depth of 24 
@@ -125,12 +127,13 @@ public class AreaPanel extends EncryptedRow {
 	}
 
 	public static  int convertYToLatm(int y) {
-		int result = (int) Math.round(Mercator.y2lat(y * Mercator.MAX_Y*2 / MAX_AP_UNITS -Mercator.MAX_Y)*1000000); 
-		
+		int result = (int) Math.round(Mercator.y2lat(y * Mercator.MAX_Y*2 / MAX_AP_UNITS -Mercator.MAX_Y)
+				*LATLON_TO_LATLONM);
+
 //		Log.d("GTG","convert y to latm, y: "+y+" result: "+result);
 		return result;
 	}
-	
+
 	public static  int convertLonmToX(int lonm) {
 		return (int) Math.round((MAX_AP_UNITS*(double)(lonm - Util.MIN_LONM) / Util.LONM_PER_WORLD));
 	}
@@ -143,33 +146,33 @@ public class AreaPanel extends EncryptedRow {
 	 * Returns the y position based on latitude.
 	 * Note that this is based of Mercator which will have infinite number of points approaching
 	 * +/-90 degrees. So if we are out of range, (beyond the configured min/max latitude),
-	 * we return -1 and MAX_AP_UNITS based on which direction we are out 
-	 * 
+	 * we return -1 and MAX_AP_UNITS based on which direction we are out
+	 *
 	 * @param latm
 	 * @return
 	 */
 	public static  int convertLatmToY(int latm) {
-		long v = Math.round((Mercator.MAX_Y - Mercator.lat2y(latm/1000000.)) * MAX_AP_UNITS / (Mercator.MAX_Y * 2));
+		long v = Math.round((Mercator.MAX_Y - Mercator.lat2y(latm/(double)LATLON_TO_LATLONM)) * MAX_AP_UNITS / (Mercator.MAX_Y * 2));
 //		Log.d("GTG","convert latm to y, latm: "+latm+" result: "+v);
 		if(v > MAX_AP_UNITS)
 			return MAX_AP_UNITS;
 		if(v < 0)
 			return -1;
-		
+
 		return (int) v;
 	}
-	
+
 	public static double convertLatmToYDouble(int latm) {
-		double v = (Mercator.MAX_Y - Mercator.lat2y(latm/1000000.)) * MAX_AP_UNITS / (Mercator.MAX_Y * 2);
+		double v = (Mercator.MAX_Y - Mercator.lat2y(latm/(double)LATLON_TO_LATLONM)) * MAX_AP_UNITS / (Mercator.MAX_Y * 2);
 //		Log.d("GTG","convert latm to y, latm: "+latm+" result: "+v);
 		if(v > MAX_AP_UNITS)
 			return MAX_AP_UNITS;
 		if(v < 0)
 			return -1;
-		
+
 		return v;
 	}
-	
+
 	public int getX()
 	{
 		return getInt(X);

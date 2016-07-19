@@ -41,10 +41,6 @@
         android:normalScreens="true"
         android:smallScreens="true" />
 
-    <uses-sdk
-        android:minSdkVersion="10"
-        android:targetSdkVersion="10" />
-
     <application
         android:name="com.rareventure.gps2.GpsTrailerReviewerApplication"
         android:icon="@drawable/icon_trial"

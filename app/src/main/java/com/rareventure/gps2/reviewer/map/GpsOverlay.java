@@ -19,8 +19,11 @@
 */
 package com.rareventure.gps2.reviewer.map;
 
-public interface MaplessController {
+import android.graphics.Canvas;
 
-	void animateTo(MaplessGeoPoint mgp, Runnable runMeAfter);
+import com.mapzen.tangram.MapData;
 
+public interface GpsOverlay {
+
+	void startTask(MapData mapData);
 }

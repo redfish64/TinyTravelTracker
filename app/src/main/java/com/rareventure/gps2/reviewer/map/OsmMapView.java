@@ -19,41 +19,35 @@
 */
 package com.rareventure.gps2.reviewer.map;
 
+import java.io.File;
 import java.util.ArrayList;
-
-import org.metalev.multitouch.controller.MultiTouchController;
-import org.metalev.multitouch.controller.MultiTouchController.MultiTouchObjectCanvas;
-import org.metalev.multitouch.controller.MultiTouchController.PointInfo;
-import org.metalev.multitouch.controller.MultiTouchController.PositionAndScale;
+import java.util.HashMap;
+import java.util.List;
 
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.os.Vibrator;
+import android.os.Bundle;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.Display;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.ViewConfiguration;
 
+import com.mapzen.tangram.LngLat;
+import com.mapzen.tangram.MapController;
+import com.mapzen.tangram.MapData;
+import com.mapzen.tangram.MapView;
+
+import com.mapzen.tangram.TouchInput;
 import com.rareventure.gps2.R;
 import com.rareventure.android.SuperThread;
 import com.rareventure.android.Util;
 import com.rareventure.android.AndroidPreferenceSet.AndroidPreferences;
-import com.rareventure.android.widget.ToolTipFragment.UserAction;
 import com.rareventure.gps2.GTG;
 import com.rareventure.gps2.database.cache.AreaPanel;
 import com.rareventure.gps2.database.cache.AreaPanelSpaceTimeBox;
-import com.rareventure.gps2.reviewer.map.osm.FileCache;
-import com.rareventure.gps2.reviewer.map.osm.MemoryCache;
-import com.rareventure.gps2.reviewer.map.osm.RemoteLoader;
 
-public class OsmMapView extends View implements MultiTouchObjectCanvas<OsmMapView>
+public class OsmMapView extends MapView
 {
-	private static final long DOUBLE_TAP_MS = 750;
-
-	private ArrayList<MaplessOverlay> overlays = new ArrayList<MaplessOverlay>();
+	private ArrayList<GpsOverlay> overlays = new ArrayList<GpsOverlay>();
 	
 	/**
 	 * Offset in pixels of the upper left corner. Note, these are doubles
@@ -66,12 +60,7 @@ public class OsmMapView extends View implements MultiTouchObjectCanvas<OsmMapVie
 	
 	/**
 	 * Scale amount with 8 assumed bits of precision. ie. 256 = 1, 512 = 2, 384 = 2.5
-	 * 
-	 * HACK, This is rounded to then nearest integer it ends up looking badly on the map when we
-	 * scale to an arbitrary zoom level (the text becomes blurry and and hard to read).
-	 * We don't go directly to zoom, because we don't want to destroy all this code if
-	 * for some reason, arbritray zoom might be useful later
-	 * 
+	 *
 	 * Note, it also equals the number of pixels in the whole world in one dimension
 	 * 
 	 */
@@ -80,44 +69,43 @@ public class OsmMapView extends View implements MultiTouchObjectCanvas<OsmMapVie
 	
 //	int zoom;
 
-	/**
-	 * Used for dragging action
-	 */
-	private float actionLastX;
-	private float actionLastY;
-	
-	private float actionStartX;
-	private float actionStartY;
-
 	public static int TILE_SIZE = 256;
 
 	public static Preferences prefs = new Preferences();
 
 	private Paint tickPaint;
 
-	private MemoryCache memoryCache;
-
-	private FileCache fileCache;
-
-	private RemoteLoader remoteLoader;
+//	private MemoryCache memoryCache;
+//
+//	private FileCache fileCache;
+//
+//	private RemoteLoader remoteLoader;
 
 	private MaplessScaleWidget scaleWidget;
 
-
-	private long startEventTime;
 
 	private SuperThread fileCacheSuperThread;
 
 	private SuperThread remoteLoaderSuperThread;
 
 	private OsmMapGpsTrailerReviewerMapActivity activity;
-	
-	private MultiTouchController<OsmMapView> multiTouchController = new MultiTouchController<OsmMapView>(this);
+
+	private MapController mapController;
+
+//	private MultiTouchController<OsmMapView> multiTouchController = new MultiTouchController<OsmMapView>(this);
 
 	public OsmMapView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 	}
-	
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+	}
+
+	/**
+	 * Must be called after all addOverlay() calls
+     */
 	public void init(SuperThread remoteLoaderSuperThread, SuperThread fileCacheSuperThread, OsmMapGpsTrailerReviewerMapActivity activity)
 	{
 		this.remoteLoaderSuperThread = remoteLoaderSuperThread;
@@ -125,34 +113,80 @@ public class OsmMapView extends View implements MultiTouchObjectCanvas<OsmMapVie
 		
 		this.activity = activity;
 
-		memoryCache = new MemoryCache(this);
-		
-		fileCache = new FileCache(getContext(), memoryCache, fileCacheSuperThread);
-		memoryCache.setFileCache(fileCache);
-		
-		remoteLoader = new RemoteLoader(activity, this, fileCache, remoteLoaderSuperThread);
-		memoryCache.setRemoteCache(remoteLoader);
-	}
+//		memoryCache = new MemoryCache(this);
+//
+//		fileCache = new FileCache(getContext(), memoryCache, fileCacheSuperThread);
+//		memoryCache.setFileCache(fileCache);
+//
+//		remoteLoader = new RemoteLoader(activity, this, fileCache, remoteLoaderSuperThread);
+//		memoryCache.setRemoteCache(remoteLoader);
+		// This starts a background process to set up the map.
+		getMapAsync(new MapView.OnMapReadyCallback(){
+			@Override
+			public void onMapReady(MapController mapController) {
+				OsmMapView.this.mapController = mapController;
 
-	@Override
-	protected void onDraw(Canvas canvas) {
-        GTG.ccRwtm.registerReadingThread();
-        try {
-		canvas.drawColor(0xFFFFFFFF);
-		
-		memoryCache.requestAndDrawRect(canvas, (int)x,(int)y,getWidth(),getHeight(), 
-				zoom8bitPrec, getZoomLevel()
-				-(OsmMapGpsTrailerReviewerMapActivity.prefs.panelScale-1)
-				);
+				GpsTrailerMapzenHandler mapHandler = new GpsTrailerMapzenHandler();
+				//TODO 1 we need to encrypt the tile cache again
 
-		for(MaplessOverlay o : overlays)
-		{
-			o.draw(canvas, this, thumbDown);
-		}
-        }
-        finally {
-        	GTG.ccRwtm.unregisterReadingThread();
-        }
+				File cacheDir = new File(GTG.getExternalStorageDirectory().toString()+"/tile_cache2");
+
+				cacheDir.mkdirs();
+
+				Log.d(GTG.TAG, "cacheDir is "+cacheDir);
+
+				mapHandler.setCache(cacheDir, GTG.MAX_CACHE_SIZE);
+				mapController.setHttpHandler(new GpsTrailerMapzenHandler());
+
+				mapController.setShoveResponder(new TouchInput.ShoveResponder() {
+					@Override
+					public boolean onShove(float distance) {
+						//this rotates the screen downwards for more 3d look. We don't allow it currently
+						//because it would mess up our calculations as to what points to
+						//display
+						//TODO 3 allow shoving
+						return true;
+					}
+				});
+
+				mapController.setRotateResponder(new TouchInput.RotateResponder() {
+					@Override
+					public boolean onRotate(float x, float y, float rotation) {
+						//this rotates the screen to change the northern direction. We don't allow it currently
+						//because it would mess up our calculations as to what points to
+						//display
+						//TODO 3 allow rotation
+						return true;
+					}
+				});
+
+				mapController.setPanResponder(new TouchInput.PanResponder() {
+					@Override
+					public boolean onPan(float startX, float startY, float endX, float endY) {
+						Log.d(GTG.TAG,String.format("panning sx %f sy %f ex %f ey %f",startX, startY,
+								endX, endY));
+						return false;
+					}
+
+					@Override
+					public boolean onFling(float posX, float posY, float velocityX, float velocityY) {
+						Log.d(GTG.TAG,String.format("flinging px %f py %f vx %f vy %f",
+								posX, posY, velocityX, velocityY));
+						return false;
+					}
+				});
+
+				mapController.setScaleResponder(new TouchInput.ScaleResponder() {
+					@Override
+					public boolean onScale(float x, float y, float scale, float velocity) {
+						Log.d(GTG.TAG,String.format("scaling x %f y %f sx %f sy %f",
+								x, y, scale, velocity));
+						return false;
+					}
+				});
+
+			}
+		},"map_style.yaml");
 	}
 
 	public int getZoomLevel() {
@@ -189,21 +223,6 @@ public class OsmMapView extends View implements MultiTouchObjectCanvas<OsmMapVie
 		
 		return stBox;
 	}
-		
-	private MaplessController controller = new MaplessController() {
-
-		@Override
-		public void animateTo(MaplessGeoPoint mgp, Runnable runMeAfter) {
-			//TODO 3: really animate
-//			latm = mgp.latm;
-//			lonm = mgp.lonm;
-//			invalidate();
-//			
-//			runMeAfter.run();
-		}
-	};
-
-	MaplessLocationOverlay locationOverlay;
 
 	/**
 	 * Zoom crosshairs
@@ -235,127 +254,127 @@ public class OsmMapView extends View implements MultiTouchObjectCanvas<OsmMapVie
         }
 	}
 
-	public void addLocationOverlay(OsmMapGpsTrailerReviewerMapActivity activity) {
-		addOverlay(locationOverlay = new MaplessLocationOverlay(activity));
-	}
-
-	public void addOverlay(MaplessOverlay overlay) {
+	public void addOverlay(GpsOverlay overlay) {
 		this.overlays.add(overlay);
 	}
 
-	@Override
-	public boolean onTouchEvent(MotionEvent event) {
-        GTG.ccRwtm.registerReadingThread();
-        try {
-        
-    		if(event.getAction() == MotionEvent.ACTION_DOWN)
-    		{
-    			thumbDown = true;
-    			actionStartX = actionLastX = event.getX();
-    			actionStartY = actionLastY = event.getY();
-    			startEventTime = event.getEventTime();
-    			final int localActionDownIndex = actionDownIndex;
-    			
-    			getHandler().postDelayed(new Runnable() {
-					
-					@Override
-					public void run() {
-						if(localActionDownIndex == actionDownIndex &&
-		    					(actionLastX - actionStartX) * (actionLastX - actionStartX) + 
-		    					(actionLastY - actionStartY) * (actionLastY - actionStartY) <= 
-		    						ViewConfiguration.getTouchSlop() * ViewConfiguration.getTouchSlop())
-						{
-							// Get instance of Vibrator from current Context
-							Vibrator v = (Vibrator) activity.getSystemService(Context.VIBRATOR_SERVICE);
-							 
-							// Vibrate for a short time
-							v.vibrate(50);
-							
-							longPressOn = true;
-						}
-					}
-				}, prefs.longPressTimeout);
-    		}
-    		if(event.getAction() == MotionEvent.ACTION_UP)
-    		{
-    			thumbDown = false;
-    			actionDownIndex++;
-    			
-    			
-    			if(lastShortPressTimeMs >= System.currentTimeMillis() - DOUBLE_TAP_MS)
-    			{
-    				//zoom in after recentering to the current x, y
-    				x += event.getX() - centerX;
-    				y += event.getY() - centerY;
-    				if(shouldZoomInBeEnabled())
-    					zoomIn();
-    			}
-    			else if(longPressOn)
-    			{
-    				//we go in reverse, since the last overlay is on top of the previously added ones
-    				//(this is the way that google maps does this, also
-    				for(int i = overlays.size()-1; i >= 0; i--)
-    					if(overlays.get(i).onLongPressEnd(actionStartX, actionStartY, event.getX(), event.getY(), this)) break;
-    				
-    				longPressOn = false;
-    			}
-    			else if(
-    					event.getEventTime() - startEventTime < prefs.tapTimeout &&
-    					(event.getX() - actionStartX)*(event.getX() - actionStartX) + 
-    					(event.getY() - actionStartY) * (event.getY() - actionStartY) <= 
-    						ViewConfiguration.getTouchSlop() * ViewConfiguration.getTouchSlop())
-    			{
-    				lastShortPressTimeMs = System.currentTimeMillis();
-    				//we go in reverse, since the last overlay is on top of the previously added ones
-    				//(this is the way that google maps does this, also
-    				for(int i = overlays.size()-1; i >= 0; i--)
-    					if(overlays.get(i).onTap(event.getX(), event.getY(), this)) break;
-    			}
-    			else
-    			{
-    				//round to a multiple of 2 to keep map from looking pixelated
-    				//co: this can make the map jump back to a zoom level already passed when the user
-    				// is doing their pinch to zoom thing.
-//    				int newZoom8BitPrec = 1<<(Util.minIntegerLog2(zoom8bitPrec)-1);
-//    				x = (x + centerX) *(newZoom8BitPrec)/(zoom8bitPrec) - centerX;
-//    				y = (y + centerY) *(newZoom8BitPrec)/(zoom8bitPrec) - centerY;
-//    				zoom8bitPrec = newZoom8BitPrec;
+//	@Override
+//	public boolean onTouchEvent(MotionEvent event) {
+//		//TODO 1 HACK
+//		if(1==1) return super.onTouchEvent(event);
+//
+//
+//        GTG.ccRwtm.registerReadingThread();
+//        try {
+//
+//    		if(event.getAction() == MotionEvent.ACTION_DOWN)
+//    		{
+//    			thumbDown = true;
+//    			actionStartX = actionLastX = event.getX();
+//    			actionStartY = actionLastY = event.getY();
+//    			startEventTime = event.getEventTime();
+//    			final int localActionDownIndex = actionDownIndex;
+//
+//    			getHandler().postDelayed(new Runnable() {
+//
+//					@Override
+//					public void run() {
+//						if(localActionDownIndex == actionDownIndex &&
+//		    					(actionLastX - actionStartX) * (actionLastX - actionStartX) +
+//		    					(actionLastY - actionStartY) * (actionLastY - actionStartY) <=
+//		    						ViewConfiguration.getTouchSlop() * ViewConfiguration.getTouchSlop())
+//						{
+//							// Get instance of Vibrator from current Context
+//							Vibrator v = (Vibrator) activity.getSystemService(Context.VIBRATOR_SERVICE);
+//
+//							// Vibrate for a short time
+//							v.vibrate(50);
+//
+//							longPressOn = true;
+//						}
+//					}
+//				}, prefs.longPressTimeout);
+//    		}
+//    		if(event.getAction() == MotionEvent.ACTION_UP)
+//    		{
+//    			thumbDown = false;
+//    			actionDownIndex++;
+//
+//
+//    			if(lastShortPressTimeMs >= System.currentTimeMillis() - DOUBLE_TAP_MS)
+//    			{
+//    				//zoom in after recentering to the current x, y
+//    				x += event.getX() - centerX;
+//    				y += event.getY() - centerY;
+//    				if(shouldZoomInBeEnabled())
+//    					zoomIn();
+//    			}
+//    			else if(longPressOn)
+//    			{
+//    				//we go in reverse, since the last overlay is on top of the previously added ones
+//    				//(this is the way that google maps does this, also
+//    				for(int i = overlays.size()-1; i >= 0; i--)
+//    					if(overlays.get(i).onLongPressEnd(actionStartX, actionStartY, event.getX(), event.getY(), this)) break;
+//
+//    				longPressOn = false;
+//    			}
+//    			else if(
+//    					event.getEventTime() - startEventTime < prefs.tapTimeout &&
+//    					(event.getX() - actionStartX)*(event.getX() - actionStartX) +
+//    					(event.getY() - actionStartY) * (event.getY() - actionStartY) <=
+//    						ViewConfiguration.getTouchSlop() * ViewConfiguration.getTouchSlop())
+//    			{
+//    				lastShortPressTimeMs = System.currentTimeMillis();
+//    				//we go in reverse, since the last overlay is on top of the previously added ones
+//    				//(this is the way that google maps does this, also
+//    				for(int i = overlays.size()-1; i >= 0; i--)
+//    					if(overlays.get(i).onTap(event.getX(), event.getY(), this)) break;
+//    			}
+//    			else
+//    			{
+//    				//round to a multiple of 2 to keep map from looking pixelated
+//    				//co: this can make the map jump back to a zoom level already passed when the user
+//    				// is doing their pinch to zoom thing.
+////    				int newZoom8BitPrec = 1<<(Util.minIntegerLog2(zoom8bitPrec)-1);
+////    				x = (x + centerX) *(newZoom8BitPrec)/(zoom8bitPrec) - centerX;
+////    				y = (y + centerY) *(newZoom8BitPrec)/(zoom8bitPrec) - centerY;
+////    				zoom8bitPrec = newZoom8BitPrec;
+////    				invalidate();
+////
+////    				//update scale widget for regular move
+////        			updateScaleWidget();
+//    			}
+//
+////    			else
+////    				Log.d(GTG.TAG,"dist squared is "+(event.getX() - actionStartX)*(event.getX() - actionStartX) +
+////    						(event.getY() - actionStartY) * (event.getY() - actionStartY));
+//
+//    		}
+//
+//    		if(event.getAction() == MotionEvent.ACTION_MOVE)
+//			{
+//    			actionLastX = event.getX();
+//    			actionLastY = event.getY();
+//    			if(longPressOn)
+//    			{
+//    				//we go in reverse, since the last overlay is on top of the previously added ones
+//    				//(this is the way that google maps does this, also
+//    				for(int i = overlays.size()-1; i >= 0; i--)
+//    					if(overlays.get(i).onLongPressMove(actionStartX, actionStartY, event.getX(), event.getY(), this)) break;
+//
 //    				invalidate();
-//    				
-//    				//update scale widget for regular move
-//        			updateScaleWidget();
-    			}
-    			
-//    			else 
-//    				Log.d(GTG.TAG,"dist squared is "+(event.getX() - actionStartX)*(event.getX() - actionStartX) + 
-//    						(event.getY() - actionStartY) * (event.getY() - actionStartY));
-    			
-    		}
-    		
-    		if(event.getAction() == MotionEvent.ACTION_MOVE)
-			{
-    			actionLastX = event.getX();
-    			actionLastY = event.getY();
-    			if(longPressOn)
-    			{
-    				//we go in reverse, since the last overlay is on top of the previously added ones
-    				//(this is the way that google maps does this, also
-    				for(int i = overlays.size()-1; i >= 0; i--)
-    					if(overlays.get(i).onLongPressMove(actionStartX, actionStartY, event.getX(), event.getY(), this)) break;
-    				
-    				invalidate();
-    				//don't let the multi touch controller handle it if we long pressed, so the user can drag a selection
-    				return true;
-    			}
-    			
-			}
-    		
-        	return multiTouchController.onTouchEvent(event);
-        }
-        finally {
-        	GTG.ccRwtm.unregisterReadingThread();
-        }
-	}
+//    				//don't let the multi touch controller handle it if we long pressed, so the user can drag a selection
+//    				return true;
+//    			}
+//
+//			}
+//
+//        	return multiTouchController.onTouchEvent(event);
+//        }
+//        finally {
+//        	GTG.ccRwtm.unregisterReadingThread();
+//        }
+//	}
 	
 	public boolean shouldZoomInBeEnabled()
 	{
@@ -425,6 +444,7 @@ public class OsmMapView extends View implements MultiTouchObjectCanvas<OsmMapVie
 
 	@Override
 	protected void onAttachedToWindow() {
+		super.onAttachedToWindow();
         GTG.ccRwtm.registerReadingThread();
         try {
 		tickPaint = new Paint();
@@ -436,11 +456,6 @@ public class OsmMapView extends View implements MultiTouchObjectCanvas<OsmMapVie
         	GTG.ccRwtm.unregisterReadingThread();
         }
 	}
-
-	public MaplessController getController() {
-		return controller;
-	}
-
 
 	public void notifyNewBitmapInCache() {
 		if(getHandler() != null)
@@ -524,11 +539,11 @@ public class OsmMapView extends View implements MultiTouchObjectCanvas<OsmMapVie
 	}
 
 	public void onPause() {
-		locationOverlay.onPause();
+		super.onPause();
 	}
 
 	public void onResume() {
-		locationOverlay.onResume();
+		super.onResume();
 	}
 
 	/**
@@ -539,73 +554,74 @@ public class OsmMapView extends View implements MultiTouchObjectCanvas<OsmMapVie
 	public void setZoomCenter(int x, int y) {
 		centerX = x;
 		centerY = y;
-		activity.gpsTrailerOverlay.setZoomCenter(x,y);
+		//TODO 2 FIXME
+//		activity.gpsTrailerOverlay.setZoomCenter(x,y);
 	}
 
-	@Override
-	public OsmMapView getDraggableObjectAtPoint(PointInfo touchPoint) {
-		return this;
-	}
-
-	@Override
-	public boolean pointInObjectGrabArea(PointInfo touchPoint, OsmMapView obj) {
-		return false;
-	}
-
-	@Override
-	public void getPositionAndScale(OsmMapView obj,
-			PositionAndScale objPosAndScaleOut) {
-		objPosAndScaleOut.set(-(float)x, -(float)y, true, zoom8bitPrec,
-				false, 1,1,false,0);
-		
-	}
-
-	@Override
-	public boolean setPositionAndScale(OsmMapView obj,
-			PositionAndScale newObjPosAndScale, PointInfo touchPoint) {
-		long newZoom8BitPrec = (int) newObjPosAndScale.getScale();
-
-		if(newZoom8BitPrec != zoom8bitPrec)
-		{
-			if(newZoom8BitPrec < OsmMapGpsTrailerReviewerMapActivity.prefs.maxZoom &&
-					newZoom8BitPrec > OsmMapGpsTrailerReviewerMapActivity.prefs.minZoom)
-			{
-				x = (-newObjPosAndScale.getXOff() + centerX) *(newZoom8BitPrec)/(zoom8bitPrec) - centerX;
-				y = (-newObjPosAndScale.getYOff() + centerY) *(newZoom8BitPrec)/(zoom8bitPrec) - centerY;
-				
-				zoom8bitPrec = newZoom8BitPrec;
-
-//				Log.d("GTG", "xxxxxxx = " 
-//						+ newZoom8BitPrec + " , "
-//						+ zoom8bitPrec + " : "
-//						+ newObjPosAndScale.getXOff() + " - " + newObjPosAndScale.getYOff());
-				
-			}
-			
-			activity.toolTip.setAction(UserAction.MAP_VIEW_PINCH_ZOOM);
-		}
-		else
-		{
-			x = -newObjPosAndScale.getXOff();
-			y = -newObjPosAndScale.getYOff();
-
-			activity.toolTip.setAction(UserAction.MAP_VIEW_MOVE);
-		}
-
-		invalidate();
-
-		updateScaleWidget();
-		activity.updatePlusMinusButtonsForNewZoom();
-		return false;
-	}
-
-	@Override
-	public void selectObject(OsmMapView obj, PointInfo touchPoint) {
-		
-	}
+//	@Override
+//	public OsmMapView getDraggableObjectAtPoint(PointInfo touchPoint) {
+//		return this;
+//	}
+//
+//	@Override
+//	public boolean pointInObjectGrabArea(PointInfo touchPoint, OsmMapView obj) {
+//		return false;
+//	}
+//
+//	@Override
+//	public void getPositionAndScale(OsmMapView obj,
+//			PositionAndScale objPosAndScaleOut) {
+//		objPosAndScaleOut.set(-(float)x, -(float)y, true, zoom8bitPrec,
+//				false, 1,1,false,0);
+//
+//	}
+//
+//	@Override
+//	public boolean setPositionAndScale(OsmMapView obj,
+//			PositionAndScale newObjPosAndScale, PointInfo touchPoint) {
+//		long newZoom8BitPrec = (int) newObjPosAndScale.getScale();
+//
+//		if(newZoom8BitPrec != zoom8bitPrec)
+//		{
+//			if(newZoom8BitPrec < OsmMapGpsTrailerReviewerMapActivity.prefs.maxZoom &&
+//					newZoom8BitPrec > OsmMapGpsTrailerReviewerMapActivity.prefs.minZoom)
+//			{
+//				x = (-newObjPosAndScale.getXOff() + centerX) *(newZoom8BitPrec)/(zoom8bitPrec) - centerX;
+//				y = (-newObjPosAndScale.getYOff() + centerY) *(newZoom8BitPrec)/(zoom8bitPrec) - centerY;
+//
+//				zoom8bitPrec = newZoom8BitPrec;
+//
+////				Log.d("GTG", "xxxxxxx = "
+////						+ newZoom8BitPrec + " , "
+////						+ zoom8bitPrec + " : "
+////						+ newObjPosAndScale.getXOff() + " - " + newObjPosAndScale.getYOff());
+//
+//			}
+//
+//			activity.toolTip.setAction(UserAction.MAP_VIEW_PINCH_ZOOM);
+//		}
+//		else
+//		{
+//			x = -newObjPosAndScale.getXOff();
+//			y = -newObjPosAndScale.getYOff();
+//
+//			activity.toolTip.setAction(UserAction.MAP_VIEW_MOVE);
+//		}
+//
+//		invalidate();
+//
+//		updateScaleWidget();
+//		activity.updatePlusMinusButtonsForNewZoom();
+//		return false;
+//	}
+//
+//	@Override
+//	public void selectObject(OsmMapView obj, PointInfo touchPoint) {
+//
+//	}
 
 	public void initAfterLayout() {
 		
-		memoryCache.setWidthAndHeight(getWidth(), getHeight());
+//		memoryCache.setWidthAndHeight(getWidth(), getHeight());
 	}
 }

@@ -24,10 +24,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 
-import org.bouncycastle.util.Arrays;
-
-import android.util.Log;
-
 import com.rareventure.gps2.GTG;
 import com.rareventure.gps2.database.TAssert;
 import com.rareventure.gps2.database.cache.AreaPanel;
@@ -177,8 +173,6 @@ public class ViewNode {
 	 * may have already been set, but for a prior stbox (which would make its status unknown
 	 * for the current stbox)
 	 * 
-	 * @param timeToLines array of time to lines. The key is either the start or the end time
-	 *  of the line, (since ap's must be at least one second long, this will be unique
 	 * @param parentsAndCurrent
 	 * @param newLocalStBox
 	 * @param childrenDirty

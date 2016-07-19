@@ -23,7 +23,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
-import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -36,10 +35,8 @@ import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
@@ -56,8 +53,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ZoomControls;
 
-import com.google.android.vending.licensing.LicenseChecker;
-import com.google.android.vending.licensing.StrictPolicy;
 import com.rareventure.android.AndroidPreferenceSet.AndroidPreferences;
 import com.rareventure.android.DbUtil;
 import com.rareventure.android.FatalErrorActivity;
@@ -131,9 +126,10 @@ GTGEventListener
 	        
             setContentView(R.layout.osm_gps_trailer_reviewer);
 
-            maplessView = (OsmMapView) findViewById(R.id.osmmapview);
-            
-            initUI();
+			osmMapView = (OsmMapView) findViewById(R.id.osmmapview);
+			osmMapView.onCreate(savedInstanceState);
+
+			initUI();
             
     		ViewTreeObserver vto = this.findViewById(android.R.id.content).getViewTreeObserver(); 
     	    vto.addOnGlobalLayoutListener(new OnGlobalLayoutListener() { 
@@ -141,7 +137,7 @@ GTGEventListener
     	    public void onGlobalLayout() { 
     	    	initWithWorkingGetWidth();
     	    	findViewById(android.R.id.content).getViewTreeObserver().removeGlobalOnLayoutListener(this); 
-    	    	maplessView.initAfterLayout();
+    	    	osmMapView.initAfterLayout();
     	    } 
     	    }); 
         }
@@ -166,18 +162,18 @@ GTGEventListener
 		slideSasNoneToFull.setDuration(500);
 		slideSasNoneToTab.setDuration(200);
 		
-		gpsTrailerOverlay.createDrawer();
+		gpsTrailerOverlay.notifyWidthHeightReady();
 		
-		maplessView.setZoomCenter(maplessView.getWidth()/2,
+		osmMapView.setZoomCenter(osmMapView.getWidth()/2,
 				findViewById(R.id.timeview_layout).getTop()/2);
 	
 		if(prefs.currX == 0 && prefs.currY == 0 && prefs.currZoom8BitPrec == 1024)
 		{
-			prefs.currX = maplessView.getWidth()/2 * 256d / 1024d;
+			prefs.currX = osmMapView.getWidth()/2 * 256d / 1024d;
 			prefs.currY = findViewById(R.id.timeview_layout).getTop()/2 * 256d / 1024d;
 			prefs.currZoom8BitPrec = 1024;
 			
-			maplessView.panAndZoom2(prefs.currZoom8BitPrec, prefs.currX, prefs.currY);
+			osmMapView.panAndZoom2(prefs.currZoom8BitPrec, prefs.currX, prefs.currY);
 		}
 	}
 
@@ -219,7 +215,7 @@ GTGEventListener
         else if(item.getTitle().equals(getText(R.string.turn_off_photos)))
         {
         	prefs.showPhotos = false;
-        	gpsTrailerOverlay.drawer.notifyViewNodesChanged();
+        	gpsTrailerOverlay.notifyViewNodesChanged();
         	
         	if(mediaGalleryFragment != null)
         		mediaGalleryFragment.finishBrowsing();
@@ -228,7 +224,7 @@ GTGEventListener
         else if(item.getTitle().equals(getText(R.string.turn_on_photos)))
         {
         	prefs.showPhotos = true;
-        	gpsTrailerOverlay.drawer.notifyViewNodesChanged();
+        	gpsTrailerOverlay.notifyViewNodesChanged();
         	return true;
         }
         else if(item.getTitle().equals(getText(R.string.help)))
@@ -261,7 +257,7 @@ GTGEventListener
 	private long minRecordedTimeMs;
 	private long maxRecordedTimeMs;
 	public static Preferences prefs = new Preferences();
-	OsmMapView maplessView;
+	OsmMapView osmMapView;
 	MaplessScaleWidget scaleWidget;
 	private GpsClickData gpsClickData;
 	private Dialog currentDialog;
@@ -379,11 +375,11 @@ GTGEventListener
 
 	protected void notifyHasDrawn() {
 		
-		TimeZoneTimeRow newTimeZone = GTG.tztSet.getTimeZoneCovering(gpsTrailerOverlay.drawer.closestToCenterTimeSec);
+		TimeZoneTimeRow newTimeZone = GTG.tztSet.getTimeZoneCovering(gpsTrailerOverlay.closestToCenterTimeSec);
 		
 		timeView.updateTimeZone(newTimeZone);
 		
-		maplessView.invalidate();
+		osmMapView.invalidate();
 	}
 
 	private void initUI()
@@ -435,8 +431,8 @@ GTGEventListener
 			public void onClick(View v) {
 				//we need to check because sometimes the disable doesn't happen fast enough
 				//and the user can click faster than it gets disabled
-				if(maplessView.shouldZoomInBeEnabled())
-					maplessView.zoomIn();
+				if(osmMapView.shouldZoomInBeEnabled())
+					osmMapView.zoomIn();
 
 				updatePlusMinusButtonsForNewZoom();
 				toolTip.setAction(UserAction.ZOOM_IN);
@@ -448,22 +444,21 @@ GTGEventListener
 			public void onClick(View v) {
 				//we need to check because sometimes the disable doesn't happen fast enough
 				//and the user can click faster than it gets disabled
-				if (maplessView.zoom8bitPrec > prefs.minZoom)
-					maplessView.zoomOut();
+				if (osmMapView.zoom8bitPrec > prefs.minZoom)
+					osmMapView.zoomOut();
 
 				updatePlusMinusButtonsForNewZoom();
 				toolTip.setAction(UserAction.ZOOM_OUT);
 			}
 		});
-        
-        maplessView.init(remoteThread, fileIOThread, this);
-		maplessView.panAndZoom2(prefs.currZoom8BitPrec, prefs.currX, prefs.currY);
-		maplessView.addOverlay(gpsTrailerOverlay = new GpsTrailerOverlay(this, maplessView, cpuThread));
-		maplessView.addLocationOverlay(this);
+
+		osmMapView.addOverlay(gpsTrailerOverlay = new GpsTrailerOverlay(this, cpuThread, osmMapView));
+        osmMapView.init(remoteThread, fileIOThread, this);
+		osmMapView.panAndZoom2(prefs.currZoom8BitPrec, prefs.currX, prefs.currY);
 
         scaleWidget = (MaplessScaleWidget) this.findViewById(R.id.scaleWidget);
         
-		maplessView.setScaleWidget(scaleWidget);
+		osmMapView.setScaleWidget(scaleWidget);
 		
         panToLocation = (ImageView)this.findViewById(R.id.pan_to_location);
         panToLocation.setOnClickListener(this);
@@ -755,11 +750,12 @@ GTGEventListener
         	if(locationKnown)
         	{
 				//TODO 3: animate pan and zoom
-				maplessView.panAndZoom2(maplessView.zoom8bitPrec,
-						maplessView.locationOverlay.getAbsPixelX2(maplessView.zoom8bitPrec) -
-						maplessView.centerX, 
-						maplessView.locationOverlay.getAbsPixelY2(maplessView.zoom8bitPrec)
-						- maplessView.centerY);
+				//TODO 1.5: FIXME
+//				osmMapView.panAndZoom2(osmMapView.zoom8bitPrec,
+//						osmMapView.locationOverlay.getAbsPixelX2(osmMapView.zoom8bitPrec) -
+//						osmMapView.centerX,
+//						osmMapView.locationOverlay.getAbsPixelY2(osmMapView.zoom8bitPrec)
+//						- osmMapView.centerY);
 				toolTip.setAction(ToolTipFragment.UserAction.PAN_TO_LOCATION_BUTTON);
         	}
         	else
@@ -824,7 +820,7 @@ GTGEventListener
 				return; 
 			}
 			
-			maplessView.panAndZoom(prefs.zoomPaddingPerc, prefs.zoomPaddingPerc,
+			osmMapView.panAndZoom(prefs.zoomPaddingPerc, prefs.zoomPaddingPerc,
 					stBox.minX,stBox.minY,stBox.maxX,stBox.maxY);
 			
 			updatePlusMinusButtonsForNewZoom();
@@ -836,9 +832,9 @@ GTGEventListener
 	}
 	
 	public void updatePlusMinusButtonsForNewZoom() {
-		zoomControls.setIsZoomOutEnabled(maplessView.zoom8bitPrec > prefs.minZoom );
+		zoomControls.setIsZoomOutEnabled(osmMapView.zoom8bitPrec > prefs.minZoom );
 		
-		zoomControls.setIsZoomInEnabled(maplessView.shouldZoomInBeEnabled());
+		zoomControls.setIsZoomInEnabled(osmMapView.shouldZoomInBeEnabled());
         
 	}
 
@@ -888,7 +884,7 @@ GTGEventListener
 	}
 
 	public void redrawMap() {
-		maplessView.invalidate();
+		osmMapView.invalidate();
 	}		
 
 	public static class Preferences implements AndroidPreferences
@@ -998,18 +994,18 @@ GTGEventListener
 //
 //		Point clickPoint = new Point();
 //		
-//		maplessView.getProjection().toPixels(new MaplessGeoPoint(gpsClickData.latm,
+//		osmMapView.getProjection().toPixels(new MaplessGeoPoint(gpsClickData.latm,
 //				gpsClickData.lonm), clickPoint);
 //		
 //		//we want to pan the screen over so the point is in the lower right corner and we type a name
-//		int pixelXToPanTo = clickPoint.x + maplessView.getView().getWidth()/2 
+//		int pixelXToPanTo = clickPoint.x + osmMapView.getView().getWidth()/2
 //			- p.x;
-//		int pixelYToPanTo = clickPoint.y + maplessView.getView().getHeight()/2 
+//		int pixelYToPanTo = clickPoint.y + osmMapView.getView().getHeight()/2
 //			- p.y;
 //		
-//		MaplessGeoPoint pointToPanTo = maplessView.getProjection().fromPixels(pixelXToPanTo, pixelYToPanTo);
+//		MaplessGeoPoint pointToPanTo = osmMapView.getProjection().fromPixels(pixelXToPanTo, pixelYToPanTo);
 //		
-//		maplessView.getController().animateTo(pointToPanTo,new Runnable()
+//		osmMapView.getController().animateTo(pointToPanTo,new Runnable()
 //		{
 //
 //			@Override
@@ -1070,7 +1066,7 @@ GTGEventListener
 	@Override
 	public void doOnResume() {
 		super.doOnResume();
-		
+
 		datePicker.setVisibility(View.VISIBLE);
 		timeView.setVisibility(View.VISIBLE);
 		toolTip.getView().setVisibility(View.VISIBLE);
@@ -1104,17 +1100,18 @@ GTGEventListener
 		//won't pause while its holding onto a cache creator lock
 		superThreadManager.pauseAllSuperThreads(false);
 		
-		maplessView.onResume();
+		osmMapView.onResume();
 		
 		// we do this so that if the user deleted a picture it will be 
 		//removed from the display.. it may be null if we are actually going to the start
 		//screen instead, or we haven't drawn at all
-		if(gpsTrailerOverlay != null && gpsTrailerOverlay.drawer != null)
+		if(gpsTrailerOverlay != null)
 		{
-			gpsTrailerOverlay.drawer.notifyViewNodesChanged();
+			gpsTrailerOverlay.notifyViewNodesChanged();
 			
 			//just in case it was changed
-			gpsTrailerOverlay.drawer.updateForColorRangeChange();
+			//TODO 1.5 FIXME
+//			gpsTrailerOverlay.updateForColorRangeChange();
 		}
 		
 		
@@ -1214,7 +1211,7 @@ GTGEventListener
 	@Override
 	public void doOnPause(boolean doOnResumeCalled) {
 		super.doOnPause(doOnResumeCalled);
-		
+
 		GTG.removeGTGEventListener(this);
 		
         GTG.ccRwtm.registerReadingThread();
@@ -1226,12 +1223,12 @@ GTGEventListener
 			currentDialog = null;
 		}
 
-		if(maplessView != null) {
-			maplessView.onPause();
+		if(osmMapView != null) {
+			osmMapView.onPause();
 
-			prefs.currX = maplessView.x;
-			prefs.currY = maplessView.y;
-			prefs.currZoom8BitPrec = maplessView.zoom8bitPrec;
+			prefs.currX = osmMapView.x;
+			prefs.currY = osmMapView.y;
+			prefs.currZoom8BitPrec = osmMapView.zoom8bitPrec;
 
 			GTG.runBackgroundTask(new Runnable() {
 
@@ -1257,6 +1254,8 @@ GTGEventListener
 		/* ttt_installer:remove_line */Log.d(GTG.TAG,"OsmMapGpsTrailerReviewerMapActivity.onDestory() start");
         
 		super.onDestroy();
+		osmMapView.onDestroy();
+
         GTG.ccRwtm.registerReadingThread();
         try {
 
@@ -1267,7 +1266,14 @@ GTGEventListener
         	GTG.ccRwtm.unregisterReadingThread();
         }
 	}
-	
+
+	@Override
+	public void onLowMemory() {
+		super.onLowMemory();
+		if(osmMapView != null)
+			osmMapView.onLowMemory();
+	}
+
 	private void cleanup()
 	{
 		if(superThreadManager != null)
@@ -1315,7 +1321,7 @@ GTGEventListener
 				if(gpsTrailerOverlay != null)
 					//PERF we could have a special method for pictures, because this
 					//updates distance, too
-					gpsTrailerOverlay.drawer.notifyViewNodesChanged();
+					gpsTrailerOverlay.notifyViewNodesChanged();
 
 				//TODO 2.2 we could update the fragment rather than dismissing it 
 				//co: this causes the much worse problem of the pictures being dismissed every few seconds
@@ -1583,12 +1589,12 @@ GTGEventListener
 
 	public float calcMetersPerApUnits() {
 		//zoom8bitPerc is pixels per total ap units * 256
-		return  maplessView.zoom8bitPrec / scaleWidget.pixelsPerMeter / AreaPanel.MAX_AP_UNITS;
+		return  osmMapView.zoom8bitPrec / scaleWidget.pixelsPerMeter / AreaPanel.MAX_AP_UNITS;
 	}
 
 	public void notifyPathsChanged() {
-		if(gpsTrailerOverlay != null && gpsTrailerOverlay.drawer != null)
-			gpsTrailerOverlay.drawer.notifyPathsChanged();
+		if(gpsTrailerOverlay != null)
+			gpsTrailerOverlay.notifyPathsChanged();
 	}
 
 	public void notifyDistUpdated(final double distance) {

@@ -56,4 +56,8 @@ public void addCustomData(java.lang.String,java.lang.String);
 public org.acra.ErrorReporter$ReportsSenderWorker handleSilentException(java.lang.Throwable);
 }
 
--dontwarn com.google.ads.**
+-dontwarn android.**
+-dontwarn retrofit.**
+-dontwarn okio.**
+-dontwarn dagger.**
+-dontwarn com.google.**

@@ -457,14 +457,12 @@ public class GpsTrailerService extends Service {
 		CharSequence text = getText(currentNotificationSetting.msgId);
 
 		// Set the icon, scrolling text and timestamp
-		Notification notification = new Notification(
-				currentNotificationSetting.iconId, text,
-				System.currentTimeMillis());
+		Notification.Builder builder = new Notification.Builder(this);
 
-		if (currentNotificationSetting.isOngoing)
-			notification.flags = Notification.FLAG_ONGOING_EVENT;
-		else
-			notification.flags = Notification.FLAG_AUTO_CANCEL;
+		builder.setSmallIcon(currentNotificationSetting.iconId);
+		builder.setOngoing(currentNotificationSetting.isOngoing);
+		builder.setAutoCancel(!currentNotificationSetting.isOngoing);
+		builder.setTicker(text);
 
 		// The PendingIntent to launch our activity if the user selects this notification
 		// TODO 2.5 make settings lite for notification bar only. Set it's task affinity
@@ -476,11 +474,11 @@ public class GpsTrailerService extends Service {
 						0,
 						currentNotificationSetting.intent != null ? currentNotificationSetting.intent
 								: intent, 
-								//TODO 1.5 shouldn't this be PendingIntent.FLAG_UPDATE_CURRENT or something like that?
-								Notification.FLAG_ONGOING_EVENT);
+								PendingIntent.FLAG_UPDATE_CURRENT);
 
-		// Set the info for the views that show in the notification panel.
-		notification.setLatestEventInfo(this, text, null, contentIntent);
+		builder.setContentIntent(contentIntent);
+
+		Notification notification = builder.getNotification();
 
 		nm.notify(GTG.FROG_NOTIFICATION_ID, notification);
 	}

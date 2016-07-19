@@ -820,8 +820,8 @@ public class TimeView extends View {
 
 			this.canvas = canvas;
 
-			drawSelectedArea(gtum.gpsTrailerOverlay.drawer.earliestOnScreenPointSec,
-					gtum.gpsTrailerOverlay.drawer.latestOnScreenPointSec);
+			drawSelectedArea(gtum.gpsTrailerOverlay.earliestOnScreenPointSec,
+					gtum.gpsTrailerOverlay.latestOnScreenPointSec);
 
 //			// if there is no data
 //			if (minTimeSec == maxTimeSec) {

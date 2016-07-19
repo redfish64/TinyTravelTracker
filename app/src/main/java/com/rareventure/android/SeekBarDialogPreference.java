@@ -56,7 +56,7 @@ public class SeekBarDialogPreference extends DialogPreference {
         TypedArray a = context.obtainStyledAttributes(attrs,
                 R.styleable.SeekBarDialogPreference);
 
-        title = a.getString(R.styleable.SeekBarDialogPreference_title);
+        title = a.getString(R.styleable.SeekBarDialogPreference_title1);
         desc = a.getString(R.styleable.SeekBarDialogPreference_desc);
         minValue = a.getFloat(R.styleable.SeekBarDialogPreference_minValue, 0);
         maxValue = a.getFloat(R.styleable.SeekBarDialogPreference_maxValue, 100);

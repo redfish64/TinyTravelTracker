@@ -252,8 +252,9 @@ public class GTG {
 	public static final String PREMIUM_APPLICATION_PACKAGE = /* ttt_installer:premium_package */"com.rareventure.gps2_foobar";
 	
 	public static final String TRIAL_APPLICATION_PACKAGE = /* ttt_installer:trial_package */"com.rareventure.gps2_trial";
+	public static final long MAX_CACHE_SIZE = 1024*1024*50; // TODO 2: make configurable max cache size
 
-	
+
 	public static SQLiteDatabase db;
 	
 	/**

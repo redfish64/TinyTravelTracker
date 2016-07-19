@@ -40,7 +40,7 @@ import com.rareventure.gps2.database.cache.AreaPanel;
 import com.rareventure.gps2.database.cache.AreaPanelSpaceTimeBox;
 import com.rareventure.gps2.database.cache.TimeTree;
 import com.rareventure.gps2.database.cachecreator.ViewNode.VNStatus;
-import com.rareventure.gps2.reviewer.map.GpsTrailerOverlayDrawer;
+import com.rareventure.gps2.reviewer.map.GpsTrailerOverlay;
 import com.rareventure.gps2.reviewer.map.OsmMapGpsTrailerReviewerMapActivity;
 import com.rareventure.gps2.reviewer.map.ViewLine;
 import com.rareventure.util.ReadWriteThreadManager;
@@ -750,7 +750,7 @@ public class GpsTrailerCacheCreator extends Thread {
 					
 					//note, we can use the headVn stbox because all vn's should be clean by this point
 					//this is used strictly to populate the viewnode tree
-					int minDepth = headVn.stBox == null ? 0 : GpsTrailerOverlayDrawer.getMinDepth(headVn.stBox);
+					int minDepth = headVn.stBox == null ? 0 : GpsTrailerOverlay.getMinDepth(headVn.stBox);
 					
 					int latm = currGpsLocRow.getLatm();
 					int lonm = currGpsLocRow.getLonm(); 
@@ -850,10 +850,7 @@ public class GpsTrailerCacheCreator extends Thread {
 								localGtum.notifyMaxTimeChanged();
 							}
 						});
-						GpsTrailerOverlayDrawer localDrawer = localGtum.gpsTrailerOverlay.drawer;
-						if(localDrawer != null)
-							localDrawer.notifyViewNodesChanged();
-						
+						localGtum.gpsTrailerOverlay.notifyViewNodesChanged();
 					}
 				}
 				

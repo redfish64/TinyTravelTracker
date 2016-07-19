@@ -1,27 +1,33 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 19
-    buildToolsVersion "23.0.1"
+    compileSdkVersion 23
+    buildToolsVersion "23.0.3"
+    useLibrary  'org.apache.http.legacy'
 
     defaultConfig {
         applicationId "com.rareventure.gps2"
-        minSdkVersion 10
-        targetSdkVersion 10
+        minSdkVersion 15
+        targetSdkVersion 15
 
         testApplicationId "com.rareventure.gps2.test"
         testInstrumentationRunner "android.test.InstrumentationTestRunner"
     }
 
     buildTypes {
+        debug {
+//            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
         release {
             minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-project.txt'
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
 }
 
 dependencies {
-    compile 'com.android.support:support-v4:19.1.0'
     compile 'ch.acra:acra:4.7.0-RC.2'
+    compile 'com.mapzen.tangram:tangram:0.2.1'
+    compile 'com.android.support:appcompat-v7:23.4.0'
 }

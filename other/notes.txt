@@ -1778,3 +1778,53 @@ if the user is zoomed out really far, the timezone won't be correct when
 specified on a per tile basis, which means we need another cache, and
 that would be annoying.
 
+7/18/16
+
+Integrating points into tangram maps looks difficult. The features are
+converted to individual values and fed into the native code.
+
+So unless I change the native code, it'll be difficult to have different
+colors... unless I make a bunch of layers, each with their own color, and
+assign the points to the layers.
+
+---
+
+One idea is to make httptilehandler return the trail points. This way,
+we won't have to worry about drawing anything ourselves, or adding/deleting
+points as the user moves around and scales the map. And then we can
+just use the yaml file. Since we get a zoom level along with an x/y
+we should be able to return points rather quickly for the given tile.
+
+If we can do this, it seems like the way to go.
+
+---
+
+android's tangram doesn't support raster
+
+mvt: mapbox vector tiles
+https://www.mapbox.com/vector-tiles/specification/
+
+In GeoJson, features can have ids, which we can use to identify the points
+
+--
+
+mapzen requests tiles, one at a time and expects the entire tile data to be
+returned. Our system finds points in stages, first finds a big point, and then
+cuts it into smaller points and returns those.
+
+Mapzen has no concept of an intermidiate value like we use. So we have to somehow
+coerce mapzen to ask again when we are ready with more detailed data.
+How to do this????
+
+I can't really see a way to do this.
+
+The alternative is to fool around with client points. This may be better, since it
+fits more with how it currently works (we only need to show the points on screen). But I
+worry about flickering when we clear and redraw the points in the array.
+
+I don't think it'll be too big of a problem, however, since we are drawing such a small
+number (usually) of points. I can't imagine over 1000 points... I guess this will have
+to do.
+
+Otherwise we'll have to hack up the mapzen c source which seems a like a can of worms.
+Or find an alternative???

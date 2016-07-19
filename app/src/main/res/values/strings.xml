@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
+    <!-- if you fork this, please don't use my key! TODO 2: is there a way to get f-droid to replace the key automatically?
+    -->
+    <string name="vector_tiles_key">vector-tiles-fkZ5cDc</string>
     <string name="map">Map</string>
     <string name="mapless">Mapless</string>
     <string name="app_name">Tiny Travel Tracker</string>
