@@ -820,8 +820,7 @@ GTGEventListener
 				return; 
 			}
 			
-			osmMapView.panAndZoom(prefs.zoomPaddingPerc, prefs.zoomPaddingPerc,
-					stBox.minX,stBox.minY,stBox.maxX,stBox.maxY);
+			osmMapView.panAndZoom(stBox.minX,stBox.minY,stBox.maxX,stBox.maxY);
 			
 			updatePlusMinusButtonsForNewZoom();
 		}

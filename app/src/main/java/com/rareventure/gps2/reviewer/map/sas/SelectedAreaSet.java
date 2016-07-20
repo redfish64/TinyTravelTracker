@@ -47,6 +47,10 @@ import com.rareventure.gps2.reviewer.map.sas.Area.AreaPanelInfo;
 import com.rareventure.util.ReadWriteThreadManager;
 
 /**
+ * This finds when a user entered and left a given set of areas. It is meant to be updated dynamically
+ * and notify registered observers when the data changes .When finished, it will call
+ * activity.notifyPathsChanged() when the paths through the data set changes
+ *
  * Note for path formation we use an AreaPanel structures rather than time ranges. The reason is
  * that there can only be so many area panels (tens of them) per area, but there can be 1000 or more
  * time ranges depending on how often the user came and left the place of interest.

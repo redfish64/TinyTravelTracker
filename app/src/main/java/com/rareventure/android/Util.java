@@ -94,7 +94,10 @@ public class Util {
 	public static final long MS_PER_HOUR = 1000l * 3600;
 	public static final int MIN_LONM = -180 * 1000000;
 	public static final int MAX_LONM = 180 * 1000000 - 1;
-	
+
+	public static final int MIN_LON = -180;
+	public static final int LON_PER_WORLD = 360;
+
 	public static void determineMaxBounds(TextPaint tp, Rect bounds, String s) {
 		Rect bounds2 = new Rect();
 		

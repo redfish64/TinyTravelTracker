@@ -240,7 +240,7 @@ public class MaplessScaleWidget extends View
 			
 		}
 		
-		invalidate();
+		postInvalidate();
 	}
 	
     /**

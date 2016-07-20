@@ -21,9 +21,13 @@ package com.rareventure.gps2.reviewer.map;
 
 import android.graphics.Canvas;
 
+import com.mapzen.tangram.MapController;
 import com.mapzen.tangram.MapData;
+import com.rareventure.gps2.database.cache.AreaPanelSpaceTimeBox;
 
 public interface GpsOverlay {
 
-	void startTask(MapData mapData);
+	void startTask(MapController mapController);
+
+	void notifyScreenChanged(AreaPanelSpaceTimeBox newStBox);
 }

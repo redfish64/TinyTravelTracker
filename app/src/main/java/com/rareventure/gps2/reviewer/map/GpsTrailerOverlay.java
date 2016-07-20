@@ -19,12 +19,7 @@
 */
 package com.rareventure.gps2.reviewer.map;
 
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.Paint.Style;
 import android.graphics.Point;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Debug;
 import android.os.Handler;
 import android.os.Looper;
@@ -32,15 +27,12 @@ import android.os.Message;
 import android.util.Log;
 
 import com.mapzen.tangram.LngLat;
+import com.mapzen.tangram.MapController;
 import com.mapzen.tangram.MapData;
 import com.rareventure.android.AndroidPreferenceSet;
 import com.rareventure.android.SortedBestOfIntArray;
 import com.rareventure.android.SuperThread;
-import com.rareventure.android.Util;
 import com.rareventure.gps2.GTG;
-import com.rareventure.gps2.MediaThumbnailCache;
-import com.rareventure.gps2.MediaThumbnailCache.BitmapWrapper;
-import com.rareventure.gps2.R;
 import com.rareventure.gps2.database.cache.AreaPanel;
 import com.rareventure.gps2.database.cache.AreaPanelSpaceTimeBox;
 import com.rareventure.gps2.database.cache.TimeTree;
@@ -51,8 +43,6 @@ import com.rareventure.gps2.reviewer.map.sas.SelectedAreaSet;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -125,6 +115,7 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 	private static final int MAX_TIME_DRAWING_BEFORE_DISPLAY_NOTICE_MS = 500;
 
     public static Preferences prefs = new Preferences();
+	private MapController mapController;
 
 
 	public GpsTrailerOverlay(OsmMapGpsTrailerReviewerMapActivity activity,
@@ -156,8 +147,6 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 			}
 		}
 
-		//we do this check because if viewUpToDate is false, the above check won't ever be called,
-		//but if its true, then this check won't be called
 		abortOrPauseIfNecessary();
 		
 		GTG.ccRwtm.registerReadingThread();
@@ -605,14 +594,15 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 		//never interfere with code at this point to read them. But to make the code
 		//clearer, we do it anyway
 		GTG.cacheCreator.viewNodeThreadManager.registerReadingThread();
-		
+
+		Log.d(GTG.TAG,"Drawing points for "+apStBox);
 		try {		
 			long time = System.currentTimeMillis();
 			
 			int localEarliestOnScreenPointSec = Integer.MAX_VALUE;
 			int localLatestOnScreenPointSec = Integer.MIN_VALUE;
 			
-			int points = 0;
+			int pointCount = 0;
 			
 			int maxDepth = getMaxDepth(apStBox);
 			
@@ -629,7 +619,8 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 			LngLat ll = new LngLat();
 
 			Map<String, String> props = new HashMap<>();
-			
+
+			mapData.clear();
 			while(iter.hasNext()) {
 				ViewNode vn = iter.next();
 				
@@ -639,12 +630,12 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 //				if(row.getDepth() > maxDepth)
 //					continue;
 
-				points++;
+				pointCount++;
 
-				ll.set(AreaPanel.convertXToLonm(row.getCenterX())/
-						(double)AreaPanel.LATLON_TO_LATLONM,
-						AreaPanel.convertXToLonm(row.getCenterX())/
-								(double)AreaPanel.LATLON_TO_LATLONM);
+				ll.set(AreaPanel.convertXToLon(row.getCenterX()),
+						AreaPanel.convertYToLat(row.getCenterY()));
+
+				Log.d(GTG.TAG,"Drawing point at lon "+ll.longitude+" lat "+ll.latitude);
 
 				//TODO 3 maybe one day handle altitude
 
@@ -664,7 +655,7 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 				//something; this is just a placeholder
 				props.put("paintIndex",Integer.toString(paintIndex));
 
-				//TODO 2 use props to store more interesting data we can use for selecting points,
+				//TODO 2 use props to store more interesting data we can use for selecting pointCount,
 				//etc. (or find some other way to do that)
 
 				//Here we add the actual point into mapzen.
@@ -693,8 +684,10 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 //					closestPointDistSquared = distSquared;
 //				}
 	
-			} //while examining points
-			
+			} //while examining pointCount
+
+			mapController.requestRender();
+
 			if(closestToCenterAp != null)
 			{
 				//note that we don't get the bottom level here because the overlapping range may contain some fuzziness
@@ -702,7 +695,7 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 				closestToCenterTimeSec = tt.calcTimeRangeCutEnd();
 			}
 			
-			/* ttt_installer:remove_line */Log.d("GPS","drew "+points+" points");
+			/* ttt_installer:remove_line */Log.d("GPS","drew "+pointCount+" pointCount");
 			
 			//note that we only need to do this for draw shadow, but we're doing this for all
 			//also note that there is a thread race with the main thread and time view here
@@ -711,7 +704,7 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 			latestOnScreenPointSec = localLatestOnScreenPointSec;
 			earliestOnScreenPointSec = localEarliestOnScreenPointSec;
 			
-			return points;
+			return pointCount;
 		}
 		finally
 		{
@@ -777,19 +770,9 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 		return val;
 	}
 
-	/**
-	 * Called by UI thread only
-	 */
-	public void updateViewCalcAndTimeUI(OsmMapView maplessView) {
+	public void notifyScreenChanged(AreaPanelSpaceTimeBox newStBox) {
 		synchronized(this)
 		{
-			AreaPanelSpaceTimeBox newStBox = maplessView.getCoordinatesRectangleForScreen();
-			
-			//we access the min and max time from the activity which is altered by the main ui thread
-			newStBox.minZ = OsmMapGpsTrailerReviewerMapActivity.prefs.currTimePosSec;
-			newStBox.maxZ = OsmMapGpsTrailerReviewerMapActivity.prefs.currTimePosSec +
-					OsmMapGpsTrailerReviewerMapActivity.prefs.currTimePeriodSec;
-			
 			if(requestedStBox != null)
 				newStBox.pathList = requestedStBox.pathList;
 			
@@ -801,8 +784,7 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 					distanceUpToDate = false;
 				
 				requestedStBox = newStBox;
-				
-				
+
 				this.stNotify(this);
 			}
 		}
@@ -841,9 +823,10 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 	}
 
 	@Override
-	public void startTask(MapData mapData) {
-		this.mapData = mapData;
-
+	public void startTask(MapController mapController) {
+		this.mapController = mapController;
+		mapData = mapController.addDataLayer("gt_point");
+		superThread.addTask(this);
 	}
 
 	public void shutdown() {

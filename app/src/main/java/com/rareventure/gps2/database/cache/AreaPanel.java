@@ -126,17 +126,29 @@ public class AreaPanel extends EncryptedRow {
 		return (int) Math.round((Util.LONM_PER_WORLD*(double)x / MAX_AP_UNITS) + Util.MIN_LONM);
 	}
 
-	public static  int convertYToLatm(int y) {
-		int result = (int) Math.round(Mercator.y2lat(y * Mercator.MAX_Y*2 / MAX_AP_UNITS -Mercator.MAX_Y)
-				*LATLON_TO_LATLONM);
+	public static double convertXToLon(int x) {
+		return Math.round((Util.LON_PER_WORLD*(double)x / MAX_AP_UNITS) + Util.MIN_LON);
+	}
 
-//		Log.d("GTG","convert y to latm, y: "+y+" result: "+result);
-		return result;
+
+
+	public static  int convertYToLatm(int y) {
+		return (int) Math.round(Mercator.y2lat(y * Mercator.MAX_Y*2 / MAX_AP_UNITS -Mercator.MAX_Y)
+				*LATLON_TO_LATLONM);
+	}
+
+	public static  double convertYToLat(int y) {
+		return Mercator.y2lat(y * Mercator.MAX_Y*2 / MAX_AP_UNITS -Mercator.MAX_Y);
 	}
 
 	public static  int convertLonmToX(int lonm) {
 		return (int) Math.round((MAX_AP_UNITS*(double)(lonm - Util.MIN_LONM) / Util.LONM_PER_WORLD));
 	}
+
+	public static int convertLonToX(double lon) {
+		return (int) Math.round((MAX_AP_UNITS*(double)(lon * LATLON_TO_LATLONM - Util.MIN_LONM) / Util.LONM_PER_WORLD));
+	}
+
 
 	public static double convertLonmToXDouble(int lonm) {
 		return MAX_AP_UNITS*(double)(lonm - Util.MIN_LONM) / Util.LONM_PER_WORLD;
@@ -152,7 +164,11 @@ public class AreaPanel extends EncryptedRow {
 	 * @return
 	 */
 	public static  int convertLatmToY(int latm) {
-		long v = Math.round((Mercator.MAX_Y - Mercator.lat2y(latm/(double)LATLON_TO_LATLONM)) * MAX_AP_UNITS / (Mercator.MAX_Y * 2));
+		return convertLatToY(latm/(double)LATLON_TO_LATLONM);
+	}
+
+	public static  int convertLatToY(double lat) {
+		long v = Math.round((Mercator.MAX_Y - Mercator.lat2y(lat) * MAX_AP_UNITS / (Mercator.MAX_Y * 2)));
 //		Log.d("GTG","convert latm to y, latm: "+latm+" result: "+v);
 		if(v > MAX_AP_UNITS)
 			return MAX_AP_UNITS;
@@ -271,8 +287,6 @@ public class AreaPanel extends EncryptedRow {
 //						minLonm, minLatm, 
 //						minLonm, maxLatm);
 	}
-
-	
 
 	public static class Preferences
 	{
@@ -855,8 +869,6 @@ public class AreaPanel extends EncryptedRow {
 	 * Given a value, rounds it to the nearest areapanel boundary
 	 * at a depth.
 	 * 
-	 * @param l
-	 * @param minDepth
 	 * @return
 	 */
 	public static int alignToDepth(int val, int depth) {

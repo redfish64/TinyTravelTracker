@@ -1828,3 +1828,18 @@ to do.
 
 Otherwise we'll have to hack up the mapzen c source which seems a like a can of worms.
 Or find an alternative???
+
+----
+
+Using clear and add points, there is a *lot* of flickering.
+
+If only I could refresh a datasource...
+
+---
+
+so either:
+
+1. we deal with a lot of flickering
+2. when loading points, we load for the deepest layer only. Ie don't draw at higher layers and
+iteratively go downwards
+3. Somehow make mapzen to re-request a tile on demand

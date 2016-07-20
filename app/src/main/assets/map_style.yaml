@@ -391,6 +391,10 @@ sources:
         url:  https://vector.mapzen.com/osm/all/{z}/{x}/{y}.mvt?api_key=vector-tiles-HqUVidw
         # road labels in Tangram JS are broken when overzooming, set max_zoom: 18 to preview fix
         max_zoom: 16
+        # Default point styling (SDK)
+        mz_default_point:
+            type: GeoJSON
+            url: https://gist.githubusercontent.com/anonymous/16324c771edfce45be0721390389b878/raw/7dbaebf17da7da8562e6c6f8768bc8cff83efa88/map.geojson
 
 #    # Only enable this for local debug, should not be enabled for prod (app inserts these at runtime)
 #    # These are all in San Francisco, California
@@ -430,10 +434,6 @@ sources:
 #    mz_search_result:
 #        type: GeoJSON
 #        url: https://gist.githubusercontent.com/anonymous/57dc09eeb120919f76de/raw/43426217da3c2bae0522dc4257aaa61e4df3981e/map.geojson
-#    # Default point styling (SDK)
-#    mz_default_point:
-#        type: GeoJSON
-#        url: https://gist.githubusercontent.com/anonymous/16324c771edfce45be0721390389b878/raw/7dbaebf17da7da8562e6c6f8768bc8cff83efa88/map.geojson
 #    # Default line styling (SDK)
 #    mz_default_line:
 #        type: GeoJSON
@@ -907,6 +907,13 @@ layers:
                     [show, hide]:
                         time: 0s
 
+    #GPS Trailer points
+    gt_point:
+        data: { source: gt_point }
+        draw:
+            sdk-point-overlay:
+                sprite: ux-search-active
+                size: [36px,54px]
     # Used by the SDK to place point, line, and polygon overlays on the map
     mz_default_point:
         data: { source: mz_default_point }

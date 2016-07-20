@@ -21,19 +21,16 @@ package com.rareventure.gps2.reviewer.map;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 import android.content.Context;
-import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Log;
 
 import com.mapzen.tangram.LngLat;
 import com.mapzen.tangram.MapController;
-import com.mapzen.tangram.MapData;
 import com.mapzen.tangram.MapView;
 
 import com.mapzen.tangram.TouchInput;
@@ -92,6 +89,59 @@ public class OsmMapView extends MapView
 
 	private MapController mapController;
 
+	private Handler notifyScreenChangeHandler = new Handler();
+
+	private Runnable notifyScreenChangeRunnable = new Runnable() {
+		LngLat lastP1 = new LngLat(), lastP2 = new LngLat();
+
+		@Override
+		public void run() {
+			LngLat p1 = mapController.coordinatesAtScreenPosition(0,0);
+			LngLat p2 = mapController.coordinatesAtScreenPosition(windowWidth, pointAreaHeight);
+
+			//if we haven't moved since our last run
+			if(p1.equals(lastP1) && lastP2.equals(lastP2))
+				return;
+
+			Log.i(GTG.TAG,"p1 lon "+p1.longitude+" lat "+p1.latitude+" p2 lon "+p2.longitude+" lat "+p2.latitude);
+
+			lastP1 = p1;
+
+			lastP2 = p2;
+
+			int apMinX = AreaPanel.convertLonToX(p1.longitude);
+			int apMinY = AreaPanel.convertLatToY(p1.latitude);
+			int apMaxX = AreaPanel.convertLonToX(p2.longitude);
+			int apMaxY = AreaPanel.convertLatToY(p2.latitude);
+
+			panAndZoom(apMinX,apMinY,apMaxX,apMaxY);
+
+			//we keep queuing as long as there is a change
+			//we need to time them out, as to not waste resources, hence we use a handler and delay
+			//the next call
+			notifyScreenChangeHandler.postDelayed(
+					notifyScreenChangeHandlerRunnable
+				, 250);
+		}
+	};
+
+	//used to space out our checks for the map position
+	private Runnable notifyScreenChangeHandlerRunnable =
+		new Runnable() {
+			@Override
+			public void run() {
+				mapController.queueEvent(notifyScreenChangeRunnable);
+			}
+	};
+
+	/**
+	 * This is the height of the area in which we draw points. We don't want to draw points
+	 * underneath the time scale widget at the bottom of the screen, so this excludes that
+	 */
+	private int pointAreaHeight;
+
+	private int windowWidth;
+
 //	private MultiTouchController<OsmMapView> multiTouchController = new MultiTouchController<OsmMapView>(this);
 
 	public OsmMapView(Context context, AttributeSet attrs) {
@@ -123,7 +173,7 @@ public class OsmMapView extends MapView
 		// This starts a background process to set up the map.
 		getMapAsync(new MapView.OnMapReadyCallback(){
 			@Override
-			public void onMapReady(MapController mapController) {
+			public void onMapReady(final MapController mapController) {
 				OsmMapView.this.mapController = mapController;
 
 				GpsTrailerMapzenHandler mapHandler = new GpsTrailerMapzenHandler();
@@ -165,6 +215,7 @@ public class OsmMapView extends MapView
 					public boolean onPan(float startX, float startY, float endX, float endY) {
 						Log.d(GTG.TAG,String.format("panning sx %f sy %f ex %f ey %f",startX, startY,
 								endX, endY));
+						mapController.queueEvent(notifyScreenChangeRunnable);
 						return false;
 					}
 
@@ -172,6 +223,8 @@ public class OsmMapView extends MapView
 					public boolean onFling(float posX, float posY, float velocityX, float velocityY) {
 						Log.d(GTG.TAG,String.format("flinging px %f py %f vx %f vy %f",
 								posX, posY, velocityX, velocityY));
+
+						mapController.queueEvent(notifyScreenChangeRunnable);
 						return false;
 					}
 				});
@@ -181,9 +234,14 @@ public class OsmMapView extends MapView
 					public boolean onScale(float x, float y, float scale, float velocity) {
 						Log.d(GTG.TAG,String.format("scaling x %f y %f sx %f sy %f",
 								x, y, scale, velocity));
+						mapController.queueEvent(notifyScreenChangeRunnable);
 						return false;
 					}
 				});
+
+				for(GpsOverlay o : overlays)
+					o.startTask(mapController);
+
 
 			}
 		},"map_style.yaml");
@@ -217,15 +275,15 @@ public class OsmMapView extends MapView
 			//(1 << getRoundedZoomLevel() + 8);
 		
 		stBox.minX = (int) (((long)x) * AreaPanel.MAX_AP_UNITS / maxPixels); 
-		stBox.maxX = (int) (((long)x + getWidth()) * AreaPanel.MAX_AP_UNITS / maxPixels); 
+		stBox.maxX = (int) (((long)x + windowWidth) * AreaPanel.MAX_AP_UNITS / maxPixels);
 		stBox.minY = (int) (((long)y) * AreaPanel.MAX_AP_UNITS / maxPixels); 
-		stBox.maxY = (int) (((long)y + getHeight()) * AreaPanel.MAX_AP_UNITS / maxPixels); 
+		stBox.maxY = (int) (((long)y + pointAreaHeight) * AreaPanel.MAX_AP_UNITS / maxPixels);
 		
 		return stBox;
 	}
 
 	/**
-	 * Zoom crosshairs
+	 * Center of screen in pixels
 	 */
 	int centerX;
 	int centerY;
@@ -471,21 +529,29 @@ public class OsmMapView extends MapView
 	}
 
 
-
-	public void panAndZoom(float zoomPaddingLonmWidth,
-			float zoomPaddingLatmHeight, int minX, int minY, int maxX, int maxY) {
+	/**
+	 * Pans and zooms to the given box
+	 * All arguments are in AP_UNITS. See AreaPanel.convertXToLatm, etc. for
+	 * converting betweeen lat lon and AP_UNITS.
+	 * May be called from any thread
+	 *
+	 * @param minApX
+	 * @param minApY
+	 * @param maxApX
+     * @param maxApY
+     */
+	public void panAndZoom(int minApX, int minApY, int maxApX, int maxApY) {
         GTG.ccRwtm.registerReadingThread();
         try {
 		
 		//to handle when we wrap the world
-		int width = maxX - minX;
+		int width = maxApX - minApX;
 		if(width < 0) width = - width;
 		
 		//since we have buttons on the bottom and the top, as well as the time view, we won't want the points to
 		//be covered by them, so we subtract their height from the actual height to get
 		//a proper zoom areas
-		int windowHeight = activity.findViewById(R.id.main_window_area).getBottom();
-		
+
 		
 		//1<<(zl+8) == max pixels for world = MPW
 		//AreaPanel.MAX_AP_UNITS == max ap units for world = MAW
@@ -498,24 +564,24 @@ public class OsmMapView extends MapView
 		// zl < log2 (wwP  * MAW / apW) - 8
 		
 		int maxXZoomLevel = Util.minIntegerLog2((long) Math.ceil(((double)getWidth()) * AreaPanel.MAX_AP_UNITS / width)) - 8 -1; 
-		int maxYZoomLevel = Util.minIntegerLog2((long) Math.ceil(((double)windowHeight) * AreaPanel.MAX_AP_UNITS / (maxY - minY))) - 8 -1; 
+		int maxYZoomLevel = Util.minIntegerLog2((long) Math.ceil(((double) pointAreaHeight) * AreaPanel.MAX_AP_UNITS / (maxApY - minApY))) - 8 -1;
 		
-		zoom8bitPrec = 1 << (8+Math.min(Math.min(maxXZoomLevel, maxYZoomLevel), OsmMapGpsTrailerReviewerMapActivity.prefs.maxAutoZoomLevel)); 
+		zoom8bitPrec = 1 << (8+Math.min(Math.min(maxXZoomLevel, maxYZoomLevel),
+				OsmMapGpsTrailerReviewerMapActivity.prefs.maxAutoZoomLevel));
 
 		double apUnitsToPixels = (double)zoom8bitPrec / AreaPanel.MAX_AP_UNITS;
 
 		//TODO 3 handle zoom padding
-		x = ((minX + maxX) >> 1) * apUnitsToPixels - centerX;
-		y = ((minY + maxY) >> 1) * apUnitsToPixels - centerY;
+		x = ((minApX + maxApX) >> 1) * apUnitsToPixels - centerX;
+		y = ((minApY + maxApY) >> 1) * apUnitsToPixels - centerY;
 		
 		updateScaleWidget();
-		
-		invalidate();
-		
         }
         finally {
         	GTG.ccRwtm.unregisterReadingThread();
         }
+
+		notifyOverlayScreenChanged();
 	}
 	
 	public void panAndZoom2(long zoom8BitPrec, double currX, double currY)
@@ -528,14 +594,29 @@ public class OsmMapView extends MapView
 		
 		updateScaleWidget();
 		
-		invalidate();
-		
 		activity.updatePlusMinusButtonsForNewZoom();
 		
         }
         finally {
         	GTG.ccRwtm.unregisterReadingThread();
         }
+
+		notifyOverlayScreenChanged();
+	}
+
+	private void notifyOverlayScreenChanged() {
+		//TODO 3 we probably don't need zoom8bitperc anymore, since zooming is handled by
+		// tangram. Then we could directly calculate ap coords from lon/lat specified by
+		// tangram, rather then our intermidiate x/y and zoom format
+		AreaPanelSpaceTimeBox newStBox = getCoordinatesRectangleForScreen();
+
+		//we access the min and max time from the activity which is altered by the main ui thread
+		newStBox.minZ = OsmMapGpsTrailerReviewerMapActivity.prefs.currTimePosSec;
+		newStBox.maxZ = OsmMapGpsTrailerReviewerMapActivity.prefs.currTimePosSec +
+				OsmMapGpsTrailerReviewerMapActivity.prefs.currTimePeriodSec;
+
+		for(GpsOverlay o : overlays)
+			o.notifyScreenChanged(newStBox);
 	}
 
 	public void onPause() {
@@ -547,7 +628,9 @@ public class OsmMapView extends MapView
 	}
 
 	/**
-	 * Set location of crosshairs and where zooms are centered
+	 * Set location of crosshairs and where zooms are centered. ie, this is the
+	 * center of the screen in pixels.
+	 *
 	 * @param x
 	 * @param y
 	 */
@@ -621,7 +704,9 @@ public class OsmMapView extends MapView
 //	}
 
 	public void initAfterLayout() {
-		
+		windowWidth = getWidth();
+		this.pointAreaHeight = activity.findViewById(R.id.main_window_area).getBottom();
+
 //		memoryCache.setWidthAndHeight(getWidth(), getHeight());
 	}
 }

@@ -24,8 +24,10 @@ public class TimeRange {
 	public double dist;
 	
 	/**
-	 * This does not cut the start sec and the end sec to the ap points
-	 * it actually contains. This differs from startSec and endSec,
+	 * This is the starting and ending seconds from the ap before the spacetime box and the ap
+	 * after the spacetime box of interest
+	 *
+	 * This differs from startSec and endSec,
 	 * since they will not include times up to but not including the prev
 	 * ap and the next ap (which are outside of the box)
 	 */
