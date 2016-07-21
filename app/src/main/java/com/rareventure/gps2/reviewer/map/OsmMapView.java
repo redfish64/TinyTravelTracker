@@ -24,6 +24,7 @@ import java.util.ArrayList;
 
 import android.content.Context;
 import android.graphics.Paint;
+import android.graphics.PointF;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.AttributeSet;
@@ -93,17 +94,21 @@ public class OsmMapView extends MapView
 
 	private Runnable notifyScreenChangeRunnable = new Runnable() {
 		LngLat lastP1 = new LngLat(), lastP2 = new LngLat();
+		PointF p = new PointF();
 
 		@Override
 		public void run() {
-			LngLat p1 = mapController.coordinatesAtScreenPosition(0,0);
-			LngLat p2 = mapController.coordinatesAtScreenPosition(windowWidth, pointAreaHeight);
+			p.x = 0;
+			p.y = 0;
+			LngLat p1 = mapController.screenPositionToLngLat(p);
+			p.x = windowWidth;
+			p.y = pointAreaHeight;
+			LngLat p2 = mapController.screenPositionToLngLat(p);
 
 			//if we haven't moved since our last run
 			if(p1.equals(lastP1) && lastP2.equals(lastP2))
 				return;
 
-			Log.i(GTG.TAG,"p1 lon "+p1.longitude+" lat "+p1.latitude+" p2 lon "+p2.longitude+" lat "+p2.latitude);
 
 			lastP1 = p1;
 
@@ -113,6 +118,12 @@ public class OsmMapView extends MapView
 			int apMinY = AreaPanel.convertLatToY(p1.latitude);
 			int apMaxX = AreaPanel.convertLonToX(p2.longitude);
 			int apMaxY = AreaPanel.convertLatToY(p2.latitude);
+
+			Log.i(GTG.TAG,"p1 lon "+p1.longitude+" lat "+p1.latitude+" p2 lon "+p2.longitude+" lat "
+					+p2.latitude
+					+" ax1 "+apMinX+" ay2 "+apMinY
+					+" ax2 "+apMaxX+" ay2 "+apMaxY
+			);
 
 			panAndZoom(apMinX,apMinY,apMaxX,apMaxY);
 
@@ -176,7 +187,7 @@ public class OsmMapView extends MapView
 			public void onMapReady(final MapController mapController) {
 				OsmMapView.this.mapController = mapController;
 
-				GpsTrailerMapzenHandler mapHandler = new GpsTrailerMapzenHandler();
+				GpsTrailerMapzenHttpHandler mapHandler = new GpsTrailerMapzenHttpHandler();
 				//TODO 1 we need to encrypt the tile cache again
 
 				File cacheDir = new File(GTG.getExternalStorageDirectory().toString()+"/tile_cache2");
@@ -186,7 +197,7 @@ public class OsmMapView extends MapView
 				Log.d(GTG.TAG, "cacheDir is "+cacheDir);
 
 				mapHandler.setCache(cacheDir, GTG.MAX_CACHE_SIZE);
-				mapController.setHttpHandler(new GpsTrailerMapzenHandler());
+				mapController.setHttpHandler(mapHandler);
 
 				mapController.setShoveResponder(new TouchInput.ShoveResponder() {
 					@Override
@@ -235,6 +246,20 @@ public class OsmMapView extends MapView
 						Log.d(GTG.TAG,String.format("scaling x %f y %f sx %f sy %f",
 								x, y, scale, velocity));
 						mapController.queueEvent(notifyScreenChangeRunnable);
+						return false;
+					}
+				});
+
+				mapController.setTapResponder(new TouchInput.TapResponder() {
+					@Override
+					public boolean onSingleTapUp(float x, float y) {
+						Log.d(GTG.TAG, "requesting render!");
+						mapController.requestRender();
+						return false;
+					}
+
+					@Override
+					public boolean onSingleTapConfirmed(float x, float y) {
 						return false;
 					}
 				});

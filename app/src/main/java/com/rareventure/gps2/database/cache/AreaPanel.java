@@ -55,7 +55,7 @@ public class AreaPanel extends EncryptedRow {
 	
 	public static final int [] DEPTH_TO_WIDTH;
 
-	public static final double LATLON_TO_LATLONM = 1000000;
+	public static final double LATLON_TO_LATLONM = 1000000.;
 
 	static {
 		//we use 26 because its the max depth of opernstreetmaps
@@ -133,8 +133,10 @@ public class AreaPanel extends EncryptedRow {
 
 
 	public static  int convertYToLatm(int y) {
-		return (int) Math.round(Mercator.y2lat(y * Mercator.MAX_Y*2 / MAX_AP_UNITS -Mercator.MAX_Y)
-				*LATLON_TO_LATLONM);
+		int result = (int) Math.round(Mercator.y2lat(y * Mercator.MAX_Y*2 / MAX_AP_UNITS -Mercator.MAX_Y)*LATLON_TO_LATLONM);
+
+//		Log.d("GTG","convert y to latm, y: "+y+" result: "+result);
+		return result;
 	}
 
 	public static  double convertYToLat(int y) {
@@ -164,7 +166,16 @@ public class AreaPanel extends EncryptedRow {
 	 * @return
 	 */
 	public static  int convertLatmToY(int latm) {
-		return convertLatToY(latm/(double)LATLON_TO_LATLONM);
+		long v = Math.round(
+				( Mercator.MAX_Y - Mercator.lat2y(latm/LATLON_TO_LATLONM) )
+				* MAX_AP_UNITS / (Mercator.MAX_Y * 2));
+//		Log.d("GTG","convert latm to y, latm: "+latm+" result: "+v);
+		if(v > MAX_AP_UNITS)
+			return MAX_AP_UNITS;
+		if(v < 0)
+			return -1;
+
+		return (int) v;
 	}
 
 	public static  int convertLatToY(double lat) {
@@ -427,11 +438,11 @@ public class AreaPanel extends EncryptedRow {
 	}
 
 	public int getCenterLonm() {
-		return convertXToLonm(getX());
+		return convertXToLonm(getCenterX());
 	}
 
 	public int getCenterLatm() {
-		return convertYToLatm(getY());
+		return convertYToLatm(getCenterY());
 	}
 
 	public int getCenterX() {

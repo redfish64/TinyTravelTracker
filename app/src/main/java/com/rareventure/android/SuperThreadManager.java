@@ -73,7 +73,7 @@ public class SuperThreadManager {
 
 	/**
 	 * Notify the listening tasks that they should do work.
-	 * Note that even if a task is not waiting, it restart
+	 * Note that even if a task is not waiting, it will restart
 	 * immediately after finishing its current work if this
 	 * is set (unlike a normal notify which will do nothing
 	 *  if a thread isn't waiting)

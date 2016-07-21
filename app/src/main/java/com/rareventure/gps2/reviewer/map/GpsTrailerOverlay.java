@@ -142,7 +142,7 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 			{
 				activity.notifyDoneProcessing(OngoingProcessEnum.DRAW_POINTS);
 				//wait for the cache to need to be changed or we're ready to retry looking for new points
-				stWait(0,this);		
+				stWait(0,this);
 				return;
 			}
 		}
@@ -195,6 +195,8 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 				long startTime = System.currentTimeMillis();
 				
 				int minDepth = getMinDepth(localApStbox);
+
+				Log.d(GTG.TAG,"calc points for "+localApStbox+" minDepth "+minDepth);
 				
 				TimeTree.hackTimesLookingUpTimeTrees = 0;
 				
@@ -268,7 +270,7 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 			
 			GTG.ccRwtm.unregisterReadingThread();
 			activity.notifyDoneProcessing(OngoingProcessEnum.DRAW_POINTS);
-			
+
 		}
 	}
 	
@@ -620,25 +622,42 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 
 			Map<String, String> props = new HashMap<>();
 
-			mapData.clear();
+			mapData.clear(false);
+
+			ll.longitude=0;
+			ll.latitude=0;
+
+			mapData.addPoint(ll,null,false);
+
+			ll.longitude=90;
+			ll.latitude=45;
+
+			mapData.addPoint(ll,null,false);
+
+			ll.longitude=-90;
+			ll.latitude=-45;
+
+			mapData.addPoint(ll,null,false);
+
 			while(iter.hasNext()) {
 				ViewNode vn = iter.next();
 				
-				AreaPanel row = vn.ap();
+				AreaPanel areaPanel = vn.ap();
 				
-				//skip any row that's "too big" to display (and will look weird)
-//				if(row.getDepth() > maxDepth)
+				//skip any areaPanel that's "too big" to display (and will look weird)
+//				if(areaPanel.getDepth() > maxDepth)
 //					continue;
 
 				pointCount++;
 
-				ll.set(AreaPanel.convertXToLon(row.getCenterX()),
-						AreaPanel.convertYToLat(row.getCenterY()));
+				ll.set(
+						AreaPanel.convertXToLon(areaPanel.getCenterX()),
+						-AreaPanel.convertYToLat(areaPanel.getCenterY())
+				);
 
 				Log.d(GTG.TAG,"Drawing point at lon "+ll.longitude+" lat "+ll.latitude);
 
 				//TODO 3 maybe one day handle altitude
-
 
 				if(localLatestOnScreenPointSec < vn.overlappingRange[1])
 					localLatestOnScreenPointSec = vn.overlappingRange[1];
@@ -646,7 +665,7 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 				if(localEarliestOnScreenPointSec > vn.overlappingRange[0])
 					localEarliestOnScreenPointSec = vn.overlappingRange[0];
 	
-				float speedMult = calcSpeedMult(vn, row.getDepth());
+				float speedMult = calcSpeedMult(vn, areaPanel.getDepth());
 				int paintIndex = figurePaintIndex(vn.overlappingRange[0],vn.overlappingRange[1]);
 //				pointPaint.setColor(paintColors[paintIndex]);
 				props.put("speedMult",Float.toString(speedMult));
@@ -667,7 +686,7 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 				//current version, and it does use a mutex before adding the point. See here:
 				//tangram-es/core/src/data/clientGeoJsonSource.cpp:
 				//void ClientGeoJsonSource::addPoint(const Properties& _tags, LngLat _point)
-				mapData.addPoint(ll,props);
+				mapData.addPoint(ll,props,false);
 
 				//we need to figure out what timezone to use. We do this by looking for the point
 				//closest to the center of the screen and using the timezone we were in during
@@ -680,13 +699,13 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 //				if(distSquared < closestPointDistSquared)
 //				{
 //					closestToCenterEndTimeSec = vn.overlappingRange[1];
-//					closestToCenterAp = row;
+//					closestToCenterAp = areaPanel;
 //					closestPointDistSquared = distSquared;
 //				}
 	
 			} //while examining pointCount
 
-			mapController.requestRender();
+			mapData.commitChanges();
 
 			if(closestToCenterAp != null)
 			{

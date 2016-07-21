@@ -1004,6 +1004,15 @@ public class GpsTrailerCacheCreator extends Thread {
 		return true;
 	}
 
+	/**
+	 * Calculate viewable nodes for a given space time box
+	 *
+	 * @param newLocalStBox
+	 * @param minDepth
+	 * @param earliestOnScreenPoint
+	 * @param latestOnScreenPoint
+     * @return
+     */
 	public int calcViewableNodes(AreaPanelSpaceTimeBox newLocalStBox,
 			int minDepth, int earliestOnScreenPoint, int latestOnScreenPoint) {
 //		Log.d("GPS", "calcViewableNodes start");

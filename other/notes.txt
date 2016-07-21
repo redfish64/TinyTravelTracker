@@ -1799,7 +1799,6 @@ If we can do this, it seems like the way to go.
 
 ---
 
-android's tangram doesn't support raster
 
 mvt: mapbox vector tiles
 https://www.mapbox.com/vector-tiles/specification/
@@ -1843,3 +1842,40 @@ so either:
 2. when loading points, we load for the deepest layer only. Ie don't draw at higher layers and
 iteratively go downwards
 3. Somehow make mapzen to re-request a tile on demand
+
+We're going to try 2 first, and then if necessary attempt to crack open tangram native source
+to do 3.
+
+---
+
+It looks like we could also do raster if we need to. But it seems like a desperate move.
+I'd rather use shaders and junk
+
+---
+
+I'm cooling off on the idea. The problem is that if we adjust the timeview forward or backward,
+it's going to completely mess up the points, unless we can redraw.
+
+Not to mention the lines....
+Maybe I'm getting over my head with this stuff.
+
+But even if we can redraw, we still will face flickering, I'd guessimate.
+
+---
+
+Using the screen version has lots of flickering
+
+---
+
+The map itself won't flicker when transistioning to a more detailed panel, so it must use
+something special internally when a panel is replaced or written over.
+
+We should be able to harness that.
+
+Looking into the tangram source code, it creates this vector of features internally and temporarily
+and then uses a mutex to copy that all into a GeoJSONVT object.
+
+So, if we create a way to prevent changes from being commited before putting it in the geojsonvt
+object, we can prevent flickering, I think.
+
+Specifically, during the clear method, it right away runs mutexed code to update GeoJSONVT

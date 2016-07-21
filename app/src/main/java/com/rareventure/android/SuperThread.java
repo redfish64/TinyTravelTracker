@@ -26,6 +26,14 @@ import android.util.Log;
 
 import com.rareventure.gps2.GTG;
 
+/**
+ * A super thread is used to share threads between multiple blocking tasks.
+ * This way one thread can handle several operations, each which may need to block.
+ *
+ * Tasks to run are added using addTask(). When they need to block, they call waitSt().
+ * If they still have work to do, but want to yield to another task, they can simply exit
+ * and will be called again when the other tasks have time to run
+ */
 public class SuperThread extends Thread
 {
 	boolean isSTDead;
@@ -63,13 +71,23 @@ public class SuperThread extends Thread
 		
 		/**
 		 * The implementation is expected to do all the work it can
-		 * do and finish when it needs to wait on an object.
+		 * do and finish when it needs to wait on an object. It can
+		 * specify the object its waiting on by calling stWait().
+		 *
+		 * It may return without calling doWork(), which will give
+		 * other tasks associated with the super thread a chance to
+		 * run. Afterwards, doWork() will be called again, and the
+		 * task should continue where it left off.
 		 */
 		abstract protected void doWork();
 		
 		/**
 		 * specifies what the task is waiting on next before it can do
-		 * more work
+		 * more work.
+		 *
+		 * WARNING: this doesn't pause the current task.
+		 * The task is expected to exit after calling this method. It
+		 * will be recalled when stNotify is called for the given item
 		 * 
 		 * @param time time to wait if none of the objects are stNotified (if zero or less,
 		 * will never wake up)
@@ -117,7 +135,15 @@ public class SuperThread extends Thread
 		public void abortOrPauseIfNecessary() {
 			superThread.abortOrPauseIfNecessary();
 		}
-		
+
+		/**
+		 * Notify the listening tasks that they should do work.
+		 * Note that even if a task is not waiting, it will restart
+		 * immediately after finishing its current work if this
+		 * is set (unlike a normal notify which will do nothing
+		 *  if a thread isn't waiting)
+		 * @param o object to notify
+		 */
 		public void stNotify(Object o)
 		{
 			superThread.manager.stNotify(o);
@@ -136,7 +162,7 @@ public class SuperThread extends Thread
 			task.superThread = this;
 			this.tasks.add(task);
 			
-			manager.notify();
+			manager.notifyAll();
 		}
 	}
 	
