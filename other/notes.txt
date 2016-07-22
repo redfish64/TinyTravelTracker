@@ -1879,3 +1879,104 @@ So, if we create a way to prevent changes from being commited before putting it 
 object, we can prevent flickering, I think.
 
 Specifically, during the clear method, it right away runs mutexed code to update GeoJSONVT
+
+---
+
+yaml has some limitations
+
+specifically it seems we can upload only two values for points, lon and lat. This prevents
+us from resizing points based on the time in the area and coloring based on time period.
+
+Possible solutions
+
+1. Use a polygon format. In the vertex shader, set some sort of varying value(??? can we
+do this?) based on additional points within the polygon ie:
+
+p[0] = lon, lat
+p[1] = speed, color
+
+parameters color??? size???
+
+Tangram::Properties is used to store properties, and it seems
+to be a simple string -> string hash.
+styleParams.cpp contain the list of supported properties, but when I try to use them, ex color,
+it does nothing. Maybe it expects a number?
+something else.. can't get points to display at all anymore
+ok: color must be specified in yaml(or maybe in props, and it must be in the format '#ffffff'
+
+I tried "color","'#0000ff'" in java with the yaml color commented out and nothing is displayed.
+with yaml color preset, result is yaml color
+I also tried "#0000ff" as a color as well.
+styleParam.cpp has parseColor which supposedly parses a color but they aren't getting through.
+
+in the demos of tangram, there is a MainActivity.java which does set a color with addPoint, but
+it's done the same way I did, "#0000ff"
+They also set a type.
+
+I tried this, but the point is still the yaml color
+
+I am able to print out debug messages in the c code. the clientGeoJson code is definitely getting
+the color parameter.
+
+ClientGeoJsonSource::parse is being called to get the points for a particular tile.
+I checked that color has made it that far, and into what is returned, a feature
+within TileData::layers
+
+This seems to be called from tileTask.cpp, in TileTask::process
+It calls _tileBuilder.build
+
+That applies some ruleset and then calls tile->setMesh
+The odd thing is I can't see where m_ruleSet is being set... is it an oversight? It's not always used.
+Ah, default constructor for m_ruleSet i think.
+Ok, so m_ruleSet.apply is definitely being called, checked with log message, and color is there at this point
+still there...
+
+Ok so it seems there are two phases. Phase 1, tile is downloaded, phase 2, tile is parsed and built.
+Finally, requestRender() which calls an android opengl native method is run.
+void TileTask::process(TileBuilder& _tileBuilder) {
+
+    auto tileData = m_source->parse(*this, *_tileBuilder.scene().mapProjection());
+
+    if (tileData) {
+        m_tile = _tileBuilder.build(m_tileId, *tileData, *m_source);
+    } else {
+        cancel();
+    }
+}
+
+So it must be that _tileBuilder.build is deciding on the color.
+
+PointStyleBuilder is a StyleBuilder which tileBuilder is initialized with.
+It has applyRule, build, and style()
+
+applyRule does not seem to be being called for my added points (Without a yaml color)
+
+with a yaml color, it is called, and the color is "#0000ff" (which I set with java code)
+but it still displays "#ffffff" which is from the yaml.
+
+But tilebuilder calls DrawRuleMergeSet::apply, not applyRule.
+
+applyRule is called by addPoint in PointStyleBuilder..
+
+This is important, we aren't even calling applyRule when the yaml has no color.
+
+StyleBuilder::addFeature is calling addPoint, but checkRule first, and if that fails,
+simply returns.
+
+Note that it calls checkRule with only its rule param, but addPoint with the rule param
+and the properties file
+
+applyRule applies a rule to a _props(Properties) and returns a Parameters.
+
+So the issue is that applyRule only applies properties to the label stuff. Color,
+size is not applied to the style. It's just ignored.
+
+I'm thinking the idea is that data sources shouldn't specify color or size.
+
+So that gives us a few options.
+
+1. hack the code to make it accept color and size.
+2. use javascript??? to set the color based on another parameter we decide.. can we do this??
+3. Use another type and a custom shader to hack the color and size that way.. at least
+we aren't messing with tangram too much.
+

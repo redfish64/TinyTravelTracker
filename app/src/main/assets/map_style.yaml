@@ -451,6 +451,15 @@ cameras:
         type: isometric
 
 styles:
+#    gt_point_style:
+#        base: points
+#        shaders:
+#           blocks:
+#                filter: |
+#                         vec4 wp = worldPosition();
+#                         color.rgb *= vec3(sin(wp.x),sin(wp.y),sin(wp.z));
+
+
     dashedline:
         base: lines
         texcoords: true
@@ -917,7 +926,8 @@ layers:
             points:
                 collide: false
                 size: [10px, 10px]
-                color: '#ff0000'
+                order: 10000
+                color: function() { return feature.color; }
 
     # Used by the SDK to place point, line, and polygon overlays on the map
     mz_default_point:

@@ -45,8 +45,10 @@ import com.rareventure.gps2.database.cache.AreaPanelSpaceTimeBox;
 
 public class OsmMapView extends MapView
 {
+	private static final float ZOOM_STEP = 1f;
+	private static final int ZOOM_EASE_MS = 500;
 	private ArrayList<GpsOverlay> overlays = new ArrayList<GpsOverlay>();
-	
+
 	/**
 	 * Offset in pixels of the upper left corner. Note, these are doubles
 	 * so that when we zoom out and zoom back in again, we will end up around
@@ -98,34 +100,36 @@ public class OsmMapView extends MapView
 
 		@Override
 		public void run() {
-			p.x = 0;
-			p.y = 0;
-			LngLat p1 = mapController.screenPositionToLngLat(p);
-			p.x = windowWidth;
-			p.y = pointAreaHeight;
-			LngLat p2 = mapController.screenPositionToLngLat(p);
-
-			//if we haven't moved since our last run
-			if(p1.equals(lastP1) && lastP2.equals(lastP2))
-				return;
-
-
-			lastP1 = p1;
-
-			lastP2 = p2;
+//			p.x = 0;
+//			p.y = 0;
+//			LngLat p1 = mapController.screenPositionToLngLat(p);
+//			p.x = windowWidth;
+//			p.y = pointAreaHeight;
+//			LngLat p2 = mapController.screenPositionToLngLat(p);
+			LngLat p1 = mapController.coordinatesAtScreenPosition(0,0);
+			LngLat p2 = mapController.coordinatesAtScreenPosition(windowWidth, pointAreaHeight);
 
 			int apMinX = AreaPanel.convertLonToX(p1.longitude);
 			int apMinY = AreaPanel.convertLatToY(p1.latitude);
 			int apMaxX = AreaPanel.convertLonToX(p2.longitude);
 			int apMaxY = AreaPanel.convertLatToY(p2.latitude);
 
-			Log.i(GTG.TAG,"p1 lon "+p1.longitude+" lat "+p1.latitude+" p2 lon "+p2.longitude+" lat "
-					+p2.latitude
-					+" ax1 "+apMinX+" ay2 "+apMinY
-					+" ax2 "+apMaxX+" ay2 "+apMaxY
-			);
+//			Log.i(GTG.TAG,"p1 lon "+p1.longitude+" lat "+p1.latitude+" p2 lon "+p2.longitude+" lat "
+//					+p2.latitude
+//					+" ax1 "+apMinX+" ay1 "+apMinY
+//					+" ax2 "+apMaxX+" ay2 "+apMaxY
+//			);
 
 			panAndZoom(apMinX,apMinY,apMaxX,apMaxY);
+
+			//if we haven't moved since our last run
+			//note that we place this check after panAndMove, so that if we are called once,
+			//we'll always redraw no matter once. (used by redrawMap())
+			if(p1.equals(lastP1) && lastP2.equals(lastP2))
+				return;
+
+			lastP1 = p1;
+			lastP2 = p2;
 
 			//we keep queuing as long as there is a change
 			//we need to time them out, as to not waste resources, hence we use a handler and delay
@@ -341,124 +345,6 @@ public class OsmMapView extends MapView
 		this.overlays.add(overlay);
 	}
 
-//	@Override
-//	public boolean onTouchEvent(MotionEvent event) {
-//		//TODO 1 HACK
-//		if(1==1) return super.onTouchEvent(event);
-//
-//
-//        GTG.ccRwtm.registerReadingThread();
-//        try {
-//
-//    		if(event.getAction() == MotionEvent.ACTION_DOWN)
-//    		{
-//    			thumbDown = true;
-//    			actionStartX = actionLastX = event.getX();
-//    			actionStartY = actionLastY = event.getY();
-//    			startEventTime = event.getEventTime();
-//    			final int localActionDownIndex = actionDownIndex;
-//
-//    			getHandler().postDelayed(new Runnable() {
-//
-//					@Override
-//					public void run() {
-//						if(localActionDownIndex == actionDownIndex &&
-//		    					(actionLastX - actionStartX) * (actionLastX - actionStartX) +
-//		    					(actionLastY - actionStartY) * (actionLastY - actionStartY) <=
-//		    						ViewConfiguration.getTouchSlop() * ViewConfiguration.getTouchSlop())
-//						{
-//							// Get instance of Vibrator from current Context
-//							Vibrator v = (Vibrator) activity.getSystemService(Context.VIBRATOR_SERVICE);
-//
-//							// Vibrate for a short time
-//							v.vibrate(50);
-//
-//							longPressOn = true;
-//						}
-//					}
-//				}, prefs.longPressTimeout);
-//    		}
-//    		if(event.getAction() == MotionEvent.ACTION_UP)
-//    		{
-//    			thumbDown = false;
-//    			actionDownIndex++;
-//
-//
-//    			if(lastShortPressTimeMs >= System.currentTimeMillis() - DOUBLE_TAP_MS)
-//    			{
-//    				//zoom in after recentering to the current x, y
-//    				x += event.getX() - centerX;
-//    				y += event.getY() - centerY;
-//    				if(shouldZoomInBeEnabled())
-//    					zoomIn();
-//    			}
-//    			else if(longPressOn)
-//    			{
-//    				//we go in reverse, since the last overlay is on top of the previously added ones
-//    				//(this is the way that google maps does this, also
-//    				for(int i = overlays.size()-1; i >= 0; i--)
-//    					if(overlays.get(i).onLongPressEnd(actionStartX, actionStartY, event.getX(), event.getY(), this)) break;
-//
-//    				longPressOn = false;
-//    			}
-//    			else if(
-//    					event.getEventTime() - startEventTime < prefs.tapTimeout &&
-//    					(event.getX() - actionStartX)*(event.getX() - actionStartX) +
-//    					(event.getY() - actionStartY) * (event.getY() - actionStartY) <=
-//    						ViewConfiguration.getTouchSlop() * ViewConfiguration.getTouchSlop())
-//    			{
-//    				lastShortPressTimeMs = System.currentTimeMillis();
-//    				//we go in reverse, since the last overlay is on top of the previously added ones
-//    				//(this is the way that google maps does this, also
-//    				for(int i = overlays.size()-1; i >= 0; i--)
-//    					if(overlays.get(i).onTap(event.getX(), event.getY(), this)) break;
-//    			}
-//    			else
-//    			{
-//    				//round to a multiple of 2 to keep map from looking pixelated
-//    				//co: this can make the map jump back to a zoom level already passed when the user
-//    				// is doing their pinch to zoom thing.
-////    				int newZoom8BitPrec = 1<<(Util.minIntegerLog2(zoom8bitPrec)-1);
-////    				x = (x + centerX) *(newZoom8BitPrec)/(zoom8bitPrec) - centerX;
-////    				y = (y + centerY) *(newZoom8BitPrec)/(zoom8bitPrec) - centerY;
-////    				zoom8bitPrec = newZoom8BitPrec;
-////    				invalidate();
-////
-////    				//update scale widget for regular move
-////        			updateScaleWidget();
-//    			}
-//
-////    			else
-////    				Log.d(GTG.TAG,"dist squared is "+(event.getX() - actionStartX)*(event.getX() - actionStartX) +
-////    						(event.getY() - actionStartY) * (event.getY() - actionStartY));
-//
-//    		}
-//
-//    		if(event.getAction() == MotionEvent.ACTION_MOVE)
-//			{
-//    			actionLastX = event.getX();
-//    			actionLastY = event.getY();
-//    			if(longPressOn)
-//    			{
-//    				//we go in reverse, since the last overlay is on top of the previously added ones
-//    				//(this is the way that google maps does this, also
-//    				for(int i = overlays.size()-1; i >= 0; i--)
-//    					if(overlays.get(i).onLongPressMove(actionStartX, actionStartY, event.getX(), event.getY(), this)) break;
-//
-//    				invalidate();
-//    				//don't let the multi touch controller handle it if we long pressed, so the user can drag a selection
-//    				return true;
-//    			}
-//
-//			}
-//
-//        	return multiTouchController.onTouchEvent(event);
-//        }
-//        finally {
-//        	GTG.ccRwtm.unregisterReadingThread();
-//        }
-//	}
-	
 	public boolean shouldZoomInBeEnabled()
 	{
 		return zoom8bitPrec <= (OsmMapGpsTrailerReviewerMapActivity.prefs.maxZoom >> 1);
@@ -478,37 +364,24 @@ public class OsmMapView extends MapView
 	}
 
 	public void zoomIn() {
-        GTG.ccRwtm.registerReadingThread();
-        try {
-		zoom8bitPrec <<= 1;
-		
-		x = ((x + centerX)*2) - centerX;
-		y = ((y + centerY)*2) - centerY;
-		
-		updateScaleWidget();
-		invalidate();
-        }
-        finally {
-        	GTG.ccRwtm.unregisterReadingThread();
-        }
+		float newZoom = mapController.getZoom() + ZOOM_STEP;
+
+		mapController.setZoomEased(newZoom,ZOOM_EASE_MS);
 	}
 
 	public void zoomOut() {
-        GTG.ccRwtm.registerReadingThread();
-        try {
-		zoom8bitPrec >>= 1;
-		
-		x = ((x + centerX)*.5) - centerX;
-		y = ((y + centerY)*.5) - centerY;
-		
-		updateScaleWidget();
-		invalidate();
-        }
-        finally {
-        	GTG.ccRwtm.unregisterReadingThread();
-        }
+		float newZoom = mapController.getZoom() - ZOOM_STEP;
+
+		mapController.setZoomEased(newZoom,ZOOM_EASE_MS);
 	}
-	
+
+	/**
+	 * Redraws the map for a change of points displayed or screen
+	 */
+	public void redrawMap() {
+		mapController.queueEvent(notifyScreenChangeRunnable);
+	}
+
 	public static class Preferences implements AndroidPreferences
 	{
 
@@ -599,7 +472,7 @@ public class OsmMapView extends MapView
 		//TODO 3 handle zoom padding
 		x = ((minApX + maxApX) >> 1) * apUnitsToPixels - centerX;
 		y = ((minApY + maxApY) >> 1) * apUnitsToPixels - centerY;
-		
+
 		updateScaleWidget();
         }
         finally {

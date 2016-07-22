@@ -883,7 +883,7 @@ GTGEventListener
 	}
 
 	public void redrawMap() {
-		osmMapView.invalidate();
+		osmMapView.redrawMap();
 	}		
 
 	public static class Preferences implements AndroidPreferences

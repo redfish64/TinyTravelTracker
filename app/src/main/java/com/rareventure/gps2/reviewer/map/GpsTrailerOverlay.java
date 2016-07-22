@@ -1,4 +1,4 @@
-/** 
+/**
     Copyright 2015 Tim Engler, Rareventure LLC
 
     This file is part of Tiny Travel Tracker.
@@ -58,8 +58,8 @@ import java.util.Map.Entry;
 //TODO 3: we need a hard limit and a soft limit for number of points displayed. Once we cross the soft limit,
 // we won't draw the next depth unless the stb changes
 
-//TODD 2.1: do we really need superthreads anymore? The only reason we have them is to "pause" 
-// drawer, and map tile threads as well as to shut them down. (see onPause and onDestroy in the 
+//TODD 2.1: do we really need superthreads anymore? The only reason we have them is to "pause"
+// drawer, and map tile threads as well as to shut them down. (see onPause and onDestroy in the
 //  activity)
 //I suppose that's ok, but why do we have such a complicated
 // object for this?
@@ -117,6 +117,7 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
     public static Preferences prefs = new Preferences();
 	private MapController mapController;
 
+ 	public int[] paintColors;
 
 	public GpsTrailerOverlay(OsmMapGpsTrailerReviewerMapActivity activity,
 							   SuperThread superThread,
@@ -126,10 +127,35 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 		this.sas = new SelectedAreaSet(activity);
 		this.osmMapView = osmMapView;
 		this.superThread = superThread;
+
+		paintColors = new int[NUM_COLORS];
+		updateForColorRangeChange();
 	}
 
 	public void notifyWidthHeightReady() {
 	//TODO 2 do something here???? do we need to know???
+	}
+
+	public void updateForColorRangeChange() {
+			// MEMPERF PERF consider just changing the color everytime
+			for (int i = 0; i < NUM_COLORS; i++) {
+					int result = 0;
+
+					int c1i = i * (OsmMapGpsTrailerReviewerMapActivity.prefs.colorRange.length - 1) / (NUM_COLORS - 1);
+					int c2i = c1i + 1;
+					if (c2i > OsmMapGpsTrailerReviewerMapActivity.prefs.colorRange.length - 1)
+							c2i = c1i;
+
+					for (int j = 0xFF; j > 0; j = j << 8) {
+							int c1 = OsmMapGpsTrailerReviewerMapActivity.prefs.colorRange[c2i] & j;
+							int c0 = OsmMapGpsTrailerReviewerMapActivity.prefs.colorRange[c1i] & j;
+							result |= ((int) (((double) c1 - c0) * i / NUM_COLORS + c0)) & j;
+					}
+
+					result |= 0xFF000000;
+
+					paintColors[i] = result;
+			}
 	}
 
 	public void doWork()
@@ -148,22 +174,22 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 		}
 
 		abortOrPauseIfNecessary();
-		
+
 		GTG.ccRwtm.registerReadingThread();
 		if(doMethodTracing)
 			Debug.startMethodTracing("/sdcard/it.trace");
 		try {
-			
+
 			boolean stillMoreNodesToCalc = true;
 			boolean allLinesCalculated = false;
-			
+
 			long timeStartedDrawingMs = System.currentTimeMillis();
-			
+
 			while((!allLinesCalculated || stillMoreNodesToCalc) && !superThread.manager.isShutdown)
 			{
 				if(System.currentTimeMillis() - timeStartedDrawingMs > MAX_TIME_DRAWING_BEFORE_DISPLAY_NOTICE_MS)
 					activity.notifyProcessing(OngoingProcessEnum.DRAW_POINTS);
-				
+
 				if(!distanceUpToDate)
 				{
 					int startTime, endTime;
@@ -172,15 +198,15 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 						startTime = requestedStBox.minZ;
 						endTime = requestedStBox.maxZ;
 					}
-					
+
 					activity.notifyDistUpdated(GpsTrailerCacheCreator.calcTrDist(startTime, endTime, null));
-					
+
 					synchronized(this)
 					{
 						distanceUpToDate = true;
 					}
 				}
-					
+
 				synchronized(this)
 				{
 					if(localApStbox == null || !localApStbox.equals(requestedStBox))
@@ -191,23 +217,23 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 					}
 				}
 
-				
+
 				long startTime = System.currentTimeMillis();
-				
+
 				int minDepth = getMinDepth(localApStbox);
 
 				Log.d(GTG.TAG,"calc points for "+localApStbox+" minDepth "+minDepth);
-				
+
 				TimeTree.hackTimesLookingUpTimeTrees = 0;
-				
+
 				while(System.currentTimeMillis() - startTime < prefs.maxDrawCalcTime
 						&& stillMoreNodesToCalc)
 				{
 					int status = GTG.cacheCreator.calcViewableNodes(localApStbox, minDepth,
 							earliestOnScreenPointSec, latestOnScreenPointSec);
-					
+
 					stillMoreNodesToCalc = ((status & GpsTrailerCacheCreator.CALC_VIEW_NODES_STILL_MORE_NODES_TO_CALC) != 0);
-					
+
 					//if there were some view nodes that were reset or new ones created and the lines need to be recalculated
 					if((status & GpsTrailerCacheCreator.CALC_VIEW_NODES_LINES_NEED_RECALC) != 0)
 					{
@@ -215,14 +241,14 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 						lastNumberOfViewNodesLinesCalculatedFor = Integer.MAX_VALUE;
 					}
 				}
-				
-	
+
+
 				/* ttt_installer:remove_line */Log.d("GPS","times looking up time trees is "+TimeTree.hackTimesLookingUpTimeTrees);
-	
+
 				allLinesCalculated = calcLines(localApStbox, minDepth);
-						
+
 				//PERF: it would be faster to store the pixel locations
-				
+
 				//if while calculating all lines, we got to the maximum line count, and drawLines deletes
 				//some of them, we  have to recalculate to add some more back in
 				if(allLinesCalculated && isAtMaxLines())
@@ -237,14 +263,15 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 					drawLines(localApStbox, minDepth);
 				}
 
+				calcStartAndEndTimeOnScreen();
 				int currPoints = drawPoints(localApStbox);
 
 				//TODO 2 handle photos
 //				if(OsmMapGpsTrailerReviewerMapActivity.prefs.showPhotos)
 //					drawMedia(localApStbox);
-				
+
 				boolean stBoxNotChanged;
-		
+
 				synchronized(this)
 				{
 					//we only say view is up to date if its up to date according to the requeted stbox
@@ -253,12 +280,12 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 							&& !stillMoreNodesToCalc)
 						viewUpToDate = true;
 				}
-				
+
 				if(stBoxNotChanged)
 				{
 					activity.runOnUiThread(activity.NOTIFY_HAS_DRAWN_RUNNABLE);
 				}
-				
+
 			}
 		}
 		finally {
@@ -267,13 +294,13 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 				doMethodTracing = false;
 				Debug.stopMethodTracing();
 			}
-			
+
 			GTG.ccRwtm.unregisterReadingThread();
 			activity.notifyDoneProcessing(OngoingProcessEnum.DRAW_POINTS);
 
 		}
 	}
-	
+
 	private boolean isAtMaxLines() {
 		return GTG.cacheCreator.startTimeToViewLine.size() >= MAX_LINES;
 	}
@@ -281,7 +308,7 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 	private boolean distanceUpToDate;
 
 	public int closestToCenterTimeSec;
-	
+
 	/**
 	 * For each round when we calculate lines for viewnodes, we must calculate the most
 	 * important lines first, which we determine by the time length with the time trees of the nodes.
@@ -289,7 +316,7 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 	 * process this round, so that next round, we know which ones to start from
 	 */
 	private SortedBestOfIntArray bestLargestTimeTreeLengthForUncreatedLinesList = new SortedBestOfIntArray(BEST_LARGEST_TIME_TREE_LENGTH_FOR_UNCREATED_LINES_LIST_TOTAL);
-	
+
 	/**
 	 * We use this to determine how many lines at a time should be pulled from each viewnode. At the beginning, we pull very few, but as
 	 * the number of active nodes becomes less and less, we pull more and more, so we don't have to keep relooping over and over.
@@ -297,81 +324,81 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 	 * this often means an easily viewable trail
 	 */
 	private int lastNumberOfViewNodesLinesCalculatedFor = Integer.MAX_VALUE;;
-	
+
 	/**
-	 * Updates startTimeToViewLines and endTimeToViewLines with visible lines. 
+	 * Updates startTimeToViewLines and endTimeToViewLines with visible lines.
 	 *
 	 * @return true if there are no more lines to calculate, false otherwise
 	 */
 	private boolean calcLines(AreaPanelSpaceTimeBox apStBox, int minDepth)
 	{
-		
+
 //		float metersPerApUnits = activity.calcMetersPerApUnits();
-		
+
 //		Log.d(GTG.TAG,"vn calcLines ----");
-		
+
 		//note, technically, this isn't needed, since writing to the view nodes will
 		//never interfere with code at this point to read them. But to make the code
 		//clearer, we do it anyway
 		GTG.cacheCreator.viewNodeThreadManager.registerReadingThread();
-		
+
 		int numberOfViewNodesLinesCalculatedFor = 0;
-		
-		try {		
+
+		try {
 			Iterator<ViewNode> iter = GTG.cacheCreator.getViewNodeIter();
-			
+
 			ArrayList<TimeTree> scratchPath = new ArrayList<TimeTree>();
-			
+
 			//if there are no visible ap's (view nodes)
 			if(!iter.hasNext())
 			{
 				//we still may need to draw a line. Consider, A at 10:00,
 				// B at 11:00 and the time range at 10:30 - 10:35
 				AreaPanel topAp = GTG.apCache.getTopRow();
-				
+
 				//if there is no data at all
 				if(topAp == null || topAp.getTimeTree() == null)
 					return true;
-				
+
 				//start and end ap are the same because we are in the middle of the line,
 				//and we don't know which one we'll get
 				AreaPanel ap = topAp.getChildApAtDepthAndTime(minDepth, apStBox.minZ);
-				
+
 				//if there isn't an ap, we must be off the edge of the start and end times
 				if(ap == null)
 					return true;
-				
+
 				TimeTree tt = ap.getTimeTree().getBottomLevelEncompassigTimeTree(apStBox.minZ);
-				
+
 				ViewLine vl;
-				
+
 				int endCutTime = tt.calcTimeRangeCutEnd();
-				
+
 				if(endCutTime <= apStBox.minZ)
 				{
 					vl = new ViewLine(endCutTime, tt.getMaxTimeSecs());
-					
+
 					vl.startApId = ap.id;
 					vl.endApId = tt.getNextApId();
 				}
 				else
 				{
 					vl = new ViewLine(tt.getMinTimeSecs(), tt.calcTimeRangeCutStart());
-					
+
 					vl.startApId = tt.getPrevApId();
 					vl.endApId = ap.id;
 				}
-								
+
 				GTG.cacheCreator.startTimeToViewLine.put(vl.startTimeSec, vl);
 				GTG.cacheCreator.endTimeToViewLine.put(vl.endTimeSec, vl);
-				
+
 				return true;
 			}
-			
+
 			//PERF: we could combine this with drawPoints and not iterate twice (and draw lines after drawing points shadow)
 			while(iter.hasNext()) {
 				ViewNode vn = iter.next();
-				
+
 				//if we need to calculate lines for the view node... we don't do this for
 				// ap's not at min depth, since they'll be replaced anyway
 				if(vn.largestTimeTreeLengthForUncreatedLines >= minTimeTreeLengthForLineCalc && vn.ap().getDepth() == minDepth)
@@ -381,9 +408,9 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 							lastNumberOfViewNodesLinesCalculatedFor);
 
 					numberOfViewNodesLinesCalculatedFor++;
-					
+
 					if(numberOfViewNodesLinesCalculatedFor > VIEW_NODES_TO_CALC_LINES_FOR_PER_ROUND)
-						//this is a fine point. The first round, we need to process all the view nodes 
+						//this is a fine point. The first round, we need to process all the view nodes
 						//to get their start and end times done first. So we don't want to change
 						//minTimeTreeLengthForLineCalc until that is done. However, when the ends are
 						//finished, we need to choose the next minTimeTreeLengthForLineCalc, so at that
@@ -392,44 +419,44 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 						//underlying tree, I can't see reusing the iterator to be very easy
 						//PERF reuse the iterator
 						return false;
-					
+
 					if(isAtMaxLines())
 					{
 						/* ttt_installer:remove_line */Log.d(GTG.TAG,"Reached max lines: "+GTG.cacheCreator.startTimeToViewLine.size()+" minTimeTreeLengthForLineCalc is "+minTimeTreeLengthForLineCalc);
 						return true;
 					}
 				}
-				
+
 			}
-			
+
 			//we've gone through the whole list of viewnodes for this round
 			bestLargestTimeTreeLengthForUncreatedLinesList.clear();
-			
+
 			iter = GTG.cacheCreator.getViewNodeIter();
-			
+
 			while(iter.hasNext())
 			{
 				ViewNode vn = iter.next();
-				
+
 				if(vn.ap().getDepth() != minDepth)
 					continue;
-				
+
 				bestLargestTimeTreeLengthForUncreatedLinesList.add(vn.largestTimeTreeLengthForUncreatedLines);
 			}
-			
+
 			//if there are no time gaps that are more finely grained then those we have already
 			//created viewlines for
 			if(bestLargestTimeTreeLengthForUncreatedLinesList.data[BEST_LARGEST_TIME_TREE_LENGTH_FOR_UNCREATED_LINES_LIST_TOTAL-1] <= 0)
 				return true; ///we're done
-			
+
 			//choose a min time jump for next round
 			minTimeTreeLengthForLineCalc = bestLargestTimeTreeLengthForUncreatedLinesList.data[0];
-			
+
 			return false;
 		}
 		finally {
 			GTG.cacheCreator.viewNodeThreadManager.unregisterReadingThread();
-			
+
 			lastNumberOfViewNodesLinesCalculatedFor = numberOfViewNodesLinesCalculatedFor;
 
 			/* ttt_installer:remove_line */Log.d(GTG.TAG,"numberOfViewNodesLinesCalculatedFor: "+numberOfViewNodesLinesCalculatedFor+" lines: "+GTG.cacheCreator.startTimeToViewLine.size()+
@@ -437,7 +464,7 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 			/* ttt_installer:remove_line */		" blttlfull0="+bestLargestTimeTreeLengthForUncreatedLinesList.data[0]
 			/* ttt_installer:remove_line */				+" blttlfullMAX="+bestLargestTimeTreeLengthForUncreatedLinesList.data[BEST_LARGEST_TIME_TREE_LENGTH_FOR_UNCREATED_LINES_LIST_TOTAL-1]);
 		}
-		
+
 	}
 
 	/**
@@ -446,7 +473,7 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 	 * to incrementally calculate some lines, draw our work, and keep looping
 	 * until all the lines are calculated and drawn. By doing it this way,
 	 * we show our work to the user periodically as we draw more and more lines
-	 * 
+	 *
 	 * @param apStBox
 	 * @param minDepth
 	 * @return
@@ -459,22 +486,22 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 
 
 		/* ttt_installer:remove_line */Log.d(GTG.TAG,"vn drawLines ----");
-		
+
 		boolean removedLines = false;
-		
+
 		for(Iterator<Entry<Integer, ViewLine>> i = GTG.cacheCreator.startTimeToViewLine.entrySet().iterator(); i.hasNext();)
 		{
 			Entry<Integer, ViewLine> e = i.next();
-			
+
 			ViewLine vl = e.getValue();
-			
+
 			if(vl.endTimeSec > apStBox.minZ && vl.startTimeSec < apStBox.maxZ)
 			{
-				AreaPanel priorAp = vl.getStartAp();			
-				
+				AreaPanel priorAp = vl.getStartAp();
+
 				if(priorAp.getDepth() == minDepth)
 				{
-					AreaPanel nextAp = vl.getEndAp();			
+					AreaPanel nextAp = vl.getEndAp();
 					//if the start or end part of the line is within the area panel
 					if(apStBox.contains(priorAp.getX(), priorAp.getY()) || apStBox.contains(nextAp.getX(), nextAp.getY()))
 					{
@@ -483,15 +510,15 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 					}
 				}
 			}
-			
+
 			//if we didn't draw the line, we remove it here
 			i.remove();
-			
+
 			GTG.cacheCreator.endTimeToViewLine.remove(vl.endTimeSec);
-			
+
 			removedLines = true;
 		}
-		
+
 		return removedLines;
 	}
 
@@ -499,23 +526,23 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 			AreaPanelSpaceTimeBox apStBox) {
 		if(ap1 == null || ap2 == null)
 			return;
-		
+
 		//if one of the aps is out of time range
 		if(ap2.getStartTimeSec() >= apStBox.maxZ ||
 				ap1.getEndTimeSec() <= apStBox.minZ)
 			return;
-		
+
 		//PERF if points are directly next to each other, don't draw lines
-		
+
 		int apX1 = ap1.getCenterX();
 		int apY1 = ap1.getCenterY();
-		
+
 		int apX2 = ap2.getCenterX();
 		int apY2 = ap2.getCenterY();
-		
+
 		if(apX2 - apX1 > AreaPanel.MAX_AP_UNITS>>1)
 		{
-			
+
 			int yAtEdge = apY1+ (int) (((long)apX1)*(apY2 - apY1)/(apX1 + AreaPanel.MAX_AP_UNITS - apX2));
 
 			drawLineBetweeenApPoints(apStBox, apX1, apY1, 0, yAtEdge);
@@ -523,7 +550,7 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 		}
 		else if(apX1 - apX2 > AreaPanel.MAX_AP_UNITS>>1)
 		{
-			
+
 			int yAtEdge = apY1 + (int) (((long)AreaPanel.MAX_AP_UNITS - apX1)*(apY2 - apY1)/(apX2 + AreaPanel.MAX_AP_UNITS - apX1));
 
 			drawLineBetweeenApPoints(apStBox, apX1, apY1, AreaPanel.MAX_AP_UNITS-1, yAtEdge);
@@ -532,11 +559,11 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 		else
 			drawLineBetweeenApPoints(apStBox, apX1, apY1, apX2, apY2);
 	}
-	
+
 	private static Point p1 = new Point();
 	private static Point p2 = new Point();
 
-	private void drawLineBetweeenApPoints(AreaPanelSpaceTimeBox stBox, int apX1, int apY1, 
+	private void drawLineBetweeenApPoints(AreaPanelSpaceTimeBox stBox, int apX1, int apY1,
 			int apX2, int apY2) {
 
 		//TODO 1.5 fix lines!
@@ -554,13 +581,13 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 	private static int getMaxDepth(AreaPanelSpaceTimeBox stBox)
 	{
 		/*index of the search key, if it is contained in the array; otherwise, (-(insertion point) - 1).
-		 *  The insertion point is defined as the point at which the key would be inserted into the array: 
-		 *  the index of the first element greater than the key, or a.length if all elements in the array 
-		 *  are less than the specified key. Note that this guarantees that the return value will be >= 0 
+		 *  The insertion point is defined as the point at which the key would be inserted into the array:
+		 *  the index of the first element greater than the key, or a.length if all elements in the array
+		 *  are less than the specified key. Note that this guarantees that the return value will be >= 0
 		 *  if and only if the key is found.*/
-			
+
 		int index = Arrays.binarySearch(AreaPanel.DEPTH_TO_WIDTH, (int)(stBox.getWidth() * GpsTrailerOverlay.prefs.maxPointSizePerc));
-		
+
 		//if we exactly matched a depth, that will be the max depth
 		if(index >= 0)
 			return index;
@@ -570,10 +597,10 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 		//otherwise we want the depth 1 below our max
 		return -index - 2;
 	}
-	
+
 	public static int getMinDepth(AreaPanelSpaceTimeBox apStbox)
 	{
-		int index = Arrays.binarySearch(AreaPanel.DEPTH_TO_WIDTH, 
+		int index = Arrays.binarySearch(AreaPanel.DEPTH_TO_WIDTH,
 				(int)(apStbox.getWidth() * GpsTrailerOverlay.prefs.minPointSizePerc));
 
 		//if we exactly matched a depth, that will be the min depth
@@ -588,6 +615,45 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 	}
 
 	/**
+	 * This calculates the start and end time the path is visible on screen, so we can choose
+	 * appropriate colors. It uses the points calculated by cache creator
+	 * and places the results in {@code earliestOnScreenPointSec} and {@code latestOnScreenPointSec}
+	 */
+	private void calcStartAndEndTimeOnScreen() {
+		GTG.cacheCreator.viewNodeThreadManager.registerReadingThread();
+
+		try {
+			int localEarliestOnScreenPointSec = Integer.MAX_VALUE;
+			int localLatestOnScreenPointSec = Integer.MIN_VALUE;
+
+			Iterator<ViewNode> iter = GTG.cacheCreator.getViewNodeIter();
+
+			while(iter.hasNext()) {
+				ViewNode vn = iter.next();
+
+				if (localLatestOnScreenPointSec < vn.overlappingRange[1])
+					localLatestOnScreenPointSec = vn.overlappingRange[1];
+
+				if (localEarliestOnScreenPointSec > vn.overlappingRange[0])
+					localEarliestOnScreenPointSec = vn.overlappingRange[0];
+
+				//note that there is a thread race with the main thread and time view here
+				//but I don't think this will affect much
+				//TODO 2.5 should we synchronize here? It's growing with the addition of colorRangeStartEndSec
+				latestOnScreenPointSec = localLatestOnScreenPointSec;
+				earliestOnScreenPointSec = localEarliestOnScreenPointSec;
+
+			}
+		}
+		finally
+		{
+			GTG.cacheCreator.viewNodeThreadManager.unregisterReadingThread();
+		}
+
+	}
+
+
+	/**
 	 * @return number of points drawn
 	 */
 	private int drawPoints(AreaPanelSpaceTimeBox apStBox)
@@ -598,22 +664,20 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 		GTG.cacheCreator.viewNodeThreadManager.registerReadingThread();
 
 		Log.d(GTG.TAG,"Drawing points for "+apStBox);
-		try {		
+		try {
 			long time = System.currentTimeMillis();
-			
-			int localEarliestOnScreenPointSec = Integer.MAX_VALUE;
-			int localLatestOnScreenPointSec = Integer.MIN_VALUE;
-			
+
+
 			int pointCount = 0;
-			
+
 			int maxDepth = getMaxDepth(apStBox);
-			
+
 			Iterator<ViewNode> iter = GTG.cacheCreator.getViewNodeIter();
-			
+
 			Point p = new Point();
-			
+
 			Point p2 = new Point();
-			
+
 			float closestPointDistSquared = Float.MAX_VALUE;
 			int closestToCenterEndTimeSec = 0;
 			AreaPanel closestToCenterAp = null;
@@ -622,28 +686,14 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 
 			Map<String, String> props = new HashMap<>();
 
-			mapData.clear(false);
-
-			ll.longitude=0;
-			ll.latitude=0;
-
-			mapData.addPoint(ll,null,false);
-
-			ll.longitude=90;
-			ll.latitude=45;
-
-			mapData.addPoint(ll,null,false);
-
-			ll.longitude=-90;
-			ll.latitude=-45;
-
-			mapData.addPoint(ll,null,false);
+			mapData.beginChangeBlock();
+			mapData.clear();
 
 			while(iter.hasNext()) {
 				ViewNode vn = iter.next();
-				
+
 				AreaPanel areaPanel = vn.ap();
-				
+
 				//skip any areaPanel that's "too big" to display (and will look weird)
 //				if(areaPanel.getDepth() > maxDepth)
 //					continue;
@@ -655,27 +705,15 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 						-AreaPanel.convertYToLat(areaPanel.getCenterY())
 				);
 
-				Log.d(GTG.TAG,"Drawing point at lon "+ll.longitude+" lat "+ll.latitude);
+//				Log.d(GTG.TAG,"Drawing point at lon "+ll.longitude+" lat "+ll.latitude);
 
 				//TODO 3 maybe one day handle altitude
 
-				if(localLatestOnScreenPointSec < vn.overlappingRange[1])
-					localLatestOnScreenPointSec = vn.overlappingRange[1];
-
-				if(localEarliestOnScreenPointSec > vn.overlappingRange[0])
-					localEarliestOnScreenPointSec = vn.overlappingRange[0];
-	
 				float speedMult = calcSpeedMult(vn, areaPanel.getDepth());
-				int paintIndex = figurePaintIndex(vn.overlappingRange[0],vn.overlappingRange[1]);
-//				pointPaint.setColor(paintColors[paintIndex]);
-				props.put("speedMult",Float.toString(speedMult));
-
 				//TODO 2 we probably won't use paintIndex to determine color, but we need to do
-				//something; this is just a placeholder
-				props.put("paintIndex",Integer.toString(paintIndex));
-
-				//TODO 2 use props to store more interesting data we can use for selecting pointCount,
-				//etc. (or find some other way to do that)
+				int paintIndex = figurePaintIndex(vn.overlappingRange[0],vn.overlappingRange[1]);
+				props.put("color",String.format("#%06x",paintColors[paintIndex]));
+				//props.put("size","20px");
 
 				//Here we add the actual point into mapzen.
 				//
@@ -686,7 +724,7 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 				//current version, and it does use a mutex before adding the point. See here:
 				//tangram-es/core/src/data/clientGeoJsonSource.cpp:
 				//void ClientGeoJsonSource::addPoint(const Properties& _tags, LngLat _point)
-				mapData.addPoint(ll,props,false);
+				mapData.addPoint(ll,props);
 
 				//we need to figure out what timezone to use. We do this by looking for the point
 				//closest to the center of the screen and using the timezone we were in during
@@ -702,10 +740,11 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 //					closestToCenterAp = areaPanel;
 //					closestPointDistSquared = distSquared;
 //				}
-	
+
 			} //while examining pointCount
 
-			mapData.commitChanges();
+			mapData.endChangeBlock();
+			mapController.requestRender();
 
 			if(closestToCenterAp != null)
 			{
@@ -713,16 +752,9 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 				TimeTree tt = closestToCenterAp.getTimeTree().getEncompassigTimeTreeOrMaxTimeTreeBeforeTime(closestToCenterEndTimeSec-1, false);
 				closestToCenterTimeSec = tt.calcTimeRangeCutEnd();
 			}
-			
+
 			/* ttt_installer:remove_line */Log.d("GPS","drew "+pointCount+" pointCount");
-			
-			//note that we only need to do this for draw shadow, but we're doing this for all
-			//also note that there is a thread race with the main thread and time view here
-			//but I don't think this will affect much
-			//TODO 2.5 should we synchronize here? It's growing with the addition of colorRangeStartEndSec
-			latestOnScreenPointSec = localLatestOnScreenPointSec;
-			earliestOnScreenPointSec = localEarliestOnScreenPointSec;
-			
+
 			return pointCount;
 		}
 		finally
@@ -762,7 +794,7 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 		20971520f,
 		41943040f
 			};
-	
+
 	private float calcSpeedMult(ViewNode vn, int depth) {
 		return .7f* (1-DEPTH_TO_MAX_SECONDS[depth]/(DEPTH_TO_MAX_SECONDS[depth]+(vn.overlappingRange[1] - vn.overlappingRange[0])))+.3f;
 	}
@@ -772,7 +804,7 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 		//co: used to use average time
 //		int val = (int)( ((long)(startTimeSec>>1) + (endTimeSec>>1) - earliestOnScreenPointSec)
 //				* (paint.length) / ((latestOnScreenPointSec - earliestOnScreenPointSec)+1));
-		
+
 		//we use the latest time that the point was visited. If we use the average point, and
 		//lets say the user started in a position, traveled in a circle and came back, then
 		//the color would be green, or represent the user was there at the midpoint of the trip.
@@ -780,7 +812,7 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 		//earlier ones when the user was there more than once
 		int val = (int)( ((long)endTimeSec - earliestOnScreenPointSec)
 				* (NUM_COLORS) / ((latestOnScreenPointSec - earliestOnScreenPointSec)+1));
-		
+
 		if (val > NUM_COLORS - 1)
 			return NUM_COLORS - 1;
 		if (val < 0)
@@ -794,21 +826,21 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 		{
 			if(requestedStBox != null)
 				newStBox.pathList = requestedStBox.pathList;
-			
+
 			if(requestedStBox == null || !requestedStBox.equals(newStBox))
 			{
 				viewUpToDate = false;
-				
+
 				if(requestedStBox == null || requestedStBox.minZ != newStBox.minZ || requestedStBox.maxZ != newStBox.maxZ)
 					distanceUpToDate = false;
-				
+
 				requestedStBox = newStBox;
 
 				this.stNotify(this);
 			}
 		}
 	}
-	
+
 	public void notifyViewNodesChanged()
 	{
 		synchronized (this)
@@ -825,7 +857,7 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 	public void notifyPathsChanged() {
 		//TODO 3 technically we should register as a reading thread, but we are actually
 		//being called by the writing thread, so registering the reading thread here would
-		//cause the rwtm to deadlock the thread on itself.. maybe we should make this is a 
+		//cause the rwtm to deadlock the thread on itself.. maybe we should make this is a
 		//noop for the writing thread and
 		// use a  thread local to identify this?
 //		overlay.sas.rwtm.registerReadingThread();

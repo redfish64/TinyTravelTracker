@@ -127,7 +127,7 @@ public class AreaPanel extends EncryptedRow {
 	}
 
 	public static double convertXToLon(int x) {
-		return Math.round((Util.LON_PER_WORLD*(double)x / MAX_AP_UNITS) + Util.MIN_LON);
+		return (Util.LON_PER_WORLD*(double)x / MAX_AP_UNITS) + Util.MIN_LON;
 	}
 
 
@@ -179,7 +179,7 @@ public class AreaPanel extends EncryptedRow {
 	}
 
 	public static  int convertLatToY(double lat) {
-		long v = Math.round((Mercator.MAX_Y - Mercator.lat2y(lat) * MAX_AP_UNITS / (Mercator.MAX_Y * 2)));
+		long v = Math.round((Mercator.MAX_Y - Mercator.lat2y(lat)) * MAX_AP_UNITS / (Mercator.MAX_Y * 2));
 //		Log.d("GTG","convert latm to y, latm: "+latm+" result: "+v);
 		if(v > MAX_AP_UNITS)
 			return MAX_AP_UNITS;
