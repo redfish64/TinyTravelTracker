@@ -45,7 +45,7 @@ import com.rareventure.gps2.database.cache.AreaPanelSpaceTimeBox;
 
 public class OsmMapView extends MapView
 {
-	private static final float ZOOM_STEP = 1f;
+	private static final float ZOOM_STEP = 2f;
 	private static final int ZOOM_EASE_MS = 500;
 	private ArrayList<GpsOverlay> overlays = new ArrayList<GpsOverlay>();
 
@@ -83,10 +83,6 @@ public class OsmMapView extends MapView
 
 	private MaplessScaleWidget scaleWidget;
 
-
-	private SuperThread fileCacheSuperThread;
-
-	private SuperThread remoteLoaderSuperThread;
 
 	private OsmMapGpsTrailerReviewerMapActivity activity;
 
@@ -171,36 +167,26 @@ public class OsmMapView extends MapView
 	/**
 	 * Must be called after all addOverlay() calls
      */
-	public void init(SuperThread remoteLoaderSuperThread, SuperThread fileCacheSuperThread, OsmMapGpsTrailerReviewerMapActivity activity)
+	public void init(final SuperThread fileCacheSuperThread, OsmMapGpsTrailerReviewerMapActivity activity)
 	{
-		this.remoteLoaderSuperThread = remoteLoaderSuperThread;
-		this.fileCacheSuperThread = fileCacheSuperThread;
-		
+
 		this.activity = activity;
 
-//		memoryCache = new MemoryCache(this);
-//
-//		fileCache = new FileCache(getContext(), memoryCache, fileCacheSuperThread);
-//		memoryCache.setFileCache(fileCache);
-//
-//		remoteLoader = new RemoteLoader(activity, this, fileCache, remoteLoaderSuperThread);
-//		memoryCache.setRemoteCache(remoteLoader);
 		// This starts a background process to set up the map.
 		getMapAsync(new MapView.OnMapReadyCallback(){
 			@Override
 			public void onMapReady(final MapController mapController) {
 				OsmMapView.this.mapController = mapController;
 
-				GpsTrailerMapzenHttpHandler mapHandler = new GpsTrailerMapzenHttpHandler();
-				//TODO 1 we need to encrypt the tile cache again
-
 				File cacheDir = new File(GTG.getExternalStorageDirectory().toString()+"/tile_cache2");
 
 				cacheDir.mkdirs();
 
-				Log.d(GTG.TAG, "cacheDir is "+cacheDir);
+//				Log.d(GTG.TAG, "cacheDir is "+cacheDir);
 
-				mapHandler.setCache(cacheDir, GTG.MAX_CACHE_SIZE);
+				GpsTrailerMapzenHttpHandler mapHandler =
+						new GpsTrailerMapzenHttpHandler(cacheDir, fileCacheSuperThread);
+
 				mapController.setHttpHandler(mapHandler);
 
 				mapController.setShoveResponder(new TouchInput.ShoveResponder() {
@@ -384,14 +370,6 @@ public class OsmMapView extends MapView
 
 	public static class Preferences implements AndroidPreferences
 	{
-
-		
-		public long longPressTimeout = 1000;
-		/**
-		 * ViewConfiguration.TAP_TIMEOUT is way too small
-		 */
-		public long tapTimeout = 750;
-		
 	}
 
 	public void setScaleWidget(MaplessScaleWidget scaleWidget) {

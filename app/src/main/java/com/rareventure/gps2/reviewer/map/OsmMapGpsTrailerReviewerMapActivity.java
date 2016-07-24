@@ -403,9 +403,7 @@ GTGEventListener
         superThreadManager = new SuperThreadManager();
         SuperThread cpuThread = new SuperThread(superThreadManager);
         SuperThread fileIOThread = new SuperThread(superThreadManager);
-        SuperThread remoteThread = new SuperThread(superThreadManager);
 
-        remoteThread.start();
         fileIOThread.start();
         cpuThread.start();
 
@@ -453,7 +451,7 @@ GTGEventListener
 		});
 
 		osmMapView.addOverlay(gpsTrailerOverlay = new GpsTrailerOverlay(this, cpuThread, osmMapView));
-        osmMapView.init(remoteThread, fileIOThread, this);
+        osmMapView.init(fileIOThread, this);
 		osmMapView.panAndZoom2(prefs.currZoom8BitPrec, prefs.currX, prefs.currY);
 
         scaleWidget = (MaplessScaleWidget) this.findViewById(R.id.scaleWidget);
@@ -1097,7 +1095,7 @@ GTGEventListener
 		
 		//note, this is with the gtg cache creator because drawer
 		//won't pause while its holding onto a cache creator lock
-		superThreadManager.pauseAllSuperThreads(false);
+		superThreadManager.resumeAllSuperThreads();
 		
 		osmMapView.onResume();
 		
@@ -1241,7 +1239,7 @@ GTGEventListener
 			GTG.cacheCreator.setGtum(null);
 
 		if(superThreadManager != null)
-			superThreadManager.pauseAllSuperThreads(true);
+			superThreadManager.pauseAllSuperThreads();
         }
         finally {
         	GTG.ccRwtm.unregisterReadingThread();

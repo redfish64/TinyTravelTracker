@@ -29,12 +29,18 @@ import com.rareventure.android.SuperThread.Task;
 import com.rareventure.gps2.GTG;
 import com.rareventure.util.MultiValueHashMap;
 
+/**
+ * This manages a set of super threads. It can coordinate them all to stop doing tasks
+ * and shutdown (when the activity is finished, for example), pause and resume them
+ * all (when the activity is paused and resumed), etc.
+ */
+public class SuperThreadManager {
 //object lock order:
 //  SuperThreadManager -> SuperThread
 // (items to the left must be synchronized first to prevent deadlocks)
-//also note that we never lock objects we're waiting on or are notified for 
+//also note that we never lock objects we're waiting on or are notified for
 // (since they could be synchronized on when calling this class)
-public class SuperThreadManager {
+
 	private ArrayList<SuperThread> superThreads = new ArrayList<SuperThread>();
 
 	private MultiValueHashMap<Object, SuperThread.Task> objectToWaitingTasks 
@@ -98,12 +104,21 @@ public class SuperThreadManager {
 		// wakes up 
 		else notifiedObjects.add(o);
 	}
-	
-	public void pauseAllSuperThreads(boolean doPause)
+
+	public void pauseAllSuperThreads()
 	{
 		synchronized (this)
 		{
-			isPaused = doPause;
+			isPaused = true;
+			this.notifyAll();
+		}
+	}
+
+	public void resumeAllSuperThreads()
+	{
+		synchronized (this)
+		{
+			isPaused = false;
 			this.notifyAll();
 		}
 	}

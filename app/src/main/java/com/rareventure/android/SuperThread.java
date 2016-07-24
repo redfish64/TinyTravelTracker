@@ -21,6 +21,8 @@ package com.rareventure.android;
 
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import android.util.Log;
 
@@ -29,17 +31,19 @@ import com.rareventure.gps2.GTG;
 /**
  * A super thread is used to share threads between multiple blocking tasks.
  * This way one thread can handle several operations, each which may need to block.
+ * <p>
+ * It prevents having to create a million different threads for every tiny little operation.
+ * Also, super threads are managed by a SuperThreadManager, which allows them to be shutdown,
+ * paused, resumed, etc. when the corresponding activity goes through these states.
+ *</p>
  *
- * Tasks to run are added using addTask(). When they need to block, they call waitSt().
- * If they still have work to do, but want to yield to another task, they can simply exit
- * and will be called again when the other tasks have time to run
  */
 public class SuperThread extends Thread
 {
 	boolean isSTDead;
 	public SuperThreadManager manager;
 
-	private ArrayList<Task> tasks = new ArrayList<SuperThread.Task>();
+	private Set<Task> tasks = new HashSet<>();
 
 	Task currentlyRunningTask;
 
@@ -58,37 +62,38 @@ public class SuperThread extends Thread
 
 		boolean promisesToDieSoon;
 
+		/**
+		 * Creates a task for the thread.
+		 * @param priority higher will run first
+         */
 		public Task(int priority)
 		{
 			this.priority = priority;
 		}
 		
-		public boolean isDead()
-		{
-			return isDead;
-		}
-		
-		
 		/**
-		 * The implementation is expected to do all the work it can
-		 * do and finish when it needs to wait on an object. It can
-		 * specify the object its waiting on by calling stWait().
-		 *
-		 * It may return without calling doWork(), which will give
-		 * other tasks associated with the super thread a chance to
-		 * run. Afterwards, doWork() will be called again, and the
-		 * task should continue where it left off.
+		 * The implementation is expected to do a reasonable amount of work
+		 * (considering there are other tasks to run). This method
+		 * will be called again and again until stExit() is called.
+		 * The task is expected to save its state in field variables
+		 * for the next run.
+		 * <p>
+		 *     It may wait on an object by calling stWait() and returning.
+		 *     doWork() will not be called again until stNotify() is called
+		 *     on the object.
+		 * </p>
 		 */
 		abstract protected void doWork();
 		
 		/**
 		 * specifies what the task is waiting on next before it can do
 		 * more work.
-		 *
+		 * <p> Does not need to synchronize on the object to wait on it</p>
+		 * <p>
 		 * WARNING: this doesn't pause the current task.
 		 * The task is expected to exit after calling this method. It
 		 * will be recalled when stNotify is called for the given item
-		 * 
+		 * </p>
 		 * @param time time to wait if none of the objects are stNotified (if zero or less,
 		 * will never wake up)
 		 * @param item item to wait on, may be null
@@ -103,7 +108,7 @@ public class SuperThread extends Thread
 		}
 		
 		/**
-		 * called when the task should never take on more work
+		 * called when the task in finshed and should never take on more work
 		 */
 		protected void stExit()
 		{
@@ -176,18 +181,21 @@ public class SuperThread extends Thread
 				int maxPriority = Integer.MIN_VALUE;
 				Task maxTask = null;
 				
-				boolean allTasksDead = true;
-				
 				long minTimeToWakeUp = Long.MAX_VALUE;
 				
 				long currentTime = System.currentTimeMillis();
+
+				ArrayList<Task> tasksToRun = new ArrayList<>();
+				tasksToRun.addAll(tasks);
+
+				Log.d(GTG.TAG,"Super task "+this+" has "+tasksToRun.size()+" tasks");
 				
-				for(Task t : tasks)
+				for(Task t : tasksToRun)
 				{
-					if(!t.isDead)
+					if(t.isDead)
+						tasks.remove(t);
+					else
 					{
-						allTasksDead = false;
-						
 						if(t.timeToWakeUp <= currentTime)
 						{
 							t.setRunnable(true);

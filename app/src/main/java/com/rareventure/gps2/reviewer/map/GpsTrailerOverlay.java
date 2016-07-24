@@ -83,6 +83,10 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 	 */
 	public AreaPanelSpaceTimeBox requestedStBox;
 
+	private int lastCalculatedGpsLatM;
+	private int lastCalculatedGpsLonM;
+	private float lastCalculatedRadius;
+
 	Handler myHandler = new Handler(Looper.getMainLooper()) {
 
 		@Override
@@ -92,9 +96,6 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 
 	};
 
-	private float lastCalculatedRadius;
-	private int lastCalculatedGpsLatM;
-	private int lastCalculatedGpsLonM;
 	public static  boolean doMethodTracing;
 
 	private int minTimeTreeLengthForLineCalc = Integer.MAX_VALUE;

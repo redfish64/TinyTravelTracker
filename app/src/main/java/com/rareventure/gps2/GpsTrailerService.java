@@ -55,7 +55,6 @@ import com.rareventure.gps2.database.GpsLocationCache;
 import com.rareventure.gps2.database.GpsLocationRow;
 import com.rareventure.gps2.database.TAssert;
 import com.rareventure.gps2.reviewer.SettingsActivity;
-import com.rareventure.gps2.reviewer.map.osm.RemoteLoader;
 import com.rareventure.gps2.reviewer.wizard.WelcomePage;
 
 public class GpsTrailerService extends Service {

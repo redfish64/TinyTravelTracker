@@ -59,7 +59,6 @@ import com.rareventure.gps2.database.cache.TimeTreeCache;
 import com.rareventure.gps2.database.cachecreator.GpsTrailerCacheCreator;
 import com.rareventure.gps2.reviewer.map.MediaLocTimeMap;
 import com.rareventure.gps2.reviewer.map.OsmMapGpsTrailerReviewerMapActivity;
-import com.rareventure.gps2.tttprotocol.TTTClient;
 import com.rareventure.util.BackgroundRunner;
 import com.rareventure.util.ReadWriteThreadManager;
 
@@ -252,7 +251,6 @@ public class GTG {
 	public static final String PREMIUM_APPLICATION_PACKAGE = /* ttt_installer:premium_package */"com.rareventure.gps2_foobar";
 	
 	public static final String TRIAL_APPLICATION_PACKAGE = /* ttt_installer:trial_package */"com.rareventure.gps2_trial";
-	public static final long MAX_CACHE_SIZE = 1024*1024*50; // TODO 2: make configurable max cache size
 
 
 	public static SQLiteDatabase db;
@@ -1319,8 +1317,6 @@ public class GTG {
 	private static int TRIAL_TIME_LIMIT_SECS_XORED = Util.SECONDS_IN_MONTH ^ COMPASS_DATA_XOR;
 
 	public static boolean isBillingSupported;
-
-	public static TTTClient tttClient = new TTTClient();
 
 	/**
 	 * Sets up encryption for a new database, deleting all data
