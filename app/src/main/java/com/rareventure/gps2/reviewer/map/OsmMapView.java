@@ -353,12 +353,20 @@ public class OsmMapView extends MapView
 		float newZoom = mapController.getZoom() + ZOOM_STEP;
 
 		mapController.setZoomEased(newZoom,ZOOM_EASE_MS);
+		//this makes our code that checks for a screen change
+		notifyScreenChangeHandler.postDelayed(
+				notifyScreenChangeHandlerRunnable
+				, ZOOM_EASE_MS/2);
 	}
 
 	public void zoomOut() {
 		float newZoom = mapController.getZoom() - ZOOM_STEP;
 
 		mapController.setZoomEased(newZoom,ZOOM_EASE_MS);
+		//this makes our code that checks for a screen change start
+		notifyScreenChangeHandler.postDelayed(
+				notifyScreenChangeHandlerRunnable
+				, ZOOM_EASE_MS/2);
 	}
 
 	/**

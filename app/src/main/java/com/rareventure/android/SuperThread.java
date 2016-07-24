@@ -188,7 +188,7 @@ public class SuperThread extends Thread
 				ArrayList<Task> tasksToRun = new ArrayList<>();
 				tasksToRun.addAll(tasks);
 
-				Log.d(GTG.TAG,"Super task "+this+" has "+tasksToRun.size()+" tasks");
+//				Log.d(GTG.TAG,"Super task "+this+" has "+tasksToRun.size()+" tasks");
 				
 				for(Task t : tasksToRun)
 				{

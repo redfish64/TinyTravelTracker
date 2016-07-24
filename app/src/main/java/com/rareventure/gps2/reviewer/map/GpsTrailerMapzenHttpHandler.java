@@ -165,7 +165,7 @@ public class GpsTrailerMapzenHttpHandler extends HttpHandler {
          */
         @Override
         protected void doWork() {
-            Log.d(GTG.TAG,"GpsTrailerMapzenHttpHandler.doWork() "+this);
+//            Log.d(GTG.TAG,"GpsTrailerMapzenHttpHandler.doWork() "+this);
             //note that doWork() will automatically be called again after returning
             //until stExit() is called
 
@@ -198,7 +198,7 @@ public class GpsTrailerMapzenHttpHandler extends HttpHandler {
                     {
                         //the cache is empty and the network failed so we give up
                         cb.onFailure(networkFailRequest, networkFailException);
-                        Log.d(GTG.TAG,"Task finished unsuccesfully for "+RequestTask.this);
+//                        Log.d(GTG.TAG,"Task finished unsuccesfully for "+RequestTask.this);
                         stExit();
                         return;
                     }
@@ -213,7 +213,7 @@ public class GpsTrailerMapzenHttpHandler extends HttpHandler {
                 saveNetworkResponseToCache();
             }
             else { //nothing more to do
-                Log.d(GTG.TAG,"Task finished for "+RequestTask.this);
+//                Log.d(GTG.TAG,"Task finished for "+RequestTask.this);
                 stExit();
                 return;
             }
