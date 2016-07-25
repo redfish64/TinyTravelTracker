@@ -925,7 +925,7 @@ layers:
         draw:
             points:
                 collide: false
-                size: [10px, 10px]
+                size: function() { return feature.size; }
                 order: 10000
                 color: function() { return feature.color; }
 

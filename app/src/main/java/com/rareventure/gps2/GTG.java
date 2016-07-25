@@ -865,7 +865,7 @@ public class GTG {
 	 * a reader thread wants to do something, so that the reader thread won't starve.
 	 * <p>
 	 * The gtgcachecreator thread uses this. Note that it grabs locks in the order
-	 * of slowRwtm, then apCacheRwtm. As long as readers use the same order to
+	 * of ccRwtm, then apCacheRwtm. As long as readers use the same order to
 	 * grab these locks as a reader lock, then a deadlock won't occur.  
 	 * It also operates as a lock
 	 * so that threads that read from apcache won't be thread dangerous with threads that

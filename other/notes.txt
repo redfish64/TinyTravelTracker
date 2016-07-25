@@ -1980,3 +1980,34 @@ So that gives us a few options.
 3. Use another type and a custom shader to hack the color and size that way.. at least
 we aren't messing with tangram too much.
 
+----
+
+mapcontroller uses the following to read the tiles
+
+
+			LngLat p1 = mapController.coordinatesAtScreenPosition(0,0);
+			LngLat p2 = mapController.coordinatesAtScreenPosition(windowWidth, pointAreaHeight);
+
+			int apMinX = AreaPanel.convertLonToX(p1.longitude);
+			int apMinY = AreaPanel.convertLatToY(p1.latitude);
+			int apMaxX = AreaPanel.convertLonToX(p2.longitude);
+			int apMaxY = AreaPanel.convertLatToY(p2.latitude);
+----
+
+f-droid
+
+we can't seem to build rareventure because our gradle is 2.10 but it wants 2.22
+
+It looks like we can specify the ndk with "ndk=" in the meta file and load the tangram
+stuff as a subproject.
+
+ex:
+
+Build:2014.1204.1.1305,201412041
+    commit=6
+    prebuild=sed -i 's/,--gc-section//g' jni/libwnnDictionary/Android.mk && \
+        echo 'NDK_TOOLCHAIN_VERSION=4.6' >> jni/Application.mk
+    target=android-19
+    buildjni=yes
+    ndk=r9b
+

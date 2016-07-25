@@ -32,6 +32,7 @@ import com.mapzen.tangram.MapData;
 import com.rareventure.android.AndroidPreferenceSet;
 import com.rareventure.android.SortedBestOfIntArray;
 import com.rareventure.android.SuperThread;
+import com.rareventure.android.Util;
 import com.rareventure.gps2.GTG;
 import com.rareventure.gps2.database.cache.AreaPanel;
 import com.rareventure.gps2.database.cache.AreaPanelSpaceTimeBox;
@@ -65,6 +66,7 @@ import java.util.Map.Entry;
 // object for this?
 public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 {
+	private final int minCirclePxRadius;
 	//this is where we write our data to, which gets picked up by mapzen and drawn
 	//using the yaml file to style the points and lines
 	private MapData mapData;
@@ -130,6 +132,8 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 		this.superThread = superThread;
 
 		paintColors = new int[NUM_COLORS];
+		minCirclePxRadius = (int) Util.convertDpToPixel(GpsTrailerOverlay.prefs.minGpsRadiusDp, activity);
+
 		updateForColorRangeChange();
 	}
 
@@ -711,10 +715,12 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 				//TODO 3 maybe one day handle altitude
 
 				float speedMult = calcSpeedMult(vn, areaPanel.getDepth());
-				//TODO 2 we probably won't use paintIndex to determine color, but we need to do
+
+				int circleSizePx = (int) (Math.max(minCirclePxRadius, 2*(p2.x-p.x))* speedMult) * 2;
+
 				int paintIndex = figurePaintIndex(vn.overlappingRange[0],vn.overlappingRange[1]);
 				props.put("color",String.format("#%06x",paintColors[paintIndex]));
-				//props.put("size","20px");
+				props.put("size",String.format("%dpx %dpx", circleSizePx, circleSizePx));
 
 				//Here we add the actual point into mapzen.
 				//
@@ -797,7 +803,7 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 			};
 
 	private float calcSpeedMult(ViewNode vn, int depth) {
-		return .7f* (1-DEPTH_TO_MAX_SECONDS[depth]/(DEPTH_TO_MAX_SECONDS[depth]+(vn.overlappingRange[1] - vn.overlappingRange[0])))+.3f;
+		return .5f* (1-DEPTH_TO_MAX_SECONDS[depth]/(DEPTH_TO_MAX_SECONDS[depth]+(vn.overlappingRange[1] - vn.overlappingRange[0])))+.5f;
 	}
 
 	private int figurePaintIndex(int startTimeSec, int endTimeSec) {
@@ -913,5 +919,9 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 		 */
 		public float timeTreeFuzzinessPerc = .33f;
 
+		/**
+		 * The min radius of the points on the graph
+		 */
+		public float minGpsRadiusDp = 2f;
 	}
 }

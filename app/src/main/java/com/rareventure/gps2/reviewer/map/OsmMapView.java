@@ -116,7 +116,7 @@ public class OsmMapView extends MapView
 //					+" ax2 "+apMaxX+" ay2 "+apMaxY
 //			);
 
-			panAndZoom(apMinX,apMinY,apMaxX,apMaxY);
+			updatePointDisplayForScreenChange(apMinX,apMinY,apMaxX,apMaxY);
 
 			//if we haven't moved since our last run
 			//note that we place this check after panAndMove, so that if we are called once,
@@ -413,18 +413,24 @@ public class OsmMapView extends MapView
 	}
 
 
+	public void panAndZoom(int minX, int minY, int maxX, int maxY) {
+		int lon1 = AreaPanel.convertLonToX(p1.longitude);
+		int apMinY = AreaPanel.convertLatToY(p1.latitude);
+		int apMaxX = AreaPanel.convertLonToX(p2.longitude);
+		int apMaxY = AreaPanel.convertLatToY(p2.latitude);
+
+		mapController.getZoom()
+	}
+
 	/**
-	 * Pans and zooms to the given box
-	 * All arguments are in AP_UNITS. See AreaPanel.convertXToLatm, etc. for
-	 * converting betweeen lat lon and AP_UNITS.
-	 * May be called from any thread
-	 *
+	 * Updates the user gps trail points to be displayed according to the given
+	 * screen position
 	 * @param minApX
 	 * @param minApY
 	 * @param maxApX
      * @param maxApY
      */
-	public void panAndZoom(int minApX, int minApY, int maxApX, int maxApY) {
+	private void updatePointDisplayForScreenChange(int minApX, int minApY, int maxApX, int maxApY) {
         GTG.ccRwtm.registerReadingThread();
         try {
 		
