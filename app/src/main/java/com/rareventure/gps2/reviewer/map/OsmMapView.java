@@ -47,6 +47,9 @@ public class OsmMapView extends MapView
 {
 	private static final float ZOOM_STEP = 2f;
 	private static final int ZOOM_EASE_MS = 500;
+	private static final int PAN_EASE_MS = 500;
+	private static final int AUTOZOOM_PAN_EASE_MS = 2000;
+	private static final int AUTOZOOM_ZOOM_EASE_MS = 2000;
 	private ArrayList<GpsOverlay> overlays = new ArrayList<GpsOverlay>();
 
 	/**
@@ -353,7 +356,15 @@ public class OsmMapView extends MapView
 		float newZoom = mapController.getZoom() + ZOOM_STEP;
 
 		mapController.setZoomEased(newZoom,ZOOM_EASE_MS);
+		notifyScreenMoved();
+	}
+
+	private void notifyScreenMoved() {
 		//this makes our code that checks for a screen change
+		//we put a delay in there because we often do animated changes,
+		//and if we run our checker too soon, it will compare the last
+		//screen change to the current and determine that we've stopped,
+		//when actually we haven't started moving yet
 		notifyScreenChangeHandler.postDelayed(
 				notifyScreenChangeHandlerRunnable
 				, ZOOM_EASE_MS/2);
@@ -363,10 +374,7 @@ public class OsmMapView extends MapView
 		float newZoom = mapController.getZoom() - ZOOM_STEP;
 
 		mapController.setZoomEased(newZoom,ZOOM_EASE_MS);
-		//this makes our code that checks for a screen change start
-		notifyScreenChangeHandler.postDelayed(
-				notifyScreenChangeHandlerRunnable
-				, ZOOM_EASE_MS/2);
+		notifyScreenMoved();
 	}
 
 	/**
@@ -414,12 +422,33 @@ public class OsmMapView extends MapView
 
 
 	public void panAndZoom(int minX, int minY, int maxX, int maxY) {
-		int lon1 = AreaPanel.convertLonToX(p1.longitude);
-		int apMinY = AreaPanel.convertLatToY(p1.latitude);
-		int apMaxX = AreaPanel.convertLonToX(p2.longitude);
-		int apMaxY = AreaPanel.convertLatToY(p2.latitude);
+		float currZoom = mapController.getZoom();
 
-		mapController.getZoom()
+		LngLat tl = mapController.coordinatesAtScreenPosition(0,0);
+		LngLat br = mapController.coordinatesAtScreenPosition(windowWidth,pointAreaHeight);
+
+		int fromMinX= AreaPanel.convertLonToX(tl.longitude);
+		int fromMinY = AreaPanel.convertLatToY(tl.latitude);
+		int fromMaxX = AreaPanel.convertLonToX(br.longitude);
+		int fromMaxY = AreaPanel.convertLatToY(br.latitude);
+
+		float zoomMultiplier = Math.min(
+				((float)fromMaxX-fromMinX)/(maxX-minX),
+				((float)fromMaxY-fromMinY)/(maxY-minY)
+		);
+
+		//mapzen uses 2**(zoom) for zoom level, so we have to convert to it
+		float newZoom = (float) (currZoom + Math.log(zoomMultiplier)/Math.log(2));
+
+		LngLat newPos = new LngLat(
+				AreaPanel.convertXToLon((maxX-minX)/2+minX),
+				AreaPanel.convertYToLat((maxY-minY)/2+minY)
+		);
+
+		mapController.setPositionEased(newPos,AUTOZOOM_PAN_EASE_MS);
+		mapController.setZoomEased(newZoom,AUTOZOOM_ZOOM_EASE_MS);
+
+		notifyScreenMoved();
 	}
 
 	/**

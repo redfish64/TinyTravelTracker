@@ -133,14 +133,14 @@ public class AreaPanel extends EncryptedRow {
 
 
 	public static  int convertYToLatm(int y) {
-		int result = (int) Math.round(Mercator.y2lat(y * Mercator.MAX_Y*2 / MAX_AP_UNITS -Mercator.MAX_Y)*LATLON_TO_LATLONM);
+		int result = (int) Math.round(Mercator.y2lat(Mercator.MAX_Y - y * Mercator.MAX_Y*2 / MAX_AP_UNITS)*LATLON_TO_LATLONM);
 
 //		Log.d("GTG","convert y to latm, y: "+y+" result: "+result);
 		return result;
 	}
 
 	public static  double convertYToLat(int y) {
-		return Mercator.y2lat(y * Mercator.MAX_Y*2 / MAX_AP_UNITS -Mercator.MAX_Y);
+		return Mercator.y2lat(Mercator.MAX_Y - y * Mercator.MAX_Y*2 / MAX_AP_UNITS );
 	}
 
 	public static  int convertLonmToX(int lonm) {

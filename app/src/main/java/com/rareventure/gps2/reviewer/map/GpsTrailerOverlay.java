@@ -707,7 +707,7 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 
 				ll.set(
 						AreaPanel.convertXToLon(areaPanel.getCenterX()),
-						-AreaPanel.convertYToLat(areaPanel.getCenterY())
+						AreaPanel.convertYToLat(areaPanel.getCenterY())
 				);
 
 //				Log.d(GTG.TAG,"Drawing point at lon "+ll.longitude+" lat "+ll.latitude);
