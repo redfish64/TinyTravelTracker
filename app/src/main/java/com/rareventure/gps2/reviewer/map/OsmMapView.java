@@ -48,8 +48,8 @@ public class OsmMapView extends MapView
 	private static final float ZOOM_STEP = 2f;
 	private static final int ZOOM_EASE_MS = 500;
 	private static final int PAN_EASE_MS = 500;
-	private static final int AUTOZOOM_PAN_EASE_MS = 2000;
-	private static final int AUTOZOOM_ZOOM_EASE_MS = 2000;
+	private static final int AUTOZOOM_PAN_EASE_MS = 1000;
+	private static final int AUTOZOOM_ZOOM_EASE_MS = 1000;
 	private ArrayList<GpsOverlay> overlays = new ArrayList<GpsOverlay>();
 
 	/**
@@ -108,16 +108,19 @@ public class OsmMapView extends MapView
 			LngLat p1 = mapController.coordinatesAtScreenPosition(0,0);
 			LngLat p2 = mapController.coordinatesAtScreenPosition(windowWidth, pointAreaHeight);
 
+			normalizeLngLat(p1);
+			normalizeLngLat(p2);
+
 			int apMinX = AreaPanel.convertLonToX(p1.longitude);
 			int apMinY = AreaPanel.convertLatToY(p1.latitude);
 			int apMaxX = AreaPanel.convertLonToX(p2.longitude);
 			int apMaxY = AreaPanel.convertLatToY(p2.latitude);
 
-//			Log.i(GTG.TAG,"p1 lon "+p1.longitude+" lat "+p1.latitude+" p2 lon "+p2.longitude+" lat "
-//					+p2.latitude
-//					+" ax1 "+apMinX+" ay1 "+apMinY
-//					+" ax2 "+apMaxX+" ay2 "+apMaxY
-//			);
+			Log.i(GTG.TAG,"p1 lon "+p1.longitude+" lat "+p1.latitude+" p2 lon "+p2.longitude+" lat "
+					+p2.latitude
+					+" ax1 "+apMinX+" ay1 "+apMinY
+					+" ax2 "+apMaxX+" ay2 "+apMaxY
+			);
 
 			updatePointDisplayForScreenChange(apMinX,apMinY,apMaxX,apMaxY);
 
@@ -136,6 +139,13 @@ public class OsmMapView extends MapView
 			notifyScreenChangeHandler.postDelayed(
 					notifyScreenChangeHandlerRunnable
 				, 250);
+		}
+
+		private void normalizeLngLat(LngLat p1) {
+			if(p1.longitude < Util.MIN_LON || p1.longitude> Util.MAX_LON) {
+				int wraps = (int) Math.floor((p1.longitude - Util.MIN_LON) / Util.LON_PER_WORLD);
+				p1.longitude -= wraps * Util.LON_PER_WORLD;
+			}
 		}
 	};
 
@@ -540,10 +550,14 @@ public class OsmMapView extends MapView
 
 	public void onPause() {
 		super.onPause();
+		for(GpsOverlay o : overlays)
+			o.onPause();
 	}
 
 	public void onResume() {
 		super.onResume();
+		for(GpsOverlay o : overlays)
+			o.onResume();
 	}
 
 	/**

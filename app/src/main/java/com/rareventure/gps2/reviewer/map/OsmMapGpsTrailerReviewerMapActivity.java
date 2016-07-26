@@ -451,6 +451,7 @@ GTGEventListener
 		});
 
 		osmMapView.addOverlay(gpsTrailerOverlay = new GpsTrailerOverlay(this, cpuThread, osmMapView));
+		osmMapView.addOverlay(new GpsLocationOverlay(this));
         osmMapView.init(fileIOThread, this);
 		osmMapView.panAndZoom2(prefs.currZoom8BitPrec, prefs.currX, prefs.currY);
 

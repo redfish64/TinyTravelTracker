@@ -152,8 +152,8 @@ public class AreaPanel extends EncryptedRow {
 	}
 
 
-	public static double convertLonmToXDouble(int lonm) {
-		return MAX_AP_UNITS*(double)(lonm - Util.MIN_LONM) / Util.LONM_PER_WORLD;
+	public static double convertLonToXDouble(double lon) {
+		return MAX_AP_UNITS*(double)(lon - Util.MIN_LON) / Util.LON_PER_WORLD;
 	}
 
 	/**
@@ -189,8 +189,8 @@ public class AreaPanel extends EncryptedRow {
 		return (int) v;
 	}
 
-	public static double convertLatmToYDouble(int latm) {
-		double v = (Mercator.MAX_Y - Mercator.lat2y(latm/(double)LATLON_TO_LATLONM)) * MAX_AP_UNITS / (Mercator.MAX_Y * 2);
+	public static double convertLatToYDouble(double lat) {
+		double v = (Mercator.MAX_Y - Mercator.lat2y(lat)) * MAX_AP_UNITS / (Mercator.MAX_Y * 2);
 //		Log.d("GTG","convert latm to y, latm: "+latm+" result: "+v);
 		if(v > MAX_AP_UNITS)
 			return MAX_AP_UNITS;

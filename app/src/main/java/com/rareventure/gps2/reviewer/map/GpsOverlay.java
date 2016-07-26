@@ -29,5 +29,8 @@ public interface GpsOverlay {
 
 	void startTask(MapController mapController);
 
+	void onPause();
+	void onResume();
+
 	void notifyScreenChanged(AreaPanelSpaceTimeBox newStBox);
 }

@@ -887,6 +887,16 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 		superThread.addTask(this);
 	}
 
+	@Override
+	public void onPause() {
+		//this is handled automatically by the super thread manager
+	}
+
+	@Override
+	public void onResume() {
+		//this is handled automatically by the super thread manager
+	}
+
 	public void shutdown() {
 		sas.shutdown();
 	}

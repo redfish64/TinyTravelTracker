@@ -96,6 +96,7 @@ public class Util {
 	public static final int MAX_LONM = 180 * 1000000 - 1;
 
 	public static final int MIN_LON = -180;
+	public static final int MAX_LON = 180;
 	public static final int LON_PER_WORLD = 360;
 
 	public static void determineMaxBounds(TextPaint tp, Rect bounds, String s) {
