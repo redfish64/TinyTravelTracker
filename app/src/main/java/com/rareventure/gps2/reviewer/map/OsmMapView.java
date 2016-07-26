@@ -53,7 +53,9 @@ public class OsmMapView extends MapView
 	private ArrayList<GpsOverlay> overlays = new ArrayList<GpsOverlay>();
 
 	/**
-	 * Offset in pixels of the upper left corner. Note, these are doubles
+	 * Offset in pixels of the upper left corner in the world map.
+	 * This relates to AP units as apUnitX * zoom8bitPrec / AreaPanel.MAX_AP_UNITS;
+	 * Note, these are doubles
 	 * so that when we zoom out and zoom back in again, we will end up around
 	 * the same spot
 	 */
@@ -65,7 +67,6 @@ public class OsmMapView extends MapView
 	 * Scale amount with 8 assumed bits of precision. ie. 256 = 1, 512 = 2, 384 = 2.5
 	 *
 	 * Note, it also equals the number of pixels in the whole world in one dimension
-	 * 
 	 */
 	long zoom8bitPrec;
 	
@@ -303,7 +304,9 @@ public class OsmMapView extends MapView
 			//(1 << getRoundedZoomLevel() + 8);
 		
 		stBox.minX = (int) (((long)x) * AreaPanel.MAX_AP_UNITS / maxPixels); 
-		stBox.maxX = (int) (((long)x + windowWidth) * AreaPanel.MAX_AP_UNITS / maxPixels);
+		stBox.maxX = (int) (
+				(((long)x + windowWidth) % maxPixels)
+						* AreaPanel.MAX_AP_UNITS / maxPixels);
 		stBox.minY = (int) (((long)y) * AreaPanel.MAX_AP_UNITS / maxPixels); 
 		stBox.maxY = (int) (((long)y + pointAreaHeight) * AreaPanel.MAX_AP_UNITS / maxPixels);
 		
@@ -463,7 +466,8 @@ public class OsmMapView extends MapView
 
 	/**
 	 * Updates the user gps trail points to be displayed according to the given
-	 * screen position
+	 * screen position. The screen position is given in ap units, which is
+	 * a mercator based unit representing the ap coordinates at max zoom level
 	 * @param minApX
 	 * @param minApY
 	 * @param maxApX
@@ -472,39 +476,35 @@ public class OsmMapView extends MapView
 	private void updatePointDisplayForScreenChange(int minApX, int minApY, int maxApX, int maxApY) {
         GTG.ccRwtm.registerReadingThread();
         try {
-		
-		//to handle when we wrap the world
-		int width = maxApX - minApX;
-		if(width < 0) width = - width;
-		
-		//since we have buttons on the bottom and the top, as well as the time view, we won't want the points to
-		//be covered by them, so we subtract their height from the actual height to get
-		//a proper zoom areas
 
-		
-		//1<<(zl+8) == max pixels for world = MPW
-		//AreaPanel.MAX_AP_UNITS == max ap units for world = MAW
-		//width of window in pixels = wwP
-		//width of stb in ap units = apW
-		// apW * (2 ** (zl+8)) / MAW < wwP
-		// 2 ** (zl+8) < wwP * MAW / apW
-		// log2 (2 ** (zl+8)) < log2 (wwP * MAW / apW)
-		// zl+8 < log2 (wwP * MAW / apW)
-		// zl < log2 (wwP  * MAW / apW) - 8
-		
-		int maxXZoomLevel = Util.minIntegerLog2((long) Math.ceil(((double)getWidth()) * AreaPanel.MAX_AP_UNITS / width)) - 8 -1; 
-		int maxYZoomLevel = Util.minIntegerLog2((long) Math.ceil(((double) pointAreaHeight) * AreaPanel.MAX_AP_UNITS / (maxApY - minApY))) - 8 -1;
-		
-		zoom8bitPrec = 1 << (8+Math.min(Math.min(maxXZoomLevel, maxYZoomLevel),
-				OsmMapGpsTrailerReviewerMapActivity.prefs.maxAutoZoomLevel));
+			//to handle when we wrap the world
+			int width = maxApX - minApX;
+			if(width < 0) width = - width;
 
-		double apUnitsToPixels = (double)zoom8bitPrec / AreaPanel.MAX_AP_UNITS;
+			//1<<(zl+8) == max pixels for world = MPW
+			//AreaPanel.MAX_AP_UNITS == max ap units for world = MAW
+			//width of window in pixels = wwP
+			//width of stb in ap units = apW
+			// apW * (2 ** (zl+8)) / MAW < wwP
+			// 2 ** (zl+8) < wwP * MAW / apW
+			// log2 (2 ** (zl+8)) < log2 (wwP * MAW / apW)
+			// zl+8 < log2 (wwP * MAW / apW)
+			// zl < log2 (wwP  * MAW / apW) - 8
 
-		//TODO 3 handle zoom padding
-		x = ((minApX + maxApX) >> 1) * apUnitsToPixels - centerX;
-		y = ((minApY + maxApY) >> 1) * apUnitsToPixels - centerY;
+			//get the appropriate zoom level for the given screen size
+			int maxXZoomLevel = Util.minIntegerLog2((long) Math.ceil(((double)getWidth()) * AreaPanel.MAX_AP_UNITS / width)) - 8 -1;
+			int maxYZoomLevel = Util.minIntegerLog2((long) Math.ceil(((double) pointAreaHeight) * AreaPanel.MAX_AP_UNITS / (maxApY - minApY))) - 8 -1;
 
-		updateScaleWidget();
+			zoom8bitPrec = 1 << (8+Math.min(Math.min(maxXZoomLevel, maxYZoomLevel),
+					OsmMapGpsTrailerReviewerMapActivity.prefs.maxAutoZoomLevel));
+
+			double apUnitsToPixels = (double)zoom8bitPrec / AreaPanel.MAX_AP_UNITS;
+
+			//
+			x = ((minApX + maxApX) >> 1) * apUnitsToPixels - centerX;
+			y = ((minApY + maxApY) >> 1) * apUnitsToPixels - centerY;
+
+			updateScaleWidget();
         }
         finally {
         	GTG.ccRwtm.unregisterReadingThread();
