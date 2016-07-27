@@ -144,7 +144,7 @@
             android:layout_height="wrap_content"
             android:paddingLeft="5dp" >
 
-            <com.rareventure.gps2.reviewer.map.MaplessScaleWidget
+            <com.rareventure.gps2.reviewer.map.MapScaleWidget
                 android:id="@+id/scaleWidget"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"

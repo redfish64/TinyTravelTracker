@@ -83,7 +83,7 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 	/**
 	 * This is what we request to be drawn next
 	 */
-	public AreaPanelSpaceTimeBox requestedStBox;
+	private AreaPanelSpaceTimeBox requestedStBox;
 
 	private int lastCalculatedGpsLatM;
 	private int lastCalculatedGpsLonM;
@@ -137,10 +137,6 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 		updateForColorRangeChange();
 	}
 
-	public void notifyWidthHeightReady() {
-	//TODO 2 do something here???? do we need to know???
-	}
-
 	public void updateForColorRangeChange() {
 			// MEMPERF PERF consider just changing the color everytime
 			for (int i = 0; i < NUM_COLORS; i++) {
@@ -180,7 +176,7 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 
 		abortOrPauseIfNecessary();
 
-		GTG.ccRwtm.registerReadingThread();
+		GTG.cacheCreatorLock.registerReadingThread();
 		if(doMethodTracing)
 			Debug.startMethodTracing("/sdcard/it.trace");
 		try {
@@ -300,7 +296,7 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 				Debug.stopMethodTracing();
 			}
 
-			GTG.ccRwtm.unregisterReadingThread();
+			GTG.cacheCreatorLock.unregisterReadingThread();
 			activity.notifyDoneProcessing(OngoingProcessEnum.DRAW_POINTS);
 
 		}

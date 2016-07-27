@@ -42,12 +42,10 @@ import com.rareventure.gps2.GTGPreferenceActivity;
 import com.rareventure.gps2.GpsTrailerCrypt;
 import com.rareventure.gps2.GpsTrailerGpsStrategy;
 import com.rareventure.gps2.GpsTrailerService;
-import com.rareventure.gps2.IGTGActivity;
 import com.rareventure.gps2.R;
 import com.rareventure.gps2.gpx.CreateGpxBackup;
 import com.rareventure.gps2.gpx.RestoreGpxBackup;
 import com.rareventure.gps2.reviewer.map.OsmMapGpsTrailerReviewerMapActivity;
-import com.rareventure.gps2.reviewer.password.EnterPasswordActivity;
 
 import java.util.Arrays;
 
@@ -254,7 +252,7 @@ public class SettingsActivity extends GTGPreferenceActivity implements OnPrefere
 
 	@Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        GTG.ccRwtm.registerReadingThread();
+        GTG.cacheCreatorLock.registerReadingThread();
         try {
         if(item.getTitle().equals(getText(R.string.go_to_main)))
         {
@@ -266,7 +264,7 @@ public class SettingsActivity extends GTGPreferenceActivity implements OnPrefere
         return super.onOptionsItemSelected(item);
         }
         finally {
-        	GTG.ccRwtm.unregisterReadingThread();
+        	GTG.cacheCreatorLock.unregisterReadingThread();
         }
     }
 

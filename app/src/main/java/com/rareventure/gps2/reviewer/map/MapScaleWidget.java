@@ -34,7 +34,7 @@ import com.rareventure.gps2.database.TAssert;
 /**
  * Display the current scale
  */
-public class MaplessScaleWidget extends View
+public class MapScaleWidget extends View
 {
 	public static final double METERS_PER_INCH = 1/39.3700787;
 	
@@ -195,7 +195,7 @@ public class MaplessScaleWidget extends View
 	}
 
 
-	public MaplessScaleWidget(Context context, AttributeSet attrs) {
+	public MapScaleWidget(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		
 		units = METRIC_UNITS;

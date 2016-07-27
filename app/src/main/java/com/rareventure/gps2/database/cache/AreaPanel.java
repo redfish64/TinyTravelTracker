@@ -37,8 +37,17 @@ import com.rareventure.gps2.reviewer.map.Mercator;
  * mercator and open street maps. It differs in the X and Y coordinates which are
  * always the same regardless of the depth (osm resets the coordinates per each depth
  * level).
+ * <p>Each area panel contains a set of sub area panels which each contain a set of sub-sub
+ * area panels and so on to the deepest level defined by MAX_DEPTH.
  * <p>
- * X goes left to right and Y goes top to bottom 
+ * X goes left to right and Y goes top to bottom
+ * <p>
+ *     When displaying points to the screen, we find a depth of area panels appropriate
+ *     for the zoom level. In this way, if the user is zoomed out so that a city is just
+ *     a single point, we can use a large area panel that encompasses the points
+ *     in the city. OTOH, if we are zoomed in very closely, we would use a smaller
+ *     area panels to represent the points.
+ * </p>
  */
 public class AreaPanel extends EncryptedRow {
 	//x and y are absolute coordinates of the earth
@@ -52,10 +61,19 @@ public class AreaPanel extends EncryptedRow {
 	//                 the current implementation of autozoom
 	public static final int NUM_SUB_PANELS_PER_SIDE = 2;
 	public static final int NUM_SUB_PANELS = NUM_SUB_PANELS_PER_SIDE*NUM_SUB_PANELS_PER_SIDE;
-	
+
+	/**
+	 * This is the size of the area panel in MAX_AP_UNITS at each depth level (lower value
+	 * means smaller panels), up to the root level with one tile.
+	 */
 	public static final int [] DEPTH_TO_WIDTH;
 
 	public static final double LATLON_TO_LATLONM = 1000000.;
+
+	/**
+	 * The maximum layers of area panels
+	 */
+	public static int MAX_DEPTH = 24;
 
 	static {
 		//we use 26 because its the max depth of opernstreetmaps
@@ -71,7 +89,7 @@ public class AreaPanel extends EncryptedRow {
 //		drwxrwxr-x root     sdcard_rw          2012-11-08 15:36 tile_cache
 
 		
-		int maxDepth = (int)Math.floor((24) * Math.log(2) / Math.log(NUM_SUB_PANELS_PER_SIDE));
+		int maxDepth = (int)Math.floor((MAX_DEPTH) * Math.log(2) / Math.log(NUM_SUB_PANELS_PER_SIDE));
 		
 
 		DEPTH_TO_WIDTH = new int[maxDepth+1];
@@ -81,8 +99,10 @@ public class AreaPanel extends EncryptedRow {
 		for(int i = 1; i < DEPTH_TO_WIDTH.length; i++)
 			DEPTH_TO_WIDTH[i] = DEPTH_TO_WIDTH[i-1] * NUM_SUB_PANELS_PER_SIDE;
 	}
-	
 
+	/**
+	 * Max ap units is the number of panels at the deepest level we
+	 */
 	public static final int MAX_AP_UNITS = DEPTH_TO_WIDTH[DEPTH_TO_WIDTH.length-1];
 	
 	

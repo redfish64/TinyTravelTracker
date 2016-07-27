@@ -21,13 +21,10 @@ package com.rareventure.gps2.reviewer.map.sas;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.ListIterator;
-import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.TreeSet;
 
-import android.app.Activity;
 import android.database.DataSetObserver;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -38,7 +35,6 @@ import com.rareventure.android.Util;
 import com.rareventure.gps2.GTG;
 import com.rareventure.gps2.database.TimeZoneTimeRow;
 import com.rareventure.gps2.database.cache.AreaPanel;
-import com.rareventure.gps2.database.cache.AreaPanelCache;
 import com.rareventure.gps2.database.cache.AreaPanelSpaceTimeBox;
 import com.rareventure.gps2.database.cache.TimeTree;
 import com.rareventure.gps2.database.cachecreator.GpsTrailerCacheCreator;
@@ -237,7 +233,7 @@ public class SelectedAreaSet extends Thread {
 
 	public void run() {
 		while (isRunning) {
-			GTG.ccRwtm.registerReadingThread();
+			GTG.cacheCreatorLock.registerReadingThread();
 			rwtm.registerWritingThread();
 			
 			boolean notifyPathsChanged = true;
@@ -274,7 +270,7 @@ public class SelectedAreaSet extends Thread {
 
 			} finally {
 				rwtm.unregisterWritingThread();
-				GTG.ccRwtm.unregisterReadingThread();
+				GTG.cacheCreatorLock.unregisterReadingThread();
 			}
 
 			//note we assume that we started not up to date, or we wouldn't be running anyway
@@ -969,7 +965,7 @@ public class SelectedAreaSet extends Thread {
 		ArrayList<Integer> timeTreeParentPath = new ArrayList<Integer>();
 
 		for (AreaPanelInfo api : requestedAreas.get(0).apiList) {
-			GTG.ccRwtm.registerReadingThread();
+			GTG.cacheCreatorLock.registerReadingThread();
 			try {
 				AreaPanel ap = api.ap();
 
@@ -1081,7 +1077,7 @@ public class SelectedAreaSet extends Thread {
 					}// else not at the bottom for tt processing
 				}// if we are doing tt processing
 			} finally {
-				GTG.ccRwtm.unregisterReadingThread();
+				GTG.cacheCreatorLock.unregisterReadingThread();
 			}
 
 		}

@@ -45,7 +45,7 @@ import com.rareventure.gps2.database.cache.AreaPanelSpaceTimeBox;
 
 public class OsmMapView extends MapView
 {
-	private static final float ZOOM_STEP = 2f;
+	private static final float ZOOM_STEP = 1.5f;
 	private static final int ZOOM_EASE_MS = 500;
 	private static final int PAN_EASE_MS = 500;
 	private static final int AUTOZOOM_PAN_EASE_MS = 1000;
@@ -53,39 +53,27 @@ public class OsmMapView extends MapView
 	private ArrayList<GpsOverlay> overlays = new ArrayList<GpsOverlay>();
 
 	/**
-	 * Offset in pixels of the upper left corner in the world map.
-	 * This relates to AP units as apUnitX * zoom8bitPrec / AreaPanel.MAX_AP_UNITS;
-	 * Note, these are doubles
-	 * so that when we zoom out and zoom back in again, we will end up around
-	 * the same spot
-	 */
-	double x = 0;
-
-	double y = 0;
-	
-	/**
-	 * Scale amount with 8 assumed bits of precision. ie. 256 = 1, 512 = 2, 384 = 2.5
+	 * Coordinates of the screen in longitude and latitude. This is the most accurate representation
+	 * of where the screen is (we get these values as is from mapzen).
+	 * The y component of screenBottomRight is based on pointAreaHeight, *NOT* the height of the map.
 	 *
-	 * Note, it also equals the number of pixels in the whole world in one dimension
+	 * Writing and reading of these values are synchronized.
 	 */
-	long zoom8bitPrec;
-	
-	
-//	int zoom;
+	private LngLat screenTopLeft = new LngLat(), screenBottomRight = new LngLat(), screenSize = new LngLat();
 
-	public static int TILE_SIZE = 256;
+	/**
+	 * These are the screen coordinates in ap units (based on Mercator). See {@code AreaPanel} for more info.
+	 * The apMaxY is based on pointAreaHeight, *NOT* the height of the map.
+	 * <p>
+	 * Writing and reading of these values are synchronized.
+	 */
+	private int apMinX, apMinY, apMaxX, apMaxY;
 
 	public static Preferences prefs = new Preferences();
 
 	private Paint tickPaint;
 
-//	private MemoryCache memoryCache;
-//
-//	private FileCache fileCache;
-//
-//	private RemoteLoader remoteLoader;
-
-	private MaplessScaleWidget scaleWidget;
+	private MapScaleWidget scaleWidget;
 
 
 	private OsmMapGpsTrailerReviewerMapActivity activity;
@@ -94,6 +82,26 @@ public class OsmMapView extends MapView
 
 	private Handler notifyScreenChangeHandler = new Handler();
 
+	/**
+	 * Center of screen in pixels
+	 */
+	int centerX;
+	int centerY;
+
+	/**
+	 * This is the height of the area in which we draw points. We don't want to draw points
+	 * underneath the time scale widget at the bottom of the screen, so this excludes that
+	 */
+	private int pointAreaHeight;
+
+	private int windowWidth;
+
+	/**
+	 * Since mapzen doesn't tell us when the screen moves, and stops moving (after a fling
+	 * for example), we continuously pull the location. We only do so when an action occurs which
+	 * would start the screen in motion, and when the screen has stopped, we turn off our
+	 * polling.
+	 */
 	private Runnable notifyScreenChangeRunnable = new Runnable() {
 		LngLat lastP1 = new LngLat(), lastP2 = new LngLat();
 		PointF p = new PointF();
@@ -109,26 +117,30 @@ public class OsmMapView extends MapView
 			LngLat p1 = mapController.coordinatesAtScreenPosition(0,0);
 			LngLat p2 = mapController.coordinatesAtScreenPosition(windowWidth, pointAreaHeight);
 
-			normalizeLngLat(p1);
-			normalizeLngLat(p2);
+			synchronized (this) {
+				//update our internal representation of the screen
+				screenSize = new LngLat(p2.longitude - p1.longitude, p1.latitude - p2.latitude);
 
-			int apMinX = AreaPanel.convertLonToX(p1.longitude);
-			int apMinY = AreaPanel.convertLatToY(p1.latitude);
-			int apMaxX = AreaPanel.convertLonToX(p2.longitude);
-			int apMaxY = AreaPanel.convertLatToY(p2.latitude);
+				normalizeLngLat(p1);
+				normalizeLngLat(p2);
 
-			Log.i(GTG.TAG,"p1 lon "+p1.longitude+" lat "+p1.latitude+" p2 lon "+p2.longitude+" lat "
-					+p2.latitude
-					+" ax1 "+apMinX+" ay1 "+apMinY
-					+" ax2 "+apMaxX+" ay2 "+apMaxY
-			);
+				screenTopLeft = p1;
+				screenBottomRight = p2;
 
-			updatePointDisplayForScreenChange(apMinX,apMinY,apMaxX,apMaxY);
+				apMinX = AreaPanel.convertLonToX(screenTopLeft.longitude);
+				apMinY = AreaPanel.convertLatToY(screenTopLeft.latitude);
+				apMaxX = AreaPanel.convertLonToX(screenBottomRight.longitude);
+				apMaxY = AreaPanel.convertLatToY(screenBottomRight.latitude);
+			}
+
+			updateScaleWidget();
+
+			notifyOverlayScreenChanged();
 
 			//if we haven't moved since our last run
-			//note that we place this check after panAndMove, so that if we are called once,
-			//we'll always redraw no matter once. (used by redrawMap())
-			if(p1.equals(lastP1) && lastP2.equals(lastP2))
+			//note that we place this check after we notify, so that if we are queued,
+			//we'll always redraw once no matter what. (used by redrawMap())
+			if(p1.equals(lastP1) && p2.equals(lastP2))
 				return;
 
 			lastP1 = p1;
@@ -158,14 +170,6 @@ public class OsmMapView extends MapView
 				mapController.queueEvent(notifyScreenChangeRunnable);
 			}
 	};
-
-	/**
-	 * This is the height of the area in which we draw points. We don't want to draw points
-	 * underneath the time scale widget at the bottom of the screen, so this excludes that
-	 */
-	private int pointAreaHeight;
-
-	private int windowWidth;
 
 //	private MultiTouchController<OsmMapView> multiTouchController = new MultiTouchController<OsmMapView>(this);
 
@@ -271,75 +275,46 @@ public class OsmMapView extends MapView
 				for(GpsOverlay o : overlays)
 					o.startTask(mapController);
 
-
+				panAndZoom2(OsmMapGpsTrailerReviewerMapActivity.prefs.leftLon,
+						OsmMapGpsTrailerReviewerMapActivity.prefs.topLat,
+						OsmMapGpsTrailerReviewerMapActivity.prefs.rightLon,
+						OsmMapGpsTrailerReviewerMapActivity.prefs.bottomLat);
 			}
 		},"map_style.yaml");
 	}
 
-	public int getZoomLevel() {
-		long z = zoom8bitPrec >> 8;
-		int zl = 0;
-		while(z != 0)
-		{
-			z = (z>>1);
-			zl++;
-		}
-		
-		return zl-1;
+	/**
+	 * Returns the ratio of meters to pixels at the center of the screen
+     */
+	public double metersToPixels() {
+		//we need the lat, because the distance changes depending on location from equator
+		double screenCenterLat = screenTopLeft.latitude - screenSize.latitude / 2;
+		double metersToLon = 1/(Util.LON_TO_METERS_AT_EQUATOR *
+				Math.cos(screenCenterLat/ 180 * Math.PI));
+
+		return screenSize.longitude / windowWidth * metersToLon;
 	}
 
-	public float metersToPixels(float meters, int latm) {
-		//TODO 3: test
-		return (float) (1./(meters * Util.LONM_TO_METERS_AT_EQUATOR * 1/Math.cos(Math.toRadians(latm * .000001)) / Util.LONM_PER_WORLD 
-//				* (1<<(getRoundedZoomLevel()+8))
-				* zoom8bitPrec
-				));
-		//return meters * scaleWidget.pixelsPerMeter;
-	}
-
-	public AreaPanelSpaceTimeBox getCoordinatesRectangleForScreen() {
+	public synchronized AreaPanelSpaceTimeBox getCoordinatesRectangleForScreen() {
 		AreaPanelSpaceTimeBox stBox = new AreaPanelSpaceTimeBox();
-		
-		long maxPixels = zoom8bitPrec; 
-			//(1 << getRoundedZoomLevel() + 8);
-		
-		stBox.minX = (int) (((long)x) * AreaPanel.MAX_AP_UNITS / maxPixels); 
-		stBox.maxX = (int) (
-				(((long)x + windowWidth) % maxPixels)
-						* AreaPanel.MAX_AP_UNITS / maxPixels);
-		stBox.minY = (int) (((long)y) * AreaPanel.MAX_AP_UNITS / maxPixels); 
-		stBox.maxY = (int) (((long)y + pointAreaHeight) * AreaPanel.MAX_AP_UNITS / maxPixels);
-		
+
+		stBox.minX = apMinX;
+		stBox.maxX = apMaxX;
+		stBox.minY = apMinY;
+		stBox.maxY = apMaxY;
+
 		return stBox;
 	}
 
-	/**
-	 * Center of screen in pixels
-	 */
-	int centerX;
-	int centerY;
-
-	/**
-	 * An index to track the current time the user clicked down, so that if they
-	 * do so multiple times, we don't get confused
-	 */
-	protected int actionDownIndex;
-
-	protected boolean longPressOn;
-
-	private boolean thumbDown;
-
-	private long lastShortPressTimeMs;
-
 	@Override
 	protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        GTG.ccRwtm.registerReadingThread();
+        GTG.cacheCreatorLock.registerReadingThread();
         try {
 		super.onLayout(changed, left, top, right, bottom);
 		updateScaleWidget();
         }
         finally {
-        	GTG.ccRwtm.unregisterReadingThread();
+        	GTG.cacheCreatorLock.unregisterReadingThread();
         }
 	}
 
@@ -347,22 +322,10 @@ public class OsmMapView extends MapView
 		this.overlays.add(overlay);
 	}
 
-	public boolean shouldZoomInBeEnabled()
-	{
-		return zoom8bitPrec <= (OsmMapGpsTrailerReviewerMapActivity.prefs.maxZoom >> 1);
-	}
-
-	
 
 	private void updateScaleWidget() {
 		if(scaleWidget != null)
-			scaleWidget.change(1/metersToPixels(1, 
-					AreaPanel.convertYToLatm((int) ((y+getHeight()/2) 
-							*AreaPanel.MAX_AP_UNITS
-							/
-							//getMapSizeInPx(getRoundedZoomLevel()
-							zoom8bitPrec
-									))));
+			scaleWidget.change((float) (1./metersToPixels()));
 	}
 
 	public void zoomIn() {
@@ -397,18 +360,26 @@ public class OsmMapView extends MapView
 		mapController.queueEvent(notifyScreenChangeRunnable);
 	}
 
+	public LngLat getScreenTopLeft() {
+		return screenTopLeft;
+	}
+
+	public LngLat getScreenBottomRight() {
+		return screenBottomRight;
+	}
+
 	public static class Preferences implements AndroidPreferences
 	{
 	}
 
-	public void setScaleWidget(MaplessScaleWidget scaleWidget) {
+	public void setScaleWidget(MapScaleWidget scaleWidget) {
 		this.scaleWidget = scaleWidget;
 	}
 
 	@Override
 	protected void onAttachedToWindow() {
 		super.onAttachedToWindow();
-        GTG.ccRwtm.registerReadingThread();
+        GTG.cacheCreatorLock.registerReadingThread();
         try {
 		tickPaint = new Paint();
 		tickPaint.setColor(0xFF000000);
@@ -416,7 +387,7 @@ public class OsmMapView extends MapView
 
         }
         finally {
-        	GTG.ccRwtm.unregisterReadingThread();
+        	GTG.cacheCreatorLock.unregisterReadingThread();
         }
 	}
 
@@ -464,79 +435,45 @@ public class OsmMapView extends MapView
 		notifyScreenMoved();
 	}
 
-	/**
-	 * Updates the user gps trail points to be displayed according to the given
-	 * screen position. The screen position is given in ap units, which is
-	 * a mercator based unit representing the ap coordinates at max zoom level
-	 * @param minApX
-	 * @param minApY
-	 * @param maxApX
-     * @param maxApY
-     */
-	private void updatePointDisplayForScreenChange(int minApX, int minApY, int maxApX, int maxApY) {
-        GTG.ccRwtm.registerReadingThread();
-        try {
+	public void panAndZoom2(double leftLon, double topLat, double rightLon, double bottomLat) {
+		if(mapController == null)
+			return;
 
-			//to handle when we wrap the world
-			int width = maxApX - minApX;
-			if(width < 0) width = - width;
+		float currZoom = mapController.getZoom();
 
-			//1<<(zl+8) == max pixels for world = MPW
-			//AreaPanel.MAX_AP_UNITS == max ap units for world = MAW
-			//width of window in pixels = wwP
-			//width of stb in ap units = apW
-			// apW * (2 ** (zl+8)) / MAW < wwP
-			// 2 ** (zl+8) < wwP * MAW / apW
-			// log2 (2 ** (zl+8)) < log2 (wwP * MAW / apW)
-			// zl+8 < log2 (wwP * MAW / apW)
-			// zl < log2 (wwP  * MAW / apW) - 8
+		LngLat tl = mapController.coordinatesAtScreenPosition(0,0);
+		LngLat br = mapController.coordinatesAtScreenPosition(windowWidth,pointAreaHeight);
 
-			//get the appropriate zoom level for the given screen size
-			int maxXZoomLevel = Util.minIntegerLog2((long) Math.ceil(((double)getWidth()) * AreaPanel.MAX_AP_UNITS / width)) - 8 -1;
-			int maxYZoomLevel = Util.minIntegerLog2((long) Math.ceil(((double) pointAreaHeight) * AreaPanel.MAX_AP_UNITS / (maxApY - minApY))) - 8 -1;
+		int fromMinX= AreaPanel.convertLonToX(tl.longitude);
+		int fromMinY = AreaPanel.convertLatToY(tl.latitude);
+		int fromMaxX = AreaPanel.convertLonToX(br.longitude);
+		int fromMaxY = AreaPanel.convertLatToY(br.latitude);
 
-			zoom8bitPrec = 1 << (8+Math.min(Math.min(maxXZoomLevel, maxYZoomLevel),
-					OsmMapGpsTrailerReviewerMapActivity.prefs.maxAutoZoomLevel));
+		int minX= AreaPanel.convertLonToX(leftLon);
+		int minY = AreaPanel.convertLatToY(topLat);
+		int maxX = AreaPanel.convertLonToX(rightLon);
+		int maxY = AreaPanel.convertLatToY(bottomLat);
 
-			double apUnitsToPixels = (double)zoom8bitPrec / AreaPanel.MAX_AP_UNITS;
+		float zoomMultiplier = Math.min(
+				((float)fromMaxX-fromMinX)/(maxX-minX),
+				((float)fromMaxY-fromMinY)/(maxY-minY)
+		);
 
-			//
-			x = ((minApX + maxApX) >> 1) * apUnitsToPixels - centerX;
-			y = ((minApY + maxApY) >> 1) * apUnitsToPixels - centerY;
+		//mapzen uses 2**(zoom) for zoom level, so we have to convert to it
+		float newZoom = (float) (currZoom + Math.log(zoomMultiplier)/Math.log(2));
 
-			updateScaleWidget();
-        }
-        finally {
-        	GTG.ccRwtm.unregisterReadingThread();
-        }
+		LngLat newPos = new LngLat(
+				AreaPanel.convertXToLon((maxX-minX)/2+minX),
+				AreaPanel.convertYToLat((maxY-minY)/2+minY)
+		);
 
-		notifyOverlayScreenChanged();
-	}
-	
-	public void panAndZoom2(long zoom8BitPrec, double currX, double currY)
-	{
-        GTG.ccRwtm.registerReadingThread();
-        try {
-		this.zoom8bitPrec = zoom8BitPrec;
-		this.x = currX;
-		this.y = currY;
-		
-		updateScaleWidget();
-		
-		activity.updatePlusMinusButtonsForNewZoom();
-		
-        }
-        finally {
-        	GTG.ccRwtm.unregisterReadingThread();
-        }
+		mapController.setPositionEased(newPos,AUTOZOOM_PAN_EASE_MS);
+		mapController.setZoomEased(newZoom,AUTOZOOM_ZOOM_EASE_MS);
 
-		notifyOverlayScreenChanged();
+		notifyScreenMoved();
 	}
 
 	private void notifyOverlayScreenChanged() {
-		//TODO 3 we probably don't need zoom8bitperc anymore, since zooming is handled by
-		// tangram. Then we could directly calculate ap coords from lon/lat specified by
-		// tangram, rather then our intermidiate x/y and zoom format
 		AreaPanelSpaceTimeBox newStBox = getCoordinatesRectangleForScreen();
 
 		//we access the min and max time from the activity which is altered by the main ui thread

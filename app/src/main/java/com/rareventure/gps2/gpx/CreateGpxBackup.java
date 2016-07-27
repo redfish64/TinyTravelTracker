@@ -46,7 +46,6 @@ import com.rareventure.gps2.GpsTrailerCrypt;
 import com.rareventure.gps2.R;
 import com.rareventure.gps2.database.GpsLocationRow;
 import com.rareventure.gps2.database.TimeZoneTimeRow;
-import com.rareventure.gps2.gpx.RestoreGpxBackup.ValidateAndRestoreGpxBackupTask;
 import com.rareventure.gpx.GpxWriter;
 import com.rareventure.util.OutputStreamToInputStreamPipe;
 
@@ -211,7 +210,7 @@ public class CreateGpxBackup extends ProgressDialogActivity {
 				
 				// this try is to close the transaction with a finally
 				//and for removing the rwtm locks
-				GTG.ccRwtm.registerReadingThread();
+				GTG.cacheCreatorLock.registerReadingThread();
 
 				try {
 					/* ttt_installer:remove_line */Log.d(GTG.TAG,"Started gpx writing...");
@@ -307,7 +306,7 @@ public class CreateGpxBackup extends ProgressDialogActivity {
 				finally {
 					DbUtil.closeCursors(c);
 					
-					GTG.ccRwtm.unregisterReadingThread();
+					GTG.cacheCreatorLock.unregisterReadingThread();
 					
 					isShutdown = true;
 				}

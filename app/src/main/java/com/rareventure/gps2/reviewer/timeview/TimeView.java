@@ -20,26 +20,20 @@
 package com.rareventure.gps2.reviewer.timeview;
 
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.LinearGradient;
-import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Region.Op;
-import android.graphics.Shader;
 import android.graphics.Paint.FontMetricsInt;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.text.TextPaint;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.MeasureSpec;
 
 import com.rareventure.android.Util;
 import com.rareventure.gps2.GTG;
@@ -806,7 +800,7 @@ public class TimeView extends View {
 	@Override
 	public void draw(Canvas canvas) {
 		super.draw(canvas);
-		GTG.ccRwtm.registerReadingThread();
+		GTG.cacheCreatorLock.registerReadingThread();
 		try {
 			// selectedTimeStart =
 			// roundTo(convertXToTimeSec(selectedAreaDim.left, yPos),
@@ -887,7 +881,7 @@ public class TimeView extends View {
 			this.canvas = null;
 
 		} finally {
-			GTG.ccRwtm.unregisterReadingThread();
+			GTG.cacheCreatorLock.unregisterReadingThread();
 		}
 	}
 
@@ -1010,7 +1004,7 @@ public class TimeView extends View {
 
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
-		GTG.ccRwtm.registerReadingThread();
+		GTG.cacheCreatorLock.registerReadingThread();
 		try {
 			long time = System.currentTimeMillis();
 			if (event.getAction() == MotionEvent.ACTION_DOWN) {
@@ -1111,7 +1105,7 @@ public class TimeView extends View {
 			// }
 			return false;
 		} finally {
-			GTG.ccRwtm.unregisterReadingThread();
+			GTG.cacheCreatorLock.unregisterReadingThread();
 		}
 	}
 

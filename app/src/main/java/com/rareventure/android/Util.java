@@ -361,6 +361,7 @@ public class Util {
 	public static final int LONM_PER_WORLD = 360 * 1000 * 1000;
  	public static final float LATM_TO_METERS = 1000000f / 111131.75f ;
  	public static final float LONM_TO_METERS_AT_EQUATOR = 1000000f / 111131.75f;
+	public static final float LON_TO_METERS_AT_EQUATOR = 1f / 111131.75f;
 	public static final int MAX_LATM = 180*1000*1000-1;
 	public static final int MIN_LATM = -180*1000*1000;
 	public static final int LATM_PER_WORLD = 180 * 1000 * 1000;

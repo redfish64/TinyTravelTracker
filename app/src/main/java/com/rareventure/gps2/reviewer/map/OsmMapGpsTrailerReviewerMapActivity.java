@@ -53,6 +53,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ZoomControls;
 
+import com.mapzen.tangram.LngLat;
 import com.rareventure.android.AndroidPreferenceSet.AndroidPreferences;
 import com.rareventure.android.DbUtil;
 import com.rareventure.android.FatalErrorActivity;
@@ -111,7 +112,7 @@ GTGEventListener
 
         timeAndDateSdf = new SimpleDateFormat(getString(R.string.time_and_date_format));
         
-        GTG.ccRwtm.registerReadingThread();
+        GTG.cacheCreatorLock.registerReadingThread();
         try {
         	/* ttt_installer:remove_line */Log.d(GTG.TAG,"OsmMapGpsTrailerReviewerMapActivity.onCreate()");
 	        
@@ -142,7 +143,7 @@ GTGEventListener
     	    }); 
         }
         finally {
-        	GTG.ccRwtm.unregisterReadingThread();
+        	GTG.cacheCreatorLock.unregisterReadingThread();
         }
 	}
 
@@ -162,18 +163,17 @@ GTGEventListener
 		slideSasNoneToFull.setDuration(500);
 		slideSasNoneToTab.setDuration(200);
 		
-		gpsTrailerOverlay.notifyWidthHeightReady();
-		
 		osmMapView.setZoomCenter(osmMapView.getWidth()/2,
 				findViewById(R.id.timeview_layout).getTop()/2);
 	
-		if(prefs.currX == 0 && prefs.currY == 0 && prefs.currZoom8BitPrec == 1024)
+		if(prefs.leftLon == 0 && prefs.rightLon == 0)
 		{
-			prefs.currX = osmMapView.getWidth()/2 * 256d / 1024d;
-			prefs.currY = findViewById(R.id.timeview_layout).getTop()/2 * 256d / 1024d;
-			prefs.currZoom8BitPrec = 1024;
-			
-			osmMapView.panAndZoom2(prefs.currZoom8BitPrec, prefs.currX, prefs.currY);
+			prefs.leftLon = -180;
+			prefs.rightLon=  180;
+			prefs.topLat= -70;
+			prefs.bottomLat= 70;
+
+			osmMapView.panAndZoom2(prefs.leftLon, prefs.topLat, prefs.rightLon, prefs.bottomLat);
 		}
 	}
 
@@ -205,7 +205,7 @@ GTGEventListener
 
 	@Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        GTG.ccRwtm.registerReadingThread();
+        GTG.cacheCreatorLock.registerReadingThread();
         try {
         if(item.getTitle().equals(getText(R.string.settings)))
         {
@@ -236,7 +236,7 @@ GTGEventListener
         return super.onOptionsItemSelected(item);
         }
         finally {
-        	GTG.ccRwtm.unregisterReadingThread();
+        	GTG.cacheCreatorLock.unregisterReadingThread();
         }
     }
 
@@ -258,7 +258,7 @@ GTGEventListener
 	private long maxRecordedTimeMs;
 	public static Preferences prefs = new Preferences();
 	OsmMapView osmMapView;
-	MaplessScaleWidget scaleWidget;
+	MapScaleWidget scaleWidget;
 	private GpsClickData gpsClickData;
 	private Dialog currentDialog;
 	
@@ -427,12 +427,8 @@ GTGEventListener
 			
 			@Override
 			public void onClick(View v) {
-				//we need to check because sometimes the disable doesn't happen fast enough
-				//and the user can click faster than it gets disabled
-				if(osmMapView.shouldZoomInBeEnabled())
-					osmMapView.zoomIn();
+				osmMapView.zoomIn();
 
-				updatePlusMinusButtonsForNewZoom();
 				toolTip.setAction(UserAction.ZOOM_IN);
 			}
 		});
@@ -440,12 +436,8 @@ GTGEventListener
 
 			@Override
 			public void onClick(View v) {
-				//we need to check because sometimes the disable doesn't happen fast enough
-				//and the user can click faster than it gets disabled
-				if (osmMapView.zoom8bitPrec > prefs.minZoom)
-					osmMapView.zoomOut();
+				osmMapView.zoomOut();
 
-				updatePlusMinusButtonsForNewZoom();
 				toolTip.setAction(UserAction.ZOOM_OUT);
 			}
 		});
@@ -453,9 +445,8 @@ GTGEventListener
 		osmMapView.addOverlay(gpsTrailerOverlay = new GpsTrailerOverlay(this, cpuThread, osmMapView));
 		osmMapView.addOverlay(new GpsLocationOverlay(this));
         osmMapView.init(fileIOThread, this);
-		osmMapView.panAndZoom2(prefs.currZoom8BitPrec, prefs.currX, prefs.currY);
 
-        scaleWidget = (MaplessScaleWidget) this.findViewById(R.id.scaleWidget);
+        scaleWidget = (MapScaleWidget) this.findViewById(R.id.scaleWidget);
         
 		osmMapView.setScaleWidget(scaleWidget);
 		
@@ -468,8 +459,6 @@ GTGEventListener
 		menuButton = (ImageButton) findViewById(R.id.menu_button);
 		menuButton.setOnClickListener(this);
 
-		updatePlusMinusButtonsForNewZoom();
-    	
 		datePicker = findViewById(R.id.date_picker);
 		datePicker.setOnClickListener(this);
 
@@ -613,7 +602,7 @@ GTGEventListener
 				if(position == 0)
 				{
 					((TextView)convertView.findViewById(R.id.totalTime)).setText(Util.convertMsToText(gpsTrailerOverlay.sas.getTotalTimeSecs()*1000l));
-					((TextView)convertView.findViewById(R.id.totalDist)).setText(MaplessScaleWidget.calcLabelForLength(gpsTrailerOverlay.sas.getTotalDistM(), 
+					((TextView)convertView.findViewById(R.id.totalDist)).setText(MapScaleWidget.calcLabelForLength(gpsTrailerOverlay.sas.getTotalDistM(),
 							GTG.prefs.useMetric));
 					((TextView)convertView.findViewById(R.id.timesInArea)).setText(String.valueOf(gpsTrailerOverlay.sas.getTimesInArea()));
 					((TextView)convertView.findViewById(R.id.timesInArea)).setText(String.valueOf(gpsTrailerOverlay.sas.getTimesInArea()));
@@ -648,7 +637,7 @@ GTGEventListener
 					distText = "--";
 				else
 				{
-					distText = MaplessScaleWidget.calcLabelForLength(tr.dist, GTG.prefs.useMetric);
+					distText = MapScaleWidget.calcLabelForLength(tr.dist, GTG.prefs.useMetric);
 				}
 				
 				((TextView)convertView.findViewById(R.id.distance)).setText(distText);
@@ -742,7 +731,7 @@ GTGEventListener
 	
 	@Override
 	public void onClick(View v) {
-        GTG.ccRwtm.registerReadingThread();
+        GTG.cacheCreatorLock.registerReadingThread();
         try {
         if(v == panToLocation)
 		{
@@ -798,7 +787,7 @@ GTGEventListener
 //		}
         }
         finally {
-        	GTG.ccRwtm.unregisterReadingThread();
+        	GTG.cacheCreatorLock.unregisterReadingThread();
         }
 
 	}
@@ -820,8 +809,6 @@ GTGEventListener
 			}
 			
 			osmMapView.panAndZoom(stBox.minX,stBox.minY,stBox.maxX,stBox.maxY);
-			
-			updatePlusMinusButtonsForNewZoom();
 		}
 		finally
 		{
@@ -829,13 +816,6 @@ GTGEventListener
 		}
 	}
 	
-	public void updatePlusMinusButtonsForNewZoom() {
-		zoomControls.setIsZoomOutEnabled(osmMapView.zoom8bitPrec > prefs.minZoom );
-		
-		zoomControls.setIsZoomInEnabled(osmMapView.shouldZoomInBeEnabled());
-        
-	}
-
 	private Float determineSpeed(long lastId, Integer lastLatM, Integer lastLonM, Long lastTime,
 			Integer latm, Integer lonm, Long time) {
 		Cursor c = null;
@@ -892,15 +872,11 @@ GTGEventListener
 
 		public boolean showPhotos = true;
 		
-		public long minZoom = 256;
-		
 		/**
 		 * The amount of scaling of a panel, in terms of zoom level. ie. 2 would equal 2x, and would mean
 		 * the smallest tile would be spread out over twice the area in x and y.
 		 */
 		public int panelScale = 2;
-
-		public long maxZoom = 1l<<(20+8+panelScale-1);
 
 		public long lastCheckedGpsLocationIdForUIManager = Long.MIN_VALUE;
 		/**
@@ -922,12 +898,10 @@ GTGEventListener
 	
 		
 		/**
-		 * currX and currY represent the upper left corner of the view.
+		 * Last location of screen when TTT was last visited. Note that rightLon
+		 * may be less than leftLon if wrapping over the -/+ 180 longitude line
 		 */
-		public double currX = 0, currY = 0;
-
-		public long currZoom8BitPrec = 1024;
-		public int maxAutoZoomLevel = 16;
+		public double leftLon, rightLon, topLat, bottomLat;
 
 		/**
 		 * Boolean map of color ranges that are in use in allColorRanges
@@ -959,19 +933,19 @@ GTGEventListener
 	
 
 	public void editUserLocation(GpsClickData gpsClickData) {
-        GTG.ccRwtm.registerReadingThread();
+        GTG.cacheCreatorLock.registerReadingThread();
         try {
 		this.gpsClickData = gpsClickData;
 		
 		turnOnSpeechBubble();
         }
         finally {
-        	GTG.ccRwtm.unregisterReadingThread();
+        	GTG.cacheCreatorLock.unregisterReadingThread();
         }
 	}
 	
 	public void createNewUserLocation(int lastCalculatedGpsLatM, int lastCalculatedGpsLonM, float lastCalculatedRadius) {
-        GTG.ccRwtm.registerReadingThread();
+        GTG.cacheCreatorLock.registerReadingThread();
         try {
 		
 		gpsClickData = new GpsClickData();
@@ -982,7 +956,7 @@ GTGEventListener
 		turnOnSpeechBubble();
         }
         finally {
-        	GTG.ccRwtm.unregisterReadingThread();
+        	GTG.cacheCreatorLock.unregisterReadingThread();
         }
 	}
 
@@ -1082,7 +1056,7 @@ GTGEventListener
 		
 		scaleWidget.setUnitsToMetric(GTG.prefs.useMetric);
 		
-        GTG.ccRwtm.registerReadingThread();
+        GTG.cacheCreatorLock.registerReadingThread();
         try {
 		
 		GTG.reviewerMapResumeId++;
@@ -1129,7 +1103,7 @@ GTGEventListener
 		
         }
         finally {
-        	GTG.ccRwtm.unregisterReadingThread();
+        	GTG.cacheCreatorLock.unregisterReadingThread();
         }
         
         //check all events and update accordingly
@@ -1146,7 +1120,7 @@ GTGEventListener
 	 * the min max range
 	 */
 	private void updateTimeViewMinMaxTime() {
-		GTG.ccRwtm.registerReadingThread();
+		GTG.cacheCreatorLock.registerReadingThread();
         try {
         	
         	if(GTG.cacheCreator.minTimeSec != GTG.cacheCreator.maxTimeSec)
@@ -1177,7 +1151,7 @@ GTGEventListener
         	timeView.setMinMaxTime(GTG.cacheCreator.minTimeSec, GTG.cacheCreator.maxTimeSec);
         }
         finally {
-        	GTG.ccRwtm.unregisterReadingThread();
+        	GTG.cacheCreatorLock.unregisterReadingThread();
         }
 	}
 
@@ -1212,7 +1186,7 @@ GTGEventListener
 
 		GTG.removeGTGEventListener(this);
 		
-        GTG.ccRwtm.registerReadingThread();
+        GTG.cacheCreatorLock.registerReadingThread();
         try {
 
 		if(currentDialog != null)
@@ -1224,9 +1198,13 @@ GTGEventListener
 		if(osmMapView != null) {
 			osmMapView.onPause();
 
-			prefs.currX = osmMapView.x;
-			prefs.currY = osmMapView.y;
-			prefs.currZoom8BitPrec = osmMapView.zoom8bitPrec;
+			LngLat tp = osmMapView.getScreenTopLeft();
+			LngLat br = osmMapView.getScreenBottomRight();
+
+			prefs.topLat = tp.latitude;
+			prefs.leftLon = tp.longitude;
+			prefs.bottomLat = br.latitude;
+			prefs.rightLon = br.longitude;
 
 			GTG.runBackgroundTask(new Runnable() {
 
@@ -1243,7 +1221,7 @@ GTGEventListener
 			superThreadManager.pauseAllSuperThreads();
         }
         finally {
-        	GTG.ccRwtm.unregisterReadingThread();
+        	GTG.cacheCreatorLock.unregisterReadingThread();
         }
         
 	}
@@ -1254,14 +1232,14 @@ GTGEventListener
 		super.onDestroy();
 		osmMapView.onDestroy();
 
-        GTG.ccRwtm.registerReadingThread();
+        GTG.cacheCreatorLock.registerReadingThread();
         try {
 
 			cleanup();
 			/* ttt_installer:remove_line */Log.d(GTG.TAG,"OsmMapGpsTrailerReviewerMapActivity.onDestory() end");
         }
         finally {
-        	GTG.ccRwtm.unregisterReadingThread();
+        	GTG.cacheCreatorLock.unregisterReadingThread();
         }
 	}
 
@@ -1294,7 +1272,7 @@ GTGEventListener
 
 	@Override
 	public void notifyTimeViewChange() {
-        GTG.ccRwtm.registerReadingThread();
+        GTG.cacheCreatorLock.registerReadingThread();
         try {
 			recalculateStartAndEndTimeFromTimeView();
 			redrawMap();
@@ -1303,7 +1281,7 @@ GTGEventListener
 				toolTip.setAction(UserAction.TIME_VIEW_CHANGE);
         }
         finally {
-        	GTG.ccRwtm.unregisterReadingThread();
+        	GTG.cacheCreatorLock.unregisterReadingThread();
         }
 	}
 	
@@ -1391,7 +1369,7 @@ GTGEventListener
 	}
 	
 	private void updateTimeViewTime() {
-        GTG.ccRwtm.registerReadingThread();
+        GTG.cacheCreatorLock.registerReadingThread();
         try {
         	
         	if(timeView.getWidth() != 0)
@@ -1404,7 +1382,7 @@ GTGEventListener
 			recalculateStartAndEndTimeFromTimeView();
 	    }
 	    finally {
-	    	GTG.ccRwtm.unregisterReadingThread();
+	    	GTG.cacheCreatorLock.unregisterReadingThread();
 	    }
 	}
 
@@ -1419,13 +1397,13 @@ GTGEventListener
 	}
 
 	public void notifyLocationKnown() {
-        GTG.ccRwtm.registerReadingThread();
+        GTG.cacheCreatorLock.registerReadingThread();
         try {
         	panToLocation.setBackgroundResource(R.drawable.pan_to_location);
         	locationKnown = true;
         }
         finally {
-        	GTG.ccRwtm.unregisterReadingThread();
+        	GTG.cacheCreatorLock.unregisterReadingThread();
         }
 	}
 	
@@ -1585,11 +1563,6 @@ GTGEventListener
 		updateStatusFromGTGEvent(event);
 	}
 
-	public float calcMetersPerApUnits() {
-		//zoom8bitPerc is pixels per total ap units * 256
-		return  osmMapView.zoom8bitPrec / scaleWidget.pixelsPerMeter / AreaPanel.MAX_AP_UNITS;
-	}
-
 	public void notifyPathsChanged() {
 		if(gpsTrailerOverlay != null)
 			gpsTrailerOverlay.notifyPathsChanged();
@@ -1608,7 +1581,7 @@ GTGEventListener
 	protected void updateDistanceView(double distance) {
 		distanceView.setText(String.format(getText(R.string.distance_traveled).toString(),
 				distance == -1 ? "--" : 
-					MaplessScaleWidget.calcLabelForLength(distance, GTG.prefs.useMetric)));
+					MapScaleWidget.calcLabelForLength(distance, GTG.prefs.useMetric)));
 				
 		
 	}

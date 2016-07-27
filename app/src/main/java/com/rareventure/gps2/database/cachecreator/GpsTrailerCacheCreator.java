@@ -167,7 +167,7 @@ public class GpsTrailerCacheCreator extends Thread {
 	}
 	
 	public static double calcTrDist(int startTime, int endTime, ReadWriteThreadManager writingRwtm) {
-		GTG.ccRwtm.registerReadingThread();
+		GTG.cacheCreatorLock.registerReadingThread();
 
 		try {
 			//now we need to find the biggest ap with a start time equal to the best start time,
@@ -330,7 +330,7 @@ public class GpsTrailerCacheCreator extends Thread {
 
 			} // end for(;;) while we haven't reached end time
 		} finally {
-			GTG.ccRwtm.unregisterReadingThread();
+			GTG.cacheCreatorLock.unregisterReadingThread();
 		}
 	}
 
@@ -671,7 +671,7 @@ public class GpsTrailerCacheCreator extends Thread {
 		
 		// this try is to close the transaction with a finally
 		//and for removing the rwtm locks
-		GTG.ccRwtm.registerWritingThread();
+		GTG.cacheCreatorLock.registerWritingThread();
 
 		try {
 			/* ttt_installer:remove_line */Log.d(GTG.TAG,"Started apCaching...");
@@ -746,7 +746,7 @@ public class GpsTrailerCacheCreator extends Thread {
 					//Note that the drawer thread won't give up its reading lock until the view
 					//is completely up to date, so we don't have to worry about the viewnodes
 					//being half updated
-					GTG.ccRwtm.pauseForReadingThreads();
+					GTG.cacheCreatorLock.pauseForReadingThreads();
 					
 					//note, we can use the headVn stbox because all vn's should be clean by this point
 					//this is used strictly to populate the viewnode tree
@@ -860,8 +860,8 @@ public class GpsTrailerCacheCreator extends Thread {
 				}
 
 
-				GTG.apCache.writeDirtyRows(GTG.ccRwtm);
-				GTG.ttCache.writeDirtyRows(GTG.ccRwtm);
+				GTG.apCache.writeDirtyRows(GTG.cacheCreatorLock);
+				GTG.ttCache.writeDirtyRows(GTG.cacheCreatorLock);
 				
 				GTG.apCache.clearDirtyRows();
 				GTG.ttCache.clearDirtyRows();
@@ -875,7 +875,7 @@ public class GpsTrailerCacheCreator extends Thread {
 		finally {
 			/* ttt_installer:remove_line */Log.d(GTG.TAG,"loadNextPoints, count is "+count);
 			DbUtil.closeCursors(c);
-			GTG.ccRwtm.unregisterWritingThread();
+			GTG.cacheCreatorLock.unregisterWritingThread();
 
 			//co: the flickering is very annoying caused by turning the
 			// processing gps points message on and off, so we just leave it on unless we are really
@@ -903,7 +903,7 @@ public class GpsTrailerCacheCreator extends Thread {
 				GTG.timmyDb.saveProperties();
 				
 				GTG.timmyDb.setTransactionSuccessful();
-				GTG.timmyDb.endTransaction(GTG.ccRwtm);
+				GTG.timmyDb.endTransaction(GTG.cacheCreatorLock);
 			}
 			else if(GTG.timmyDb.inTransaction())
 				GTG.timmyDb.endTransaction();
@@ -1356,7 +1356,7 @@ public class GpsTrailerCacheCreator extends Thread {
 	}
 
 	public boolean doViewNodesIntersect(int x1, int y1, int x2, int y2) {
-		GTG.ccRwtm.registerReadingThread();
+		GTG.cacheCreatorLock.registerReadingThread();
 		viewNodeThreadManager.registerReadingThread();
 		
 		try {
@@ -1453,7 +1453,7 @@ public class GpsTrailerCacheCreator extends Thread {
 		finally
 		{
 			viewNodeThreadManager.unregisterReadingThread();
-			GTG.ccRwtm.unregisterReadingThread();
+			GTG.cacheCreatorLock.unregisterReadingThread();
 		}
 	}
 

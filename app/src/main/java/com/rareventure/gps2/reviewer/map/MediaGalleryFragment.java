@@ -19,7 +19,6 @@
 */
 package com.rareventure.gps2.reviewer.map;
 
-import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -30,10 +29,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -46,16 +43,13 @@ import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.BaseAdapter;
 import android.widget.FrameLayout;
 import android.widget.Gallery;
-import android.widget.Gallery.LayoutParams;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.rareventure.gps2.R;
 import com.rareventure.android.Util;
 import com.rareventure.gps2.GTG;
-import com.rareventure.gps2.database.TimeZoneTimeRow;
 import com.rareventure.gps2.database.cache.MediaLocTime;
-import com.rareventure.gps2.reviewer.SettingsActivity;
 import com.rareventure.gps2.reviewer.imageviewer.ViewImage;
 
 public class MediaGalleryFragment extends Fragment
@@ -292,7 +286,7 @@ public class MediaGalleryFragment extends Fragment
 
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
-			GTG.ccRwtm.registerReadingThread();
+			GTG.cacheCreatorLock.registerReadingThread();
 			try {
 				MediaLocTime mlt = mltArray.get(position);
 				
@@ -344,7 +338,7 @@ public class MediaGalleryFragment extends Fragment
 //				Log.d(GTG.TAG, "getView for " + position);
 				return fl;
 			} finally {
-				GTG.ccRwtm.unregisterReadingThread();
+				GTG.cacheCreatorLock.unregisterReadingThread();
 			}
 		}
 	}

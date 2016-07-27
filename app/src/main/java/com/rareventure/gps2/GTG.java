@@ -742,14 +742,16 @@ public class GTG {
 					GTG.prefs.useMetric);
 			res.put(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.GTG.Preferences.passwordTimeoutMS",
 					GTG.prefs.passwordTimeoutMS);
-			
-			res.put(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.reviewer.map.OsmMapGpsTrailerReviewerMapActivity.Preferences.currX", 
-					OsmMapGpsTrailerReviewerMapActivity.prefs.currX);
-			res.put(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.reviewer.map.OsmMapGpsTrailerReviewerMapActivity.Preferences.currY", 
-					OsmMapGpsTrailerReviewerMapActivity.prefs.currY);
-			res.put(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.reviewer.map.OsmMapGpsTrailerReviewerMapActivity.Preferences.currZoom8BitPrec", 
-					OsmMapGpsTrailerReviewerMapActivity.prefs.currZoom8BitPrec);
-			res.put(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.reviewer.map.OsmMapGpsTrailerReviewerMapActivity.Preferences.currTimePosSec", 
+
+			res.put(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.reviewer.map.OsmMapGpsTrailerReviewerMapActivity.Preferences.leftLon",
+					OsmMapGpsTrailerReviewerMapActivity.prefs.leftLon);
+			res.put(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.reviewer.map.OsmMapGpsTrailerReviewerMapActivity.Preferences.rightLon",
+					OsmMapGpsTrailerReviewerMapActivity.prefs.rightLon);
+			res.put(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.reviewer.map.OsmMapGpsTrailerReviewerMapActivity.Preferences.topLat",
+					OsmMapGpsTrailerReviewerMapActivity.prefs.topLat);
+			res.put(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.reviewer.map.OsmMapGpsTrailerReviewerMapActivity.Preferences.bottomLat",
+					OsmMapGpsTrailerReviewerMapActivity.prefs.bottomLat);
+			res.put(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.reviewer.map.OsmMapGpsTrailerReviewerMapActivity.Preferences.currTimePosSec",
 					OsmMapGpsTrailerReviewerMapActivity.prefs.currTimePosSec);
 			res.put(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.reviewer.map.OsmMapGpsTrailerReviewerMapActivity.Preferences.currTimePeriodSec", 
 					OsmMapGpsTrailerReviewerMapActivity.prefs.currTimePeriodSec);
@@ -796,12 +798,14 @@ public class GTG {
 			else if(name.equals(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.GTG.Preferences.passwordTimeoutMS"))
 				GTG.prefs.passwordTimeoutMS = Long.parseLong(value);
 
-			else if(name.equals(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.reviewer.map.OsmMapGpsTrailerReviewerMapActivity.Preferences.currX"))
-				OsmMapGpsTrailerReviewerMapActivity.prefs.currX = Double.parseDouble(value);
-			else if(name.equals(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.reviewer.map.OsmMapGpsTrailerReviewerMapActivity.Preferences.currY"))
-				OsmMapGpsTrailerReviewerMapActivity.prefs.currY = Double.parseDouble(value);
-			else if(name.equals(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.reviewer.map.OsmMapGpsTrailerReviewerMapActivity.Preferences.currZoom8BitPrec"))
-				OsmMapGpsTrailerReviewerMapActivity.prefs.currZoom8BitPrec = Integer.parseInt(value);
+			else if(name.equals(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.reviewer.map.OsmMapGpsTrailerReviewerMapActivity.Preferences.leftLon"))
+				OsmMapGpsTrailerReviewerMapActivity.prefs.leftLon = Double.parseDouble(value);
+			else if(name.equals(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.reviewer.map.OsmMapGpsTrailerReviewerMapActivity.Preferences.rightLon"))
+				OsmMapGpsTrailerReviewerMapActivity.prefs.rightLon = Double.parseDouble(value);
+			else if(name.equals(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.reviewer.map.OsmMapGpsTrailerReviewerMapActivity.Preferences.topLat"))
+				OsmMapGpsTrailerReviewerMapActivity.prefs.topLat = Double.parseDouble(value);
+			else if(name.equals(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.reviewer.map.OsmMapGpsTrailerReviewerMapActivity.Preferences.bottomLat"))
+				OsmMapGpsTrailerReviewerMapActivity.prefs.bottomLat = Double.parseDouble(value);
 			else if(name.equals(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.reviewer.map.OsmMapGpsTrailerReviewerMapActivity.Preferences.currTimePosSec"))
 				OsmMapGpsTrailerReviewerMapActivity.prefs.currTimePosSec = Integer.parseInt(value);
 			else if(name.equals(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.reviewer.map.OsmMapGpsTrailerReviewerMapActivity.Preferences.currTimePeriodSec"))
@@ -859,19 +863,14 @@ public class GTG {
 	public enum GTGAction { SET_FROM_AND_TO_DATES, TOOL_TIP_CLICKED };
 	
 	/**
-	 * This is used by the read write thread manager so that all the ui important threads
-	 * will be minimally interrupted by background tasks. 
-	 * When a background task grabs a write lock, it will then pause itself whenever
-	 * a reader thread wants to do something, so that the reader thread won't starve.
-	 * <p>
-	 * The gtgcachecreator thread uses this. Note that it grabs locks in the order
-	 * of ccRwtm, then apCacheRwtm. As long as readers use the same order to
-	 * grab these locks as a reader lock, then a deadlock won't occur.  
-	 * It also operates as a lock
-	 * so that threads that read from apcache won't be thread dangerous with threads that
-	 * write to it
+	 * This lock is for the GpsTrailerCacheCreator. It prevents
+	 * (ui) threads that read the cache to find points from
+	 * interferring with writing to the cache. Since multiple threads
+	 * commonly access the cache at the same time, we don't use
+	 * regular synchronization, but instead this a ReadWriteThreadManager,
+	 * which allows multiple readers at the same time.
 	 */
-	public static ReadWriteThreadManager ccRwtm = new ReadWriteThreadManager();
+	public static ReadWriteThreadManager cacheCreatorLock = new ReadWriteThreadManager();
 
 //	public static BusyIndicationManager bim = new BusyIndicationManager();
 	
