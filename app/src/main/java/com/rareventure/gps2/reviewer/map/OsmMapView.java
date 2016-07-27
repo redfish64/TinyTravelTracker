@@ -92,9 +92,9 @@ public class OsmMapView extends MapView
 	 * This is the height of the area in which we draw points. We don't want to draw points
 	 * underneath the time scale widget at the bottom of the screen, so this excludes that
 	 */
-	private int pointAreaHeight;
+	int pointAreaHeight;
 
-	private int windowWidth;
+	int windowWidth;
 
 	/**
 	 * Since mapzen doesn't tell us when the screen moves, and stops moving (after a fling
@@ -170,6 +170,7 @@ public class OsmMapView extends MapView
 				mapController.queueEvent(notifyScreenChangeRunnable);
 			}
 	};
+	private int windowHeight;
 
 //	private MultiTouchController<OsmMapView> multiTouchController = new MultiTouchController<OsmMapView>(this);
 
@@ -275,10 +276,9 @@ public class OsmMapView extends MapView
 				for(GpsOverlay o : overlays)
 					o.startTask(mapController);
 
-				panAndZoom2(OsmMapGpsTrailerReviewerMapActivity.prefs.leftLon,
-						OsmMapGpsTrailerReviewerMapActivity.prefs.topLat,
-						OsmMapGpsTrailerReviewerMapActivity.prefs.rightLon,
-						OsmMapGpsTrailerReviewerMapActivity.prefs.bottomLat);
+				panAndZoom2(OsmMapGpsTrailerReviewerMapActivity.prefs.lastLon,
+						OsmMapGpsTrailerReviewerMapActivity.prefs.lastLat,
+						OsmMapGpsTrailerReviewerMapActivity.prefs.lastZoom);
 			}
 		},"map_style.yaml");
 	}
@@ -368,6 +368,10 @@ public class OsmMapView extends MapView
 		return screenBottomRight;
 	}
 
+	public MapController getMapController() {
+		return mapController;
+	}
+
 	public static class Preferences implements AndroidPreferences
 	{
 	}
@@ -404,17 +408,26 @@ public class OsmMapView extends MapView
 		}
 	}
 
-
+	/**
+	 * Pans and zooms so the given points will show up as the top left and
+	 * bottom right of the view. Note that the zooming/panning will be done so
+	 * that the given bottom will be placed above the time view and the zoom buttons.
+     */
 	public void panAndZoom(int minX, int minY, int maxX, int maxY) {
 		float currZoom = mapController.getZoom();
 
 		LngLat tl = mapController.coordinatesAtScreenPosition(0,0);
-		LngLat br = mapController.coordinatesAtScreenPosition(windowWidth,pointAreaHeight);
+		LngLat br = mapController.coordinatesAtScreenPosition(windowWidth,windowHeight);
 
 		int fromMinX= AreaPanel.convertLonToX(tl.longitude);
 		int fromMinY = AreaPanel.convertLatToY(tl.latitude);
 		int fromMaxX = AreaPanel.convertLonToX(br.longitude);
 		int fromMaxY = AreaPanel.convertLatToY(br.latitude);
+
+		//panAndZoom uses the center of the visible area, excluding the time view
+		//and buttons. However, mapzen, uses the entire window. So we need to adjust the
+		//y size to the whole window so mapzen will zoom and pan correctly
+		maxY = (int) (((float)maxY - minY) * windowHeight / pointAreaHeight) + minY;
 
 		float zoomMultiplier = Math.min(
 				((float)fromMaxX-fromMinX)/(maxX-minX),
@@ -435,40 +448,14 @@ public class OsmMapView extends MapView
 		notifyScreenMoved();
 	}
 
-	public void panAndZoom2(double leftLon, double topLat, double rightLon, double bottomLat) {
+	public void panAndZoom2(double lon, double lat, float zoom) {
 		if(mapController == null)
 			return;
 
-		float currZoom = mapController.getZoom();
-
-		LngLat tl = mapController.coordinatesAtScreenPosition(0,0);
-		LngLat br = mapController.coordinatesAtScreenPosition(windowWidth,pointAreaHeight);
-
-		int fromMinX= AreaPanel.convertLonToX(tl.longitude);
-		int fromMinY = AreaPanel.convertLatToY(tl.latitude);
-		int fromMaxX = AreaPanel.convertLonToX(br.longitude);
-		int fromMaxY = AreaPanel.convertLatToY(br.latitude);
-
-		int minX= AreaPanel.convertLonToX(leftLon);
-		int minY = AreaPanel.convertLatToY(topLat);
-		int maxX = AreaPanel.convertLonToX(rightLon);
-		int maxY = AreaPanel.convertLatToY(bottomLat);
-
-		float zoomMultiplier = Math.min(
-				((float)fromMaxX-fromMinX)/(maxX-minX),
-				((float)fromMaxY-fromMinY)/(maxY-minY)
-		);
-
-		//mapzen uses 2**(zoom) for zoom level, so we have to convert to it
-		float newZoom = (float) (currZoom + Math.log(zoomMultiplier)/Math.log(2));
-
-		LngLat newPos = new LngLat(
-				AreaPanel.convertXToLon((maxX-minX)/2+minX),
-				AreaPanel.convertYToLat((maxY-minY)/2+minY)
-		);
+		LngLat newPos = new LngLat(lon, lat);
 
 		mapController.setPositionEased(newPos,AUTOZOOM_PAN_EASE_MS);
-		mapController.setZoomEased(newZoom,AUTOZOOM_ZOOM_EASE_MS);
+		mapController.setZoomEased(zoom,AUTOZOOM_ZOOM_EASE_MS);
 
 		notifyScreenMoved();
 	}
@@ -576,6 +563,7 @@ public class OsmMapView extends MapView
 	public void initAfterLayout() {
 		windowWidth = getWidth();
 		this.pointAreaHeight = activity.findViewById(R.id.main_window_area).getBottom();
+		windowHeight = getHeight();
 
 //		memoryCache.setWidthAndHeight(getWidth(), getHeight());
 	}

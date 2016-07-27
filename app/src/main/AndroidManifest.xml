@@ -44,6 +44,7 @@
     <application
         android:name="com.rareventure.gps2.GpsTrailerReviewerApplication"
         android:icon="@drawable/icon_trial"
+        android:theme="@android:style/Theme.NoTitleBar"
         android:label="@string/app_name" >
 
 	    <!-- <activity android:name="com.google.ads.AdActivity"

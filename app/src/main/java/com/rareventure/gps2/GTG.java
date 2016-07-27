@@ -743,14 +743,12 @@ public class GTG {
 			res.put(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.GTG.Preferences.passwordTimeoutMS",
 					GTG.prefs.passwordTimeoutMS);
 
-			res.put(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.reviewer.map.OsmMapGpsTrailerReviewerMapActivity.Preferences.leftLon",
-					OsmMapGpsTrailerReviewerMapActivity.prefs.leftLon);
-			res.put(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.reviewer.map.OsmMapGpsTrailerReviewerMapActivity.Preferences.rightLon",
-					OsmMapGpsTrailerReviewerMapActivity.prefs.rightLon);
-			res.put(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.reviewer.map.OsmMapGpsTrailerReviewerMapActivity.Preferences.topLat",
-					OsmMapGpsTrailerReviewerMapActivity.prefs.topLat);
-			res.put(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.reviewer.map.OsmMapGpsTrailerReviewerMapActivity.Preferences.bottomLat",
-					OsmMapGpsTrailerReviewerMapActivity.prefs.bottomLat);
+			res.put(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.reviewer.map.OsmMapGpsTrailerReviewerMapActivity.Preferences.lastLon",
+					OsmMapGpsTrailerReviewerMapActivity.prefs.lastLon);
+			res.put(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.reviewer.map.OsmMapGpsTrailerReviewerMapActivity.Preferences.lastLat",
+					OsmMapGpsTrailerReviewerMapActivity.prefs.lastLat);
+			res.put(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.reviewer.map.OsmMapGpsTrailerReviewerMapActivity.Preferences.lastZoom",
+					OsmMapGpsTrailerReviewerMapActivity.prefs.lastZoom);
 			res.put(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.reviewer.map.OsmMapGpsTrailerReviewerMapActivity.Preferences.currTimePosSec",
 					OsmMapGpsTrailerReviewerMapActivity.prefs.currTimePosSec);
 			res.put(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.reviewer.map.OsmMapGpsTrailerReviewerMapActivity.Preferences.currTimePeriodSec", 
@@ -798,14 +796,12 @@ public class GTG {
 			else if(name.equals(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.GTG.Preferences.passwordTimeoutMS"))
 				GTG.prefs.passwordTimeoutMS = Long.parseLong(value);
 
-			else if(name.equals(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.reviewer.map.OsmMapGpsTrailerReviewerMapActivity.Preferences.leftLon"))
-				OsmMapGpsTrailerReviewerMapActivity.prefs.leftLon = Double.parseDouble(value);
-			else if(name.equals(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.reviewer.map.OsmMapGpsTrailerReviewerMapActivity.Preferences.rightLon"))
-				OsmMapGpsTrailerReviewerMapActivity.prefs.rightLon = Double.parseDouble(value);
-			else if(name.equals(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.reviewer.map.OsmMapGpsTrailerReviewerMapActivity.Preferences.topLat"))
-				OsmMapGpsTrailerReviewerMapActivity.prefs.topLat = Double.parseDouble(value);
-			else if(name.equals(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.reviewer.map.OsmMapGpsTrailerReviewerMapActivity.Preferences.bottomLat"))
-				OsmMapGpsTrailerReviewerMapActivity.prefs.bottomLat = Double.parseDouble(value);
+			else if(name.equals(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.reviewer.map.OsmMapGpsTrailerReviewerMapActivity.Preferences.lastLon"))
+				OsmMapGpsTrailerReviewerMapActivity.prefs.lastLon = Double.parseDouble(value);
+			else if(name.equals(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.reviewer.map.OsmMapGpsTrailerReviewerMapActivity.Preferences.lastLat"))
+				OsmMapGpsTrailerReviewerMapActivity.prefs.lastLat = Double.parseDouble(value);
+			else if(name.equals(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.reviewer.map.OsmMapGpsTrailerReviewerMapActivity.Preferences.lastZoom"))
+				OsmMapGpsTrailerReviewerMapActivity.prefs.lastZoom = Float.parseFloat(value);
 			else if(name.equals(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.reviewer.map.OsmMapGpsTrailerReviewerMapActivity.Preferences.currTimePosSec"))
 				OsmMapGpsTrailerReviewerMapActivity.prefs.currTimePosSec = Integer.parseInt(value);
 			else if(name.equals(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.reviewer.map.OsmMapGpsTrailerReviewerMapActivity.Preferences.currTimePeriodSec"))

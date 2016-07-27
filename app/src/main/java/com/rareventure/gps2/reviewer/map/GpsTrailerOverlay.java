@@ -690,6 +690,19 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 			mapData.beginChangeBlock();
 			mapData.clear();
 
+			//co:show top and bottom of view area
+//			LngLat tl = mapController.coordinatesAtScreenPosition(0,0);
+//			LngLat br = mapController.coordinatesAtScreenPosition(osmMapView.windowWidth,
+//					osmMapView.pointAreaHeight);
+//
+//			props.put("color","#ffffff");
+//			props.put("size",String.format("%dpx %dpx", 10, 10));
+//			mapData.addPoint(tl,props);
+//
+//			props.put("color","#000000");
+//			props.put("size",String.format("%dpx %dpx", 10, 10));
+//			mapData.addPoint(br,props);
+
 			while(iter.hasNext()) {
 				ViewNode vn = iter.next();
 

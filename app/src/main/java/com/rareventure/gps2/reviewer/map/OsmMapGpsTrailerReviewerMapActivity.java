@@ -86,7 +86,6 @@ import com.rareventure.gps2.reviewer.timeview.TimeView.Listener;
 public class OsmMapGpsTrailerReviewerMapActivity extends ProgressDialogActivity implements OnClickListener,  Listener,
 GTGEventListener
 {
-
 	private ImageButton menuButton;
 
 	private static enum SasPanelState { GONE, TAB, FULL;
@@ -165,16 +164,6 @@ GTGEventListener
 		
 		osmMapView.setZoomCenter(osmMapView.getWidth()/2,
 				findViewById(R.id.timeview_layout).getTop()/2);
-	
-		if(prefs.leftLon == 0 && prefs.rightLon == 0)
-		{
-			prefs.leftLon = -180;
-			prefs.rightLon=  180;
-			prefs.topLat= -70;
-			prefs.bottomLat= 70;
-
-			osmMapView.panAndZoom2(prefs.leftLon, prefs.topLat, prefs.rightLon, prefs.bottomLat);
-		}
 	}
 
 	@Override
@@ -800,7 +789,7 @@ GTGEventListener
 		try {
 	    	stBox = GTG.apCache.getAutoZoomArea(prefs.currTimePosSec, 
 	    			prefs.currTimePosSec + prefs.currTimePeriodSec, gpsTrailerOverlay.sas.getResultPaths());
-		
+
 			if(stBox == null)
 			{
 				if(showToastOnFailure)
@@ -898,10 +887,10 @@ GTGEventListener
 	
 		
 		/**
-		 * Last location of screen when TTT was last visited. Note that rightLon
-		 * may be less than leftLon if wrapping over the -/+ 180 longitude line
+		 * Last location of screen when TTT was last visited.
 		 */
-		public double leftLon, rightLon, topLat, bottomLat;
+		public double lastLon, lastLat;
+		public float lastZoom;
 
 		/**
 		 * Boolean map of color ranges that are in use in allColorRanges
@@ -1198,13 +1187,12 @@ GTGEventListener
 		if(osmMapView != null) {
 			osmMapView.onPause();
 
-			LngLat tp = osmMapView.getScreenTopLeft();
-			LngLat br = osmMapView.getScreenBottomRight();
+			LngLat lp = osmMapView.getMapController().getPosition();
+			float lastZoom = osmMapView.getMapController().getZoom();
 
-			prefs.topLat = tp.latitude;
-			prefs.leftLon = tp.longitude;
-			prefs.bottomLat = br.latitude;
-			prefs.rightLon = br.longitude;
+			prefs.lastLat = lp.latitude;
+			prefs.lastLon = lp.longitude;
+			prefs.lastZoom = lastZoom;
 
 			GTG.runBackgroundTask(new Runnable() {
 
