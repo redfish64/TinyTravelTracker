@@ -112,7 +112,7 @@ replace_in_files(
 
 replace_in_files(\@rv_src_files,
 		 ['import com\.rareventure.*\.R;',""],
-		 ['import com\.rareventure\.gps2\.R\.(.*?);','import $chosen_package.R.$1;'],
+#		 ['import com\.rareventure\.gps2\.R\.(.*?);','import $chosen_package.R.$1;'],
 #		 ['import com\.rareventure\.gps2\.R\;','import $chosen_package.R;'],
 		 ['^(package .*;)','$1;import $chosen_package.R;',""],
 #		 ['\/\*android_install_frozen_version:external_dir\*\/"\/(.*)?\/"', '\/*android_install_frozen_version:external_dir*\/"\/TinyTravelTracker_$chosen_package\/"'],

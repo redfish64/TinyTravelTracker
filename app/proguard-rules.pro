@@ -56,6 +56,17 @@ public void addCustomData(java.lang.String,java.lang.String);
 public org.acra.ErrorReporter$ReportsSenderWorker handleSilentException(java.lang.Throwable);
 }
 
+#map controller has native code that calls back mapcontroller methods, so we need to
+#keep it
+-keep public class com.mapzen.tangram.MapController {
+    *;
+    }
+
+-keep public class com.mapzen.tangram.MapController$FeaturePickListener {
+    *;
+    }
+
+
 -dontwarn android.**
 -dontwarn retrofit.**
 -dontwarn okio.**
