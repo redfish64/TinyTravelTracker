@@ -81,10 +81,9 @@ public class GpsLocationOverlay implements GpsOverlay, LocationListener
 //		locationAnim = AnimationUtils.loadAnimation(activity, R.drawable.location_anim);
 	}
 
-	public double getAbsPixelY2(long zoom8BitPrec) {
-		double apY = AreaPanel.convertLatToYDouble(lastLoc.latitude);
-		
-		return AreaPanel.convertApYToAbsPixelY2(apY, zoom8BitPrec);
+	public LngLat getLastLoc()
+	{
+		return lastLoc;
 	}
 	
 	public double getAbsPixelX2(long zoom8BitPrec) {

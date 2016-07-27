@@ -197,6 +197,13 @@ public class OsmMapView extends MapView
 			public void onMapReady(final MapController mapController) {
 				OsmMapView.this.mapController = mapController;
 
+				//TODO 1.5 after things settle down a little bit, delete the original cache directory
+				//co: we don't want any user to upgrade, then realize it doesn't work, and have
+				//    to go back to the original one, and then have all their cache deleted.
+				//    so we'll do this next version after we get enough feedback.
+//				File oldCache = new File(GTG.getExternalStorageDirectory().toString()+"/tile_cache");
+//				if(oldCache.exists())
+//					Util.deleteRecursive(new File(GTG.getExternalStorageDirectory().toString()+"/tile_cache"));
 				File cacheDir = new File(GTG.getExternalStorageDirectory().toString()+"/tile_cache2");
 
 				cacheDir.mkdirs();
@@ -459,6 +466,11 @@ public class OsmMapView extends MapView
 
 		notifyScreenMoved();
 	}
+
+	public void panTo(LngLat loc) {
+		mapController.setPositionEased(loc,AUTOZOOM_PAN_EASE_MS);
+	}
+
 
 	private void notifyOverlayScreenChanged() {
 		AreaPanelSpaceTimeBox newStBox = getCoordinatesRectangleForScreen();

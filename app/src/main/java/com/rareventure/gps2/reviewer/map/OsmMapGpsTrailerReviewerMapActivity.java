@@ -87,6 +87,7 @@ public class OsmMapGpsTrailerReviewerMapActivity extends ProgressDialogActivity 
 GTGEventListener
 {
 	private ImageButton menuButton;
+	private GpsLocationOverlay locationOverlay;
 
 	private static enum SasPanelState { GONE, TAB, FULL;
 	
@@ -432,7 +433,7 @@ GTGEventListener
 		});
 
 		osmMapView.addOverlay(gpsTrailerOverlay = new GpsTrailerOverlay(this, cpuThread, osmMapView));
-		osmMapView.addOverlay(new GpsLocationOverlay(this));
+		osmMapView.addOverlay(locationOverlay = new GpsLocationOverlay(this));
         osmMapView.init(fileIOThread, this);
 
         scaleWidget = (MapScaleWidget) this.findViewById(R.id.scaleWidget);
@@ -726,13 +727,7 @@ GTGEventListener
 		{
         	if(locationKnown)
         	{
-				//TODO 3: animate pan and zoom
-				//TODO 1.5: FIXME
-//				osmMapView.panAndZoom2(osmMapView.zoom8bitPrec,
-//						osmMapView.locationOverlay.getAbsPixelX2(osmMapView.zoom8bitPrec) -
-//						osmMapView.centerX,
-//						osmMapView.locationOverlay.getAbsPixelY2(osmMapView.zoom8bitPrec)
-//						- osmMapView.centerY);
+				osmMapView.panTo(locationOverlay.getLastLoc());
 				toolTip.setAction(ToolTipFragment.UserAction.PAN_TO_LOCATION_BUTTON);
         	}
         	else

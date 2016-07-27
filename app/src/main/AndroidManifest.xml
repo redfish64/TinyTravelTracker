@@ -6,7 +6,7 @@
     package="com.rareventure.gps2"
     android:versionCode="45"
     android:sharedUserId="com.rareventure.gps2" 
-    android:versionName="1.0.17" >
+    android:versionName="1.1.0" >
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" >
