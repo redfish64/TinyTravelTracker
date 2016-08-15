@@ -127,12 +127,17 @@ public class GpsLocationOverlay implements GpsOverlay, LocationListener
 	}
 
 	private void resetMapData() {
+		synchronized(this)
+		{
+			if(mapData == null)
+				return;
+		}
 		props.clear();
-		props.put("rotation",Double.toString(lastCompass));
+		props.put("rotation", Double.toString(lastCompass));
 
 		mapData.beginChangeBlock();
 		mapData.clear();
-		mapData.addPoint(lastLoc,props);
+		mapData.addPoint(lastLoc, props);
 		mapData.endChangeBlock();
 
 		mapController.requestRender();
@@ -182,8 +187,10 @@ public class GpsLocationOverlay implements GpsOverlay, LocationListener
 
 	@Override
 	public void startTask(MapController mapController) {
-		this.mapController = mapController;
-		mapData = mapController.addDataLayer("mz_current_location");
+		synchronized(this) {
+			this.mapController = mapController;
+			mapData = mapController.addDataLayer("mz_current_location");
+		}
 	}
 
 	public static class Preferences implements AndroidPreferences
