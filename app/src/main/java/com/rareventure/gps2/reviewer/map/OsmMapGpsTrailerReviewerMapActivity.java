@@ -1213,7 +1213,8 @@ GTGEventListener
 		/* ttt_installer:remove_line */Log.d(GTG.TAG,"OsmMapGpsTrailerReviewerMapActivity.onDestory() start");
         
 		super.onDestroy();
-		osmMapView.onDestroy();
+		if(osmMapView != null)
+			osmMapView.onDestroy();
 
         GTG.cacheCreatorLock.registerReadingThread();
         try {
