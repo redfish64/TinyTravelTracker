@@ -37,6 +37,10 @@ It also is useful in situations where you don't have internet access. All map ti
 
 Changelog:
 
+V 1.1.9
+
+* Now uses an opengl vector map implementation by Mapzen
+
 V 1.06
 
 * Smooth zooming
@@ -64,3 +68,7 @@ https://play.google.com/store/apps/details?id=com.rareventure.gps2_trial
 
 You can contact me at engler@gmail.com
 
+Donations:
+
+Bitcoin: 19bit8J9VFY9DMGbcYNrH4PzkUPdS8Rx1f
+Patreon: https://www.patreon.com/redfish64
