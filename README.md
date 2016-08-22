@@ -1,4 +1,4 @@
-_Note to users: If you have an issue you would like to see fixed, please click on the smiley on the right,
+_Note to users: If you have an issue you would like to see fixed, please click on the smiley on the right on the issue screen,
 and select thumbs up (or thumbs down). I'll use this information to decide what to work on next. Thanks_
 
 
