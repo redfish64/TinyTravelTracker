@@ -16,6 +16,10 @@
     along with Tiny Travel Tracker.  If not, see <http://www.gnu.org/licenses/>.
 
 
+Note to users: If you have an issue you would like to see fixed, please click on the smiley on the right,
+and select thumbs up (or thumbs down). I'll use this information to decide what to work on next. Thanks
+
+
 Tiny Travel Tracker could be described as a GPS journal. It's different from other GPS trackers because:
 
 * It can be safely left on all the time. It keeps track of it's own battery usage to prevent excessive battery drain.
@@ -36,6 +40,10 @@ It can find the answer to questions such as:
 It also is useful in situations where you don't have internet access. All map tiles previously viewed are cached on the phone, so even without internet, you can use the map as long as you've looked at previously viewed area. In addition, since the GPS points are stored on the phone, they are always present, regardless of internet availability.
 
 Changelog:
+
+V 1.1.11
+
+* Selecting points and long pressing to select point areas works again
 
 V 1.1.9
 
