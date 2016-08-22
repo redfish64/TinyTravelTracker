@@ -80,6 +80,7 @@ import android.view.ViewTreeObserver;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.widget.DatePicker;
 
+import com.mapzen.tangram.LngLat;
 import com.rareventure.gps2.GTG;
 import com.rareventure.gps2.database.TAssert;
 import com.rareventure.gps2.database.cache.AreaPanel;
@@ -537,11 +538,6 @@ public class Util {
 	}
 	/**
 	 * Determines whether two lon distances overlap
-	 * @param lonmStart
-	 * @param lonmEnd
-	 * @param lonmMin
-	 * @param lonmMax
-	 * @return
 	 */
 	public static boolean isLonmOverlaps(int lonmStart, int lonmEnd, int lonmStart2, int lonmEnd2) {
 		lonmEnd = Util.makeContinuousFromStartLonm(lonmStart, lonmEnd);
@@ -1144,7 +1140,7 @@ public class Util {
 	 * 1 year, or 12 months, or 365 days)
 	 * 
 	 * @param c1
-	 * @param c2
+	 * @param nowMs
 	 * @param id
 	 * @return
 	 */
@@ -1415,7 +1411,20 @@ public class Util {
 		
 		return tz;
 	}
-	
+
+	/**
+	 * mapzens MapController sometimes returns longitudes outside of -180/+180
+	 * so we convert it to a normal value. Alters given lngLat and returns it.
+     */
+	public static LngLat normalizeLngLat(LngLat p1) {
+		if(p1.longitude < Util.MIN_LON || p1.longitude> Util.MAX_LON) {
+			int wraps = (int) Math.floor((p1.longitude - Util.MIN_LON) / Util.LON_PER_WORLD);
+			p1.longitude -= wraps * Util.LON_PER_WORLD;
+		}
+
+		return p1;
+	}
+
 	public static interface LongComparator<T>
 	{
 		public int compare(T obj, long key);

@@ -40,6 +40,7 @@ import com.rareventure.gps2.database.cache.TimeTree;
 import com.rareventure.gps2.database.cachecreator.GpsTrailerCacheCreator;
 import com.rareventure.gps2.database.cachecreator.ViewNode;
 import com.rareventure.gps2.reviewer.map.OsmMapGpsTrailerReviewerMapActivity.OngoingProcessEnum;
+import com.rareventure.gps2.reviewer.map.sas.Area;
 import com.rareventure.gps2.reviewer.map.sas.SelectedAreaSet;
 
 import java.util.ArrayList;
@@ -121,6 +122,13 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 	private MapController mapController;
 
  	public int[] paintColors;
+
+	/**
+	 * If true, then when a new area is created, the previous ones will remain
+	 * TODO 3: (currently not used because there is no way in the interface to activate this)
+	 */
+	private boolean selectedAreaAddLock;
+	private SasDrawer sasDrawer;
 
 	public GpsTrailerOverlay(OsmMapGpsTrailerReviewerMapActivity activity,
 							   SuperThread superThread,
@@ -223,7 +231,7 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 
 				int minDepth = getMinDepth(localApStbox);
 
-				Log.d(GTG.TAG,"calc points for "+localApStbox+" minDepth "+minDepth);
+				//Log.d(GTG.TAG,"calc points for "+localApStbox+" minDepth "+minDepth);
 
 				TimeTree.hackTimesLookingUpTimeTrees = 0;
 
@@ -244,7 +252,7 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 				}
 
 
-				/* ttt_installer:remove_line */Log.d("GPS","times looking up time trees is "+TimeTree.hackTimesLookingUpTimeTrees);
+				///* ttt_installer:remove_line */Log.d("GPS","times looking up time trees is "+TimeTree.hackTimesLookingUpTimeTrees);
 
 				allLinesCalculated = calcLines(localApStbox, minDepth);
 
@@ -256,7 +264,7 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 				{
 					if(drawLines(localApStbox, minDepth))
 					{
-						/* ttt_installer:remove_line */Log.d("GPS", "setting all lines calculated false");
+						///* ttt_installer:remove_line */Log.d("GPS", "setting all lines calculated false");
 						allLinesCalculated = false;
 					}
 				}
@@ -664,7 +672,7 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 		//clearer, we do it anyway
 		GTG.cacheCreator.viewNodeThreadManager.registerReadingThread();
 
-		Log.d(GTG.TAG,"Drawing points for "+apStBox);
+//		Log.d(GTG.TAG,"Drawing points for "+apStBox);
 		try {
 			long time = System.currentTimeMillis();
 
@@ -690,7 +698,7 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 			mapData.beginChangeBlock();
 			mapData.clear();
 
-			//co:show top and bottom of view area
+			//co:hack to show top and bottom of view area
 //			LngLat tl = mapController.coordinatesAtScreenPosition(0,0);
 //			LngLat br = mapController.coordinatesAtScreenPosition(osmMapView.windowWidth,
 //					osmMapView.pointAreaHeight);
@@ -768,7 +776,7 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 				closestToCenterTimeSec = tt.calcTimeRangeCutEnd();
 			}
 
-			/* ttt_installer:remove_line */Log.d("GPS","drew "+pointCount+" pointCount");
+			///* ttt_installer:remove_line */Log.d("GPS","drew "+pointCount+" pointCount");
 
 			return pointCount;
 		}
@@ -846,14 +854,26 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 			{
 				viewUpToDate = false;
 
-				if(requestedStBox == null || requestedStBox.minZ != newStBox.minZ || requestedStBox.maxZ != newStBox.maxZ)
+				if(requestedStBox == null || requestedStBox.minZ != newStBox.minZ || requestedStBox.maxZ != newStBox.maxZ) {
+					//this sets up requestedStbBox to the current view
+					sas.setRequestedTime(newStBox.minZ, newStBox.maxZ);
+
 					distanceUpToDate = false;
+				}
 
 				requestedStBox = newStBox;
 
 				this.stNotify(this);
 			}
 		}
+	}
+
+	@Override
+	public boolean onTap(float x, float y) {
+//		if(handleTapForPhotos(x,y))
+//			return true;
+
+		return handleTapForSelectedArea(x,y);
 	}
 
 	public void notifyViewNodesChanged()
@@ -892,6 +912,7 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 	public void startTask(MapController mapController) {
 		this.mapController = mapController;
 		mapData = mapController.addDataLayer("gt_point");
+		sasDrawer = new SasDrawer(sas,mapController);
 		superThread.addTask(this);
 	}
 
@@ -909,7 +930,101 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 		sas.shutdown();
 	}
 
+	@Override
+	public boolean onLongPressEnd(float startX, float startY, float endX,
+								  float endY) {
+
+		getApUnitsFromPixels(p1, startX, startY);
+		getApUnitsFromPixels(p2, endX, endY);
+
+		if (p1.x > p2.x) {
+			int t = p2.x;
+			p2.x = p1.x;
+			p1.x = t;
+		}
+		if (p1.y > p2.y) {
+			int t = p2.y;
+			p2.y = p1.y;
+			p1.y = t;
+		}
+
+		Area a = new Area(p1.x, p1.y, p2.x, p2.y, getMinDepth(requestedStBox));
+
+		sas.addArea(a);
+
+		sasDrawer.resetToSas();
+
+		activity.notifySelectedAreasChanged(true);
+
+		return true;
+	}
+
+	private void getApUnitsFromPixels(Point p, float x, float y) {
+		//co; doesn't work when zoomed out all the way for some reason, x value is off
+		//requestedStBox.apUnitsToPixels();
+		LngLat l = Util.normalizeLngLat(mapController.coordinatesAtScreenPosition(x,y));
+		p.x = AreaPanel.convertLonToX(l.longitude);
+		p.y = AreaPanel.convertLatToY(l.latitude);
+	}
+
+	@Override
+	public boolean onLongPressMove(float startX, float startY, float endX,
+								   float endY) {
+		//if (!selectedAreaAddLock)
+			//PERF we only need to do this once
+			//sas.clearAreas();
+
+		int minDepth = getMinDepth(requestedStBox);
+
+		getApUnitsFromPixels(p1, startX, startY);
+		getApUnitsFromPixels(p2, endX, endY);
+
+		sasDrawer.setRectangle(p1.x, p1.y, p2.x, p2.y);
+		return true;
+	}
+
+
+	private boolean handleTapForSelectedArea(float x, float y) {
+		Point apUnitsPoint = new Point();
+
+		getApUnitsFromPixels(apUnitsPoint, x, y);
+
+		//align to a minDepth boundary for speed when sas computes time through area
+		int minDepth = getMinDepth(requestedStBox);
+
+		//compute radius in ap units
+		int radius = (int) (Util.convertDpToPixel(prefs.clickDefaultSelectedAreaDp, activity)
+				* requestedStBox.getWidth() / osmMapView.windowWidth / 2);
+
+		if (!selectedAreaAddLock)
+			sas.clearAreas();
+
+		//create an area, rounded to minDepth
+		Area a = new Area(apUnitsPoint.x - radius, apUnitsPoint.y - radius,
+				apUnitsPoint.x + radius, apUnitsPoint.y + radius, minDepth);
+
+		//make it a perfect square (since we may round in one axis but not another
+		if (a.y2 - a.y1 > a.x2 - a.x1)
+			a.x2 = a.x1 + (a.y2 - a.y1);
+		else
+			a.y2 = a.y1 + (a.x2 - a.x1);
+
+		//if they actually selected a point
+		if (GTG.cacheCreator.doViewNodesIntersect(a.x1, a.y1, a.x2, a.y2)) {
+			sas.addArea(a);
+			activity.notifySelectedAreasChanged(true);
+		} else if (!selectedAreaAddLock)
+			activity.notifySelectedAreasChanged(false);
+
+		sasDrawer.resetToSas();
+
+		return true;
+	}
+
 	public static class Preferences implements AndroidPreferenceSet.AndroidPreferences {
+
+		public float clickDefaultSelectedAreaDp = 30;
+
 		/**
 		 * Maximum time to calculate between redraws
 		 */

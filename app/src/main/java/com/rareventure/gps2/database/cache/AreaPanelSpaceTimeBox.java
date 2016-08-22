@@ -111,7 +111,17 @@ public class AreaPanelSpaceTimeBox extends AABB implements BoundedObject {
 		p.x = (int) (((long)x - minX) * width / getWidth()); 
 		p.y = (int) (((long)y - minY) * height / getHeight()); 
 	}
-	
+
+	/**
+	 * @deprecated TODO 4: PERF: doesn't seem to work when zoomed all the way out, the
+	 * longitude is wrong for some reason. Use MapController to get lng/lat
+	 * and convert that to apunits instead for now...
+	 * @param p
+	 * @param x
+	 * @param y
+	 * @param width
+     * @param height
+     */
 	public void pixelsToApUnits(Point p, int x, int y,
 			int width, int height) {
 		p.x = (int) (((long)x) * getWidth() / width + minX); 

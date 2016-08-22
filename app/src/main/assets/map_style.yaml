@@ -928,8 +928,19 @@ layers:
             points:
                 collide: false
                 size: function() { return feature.size; }
-                order: 10000
+                order: 1000
                 color: function() { return feature.color; }
+
+    # used for user to create a rectangular area to select multiple points
+    gt_selected_area_rect:
+        data: { source: gt_selected_area_rect }
+        draw:
+            sdk-line-overlay:
+            #dashedline:
+                color: '#000000'
+                order: 1001
+                width: 3px
+
 
     # Used by the SDK to place point, line, and polygon overlays on the map
     mz_default_point:

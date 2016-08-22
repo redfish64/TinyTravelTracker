@@ -21,6 +21,7 @@ package com.rareventure.gps2.reviewer.map.sas;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.ListIterator;
 import java.util.TimeZone;
 import java.util.TreeSet;
@@ -362,20 +363,6 @@ public class SelectedAreaSet extends Thread {
 	private int lastIndex;
 
 	private ArrayList<DataSetObserver> observers = new ArrayList<DataSetObserver>();
-
-	public void drawSelectedAreaSet(Canvas canvas,
-			AreaPanelSpaceTimeBox requestedStBox, Paint paint, int width,
-			int height) {
-
-		for (int i = requestedAreas.size() - 1; i >= 0; i--) {
-			Area a = requestedAreas.get(i);
-
-			requestedStBox.apUnitsToPixels(p1, a.x1, a.y1, width, height);
-			requestedStBox.apUnitsToPixels(p2, a.x2, a.y2, width, height);
-
-			canvas.drawRect(p1.x, p1.y, p2.x, p2.y, paint);
-		}
-	}
 
 	public void clearAreas() {
 		rwtm.registerWritingThread();
@@ -1345,4 +1332,7 @@ public class SelectedAreaSet extends Thread {
 				+ ", isResultTimeTree=" + isResultTimeTree + "]";
 	}
 
+	public List<Area> getRequestedAreas() {
+		return requestedAreas;
+	}
 }

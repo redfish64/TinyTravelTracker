@@ -33,4 +33,18 @@ public interface GpsOverlay {
 	void onResume();
 
 	void notifyScreenChanged(AreaPanelSpaceTimeBox newStBox);
+
+	boolean onTap(float x, float y);
+
+	/**
+	 * Long press is active and moving
+	 */
+	boolean onLongPressMove(float startX, float startY, float endX,
+							float endY);
+
+	/**
+	 * long press has ended
+	 */
+	boolean onLongPressEnd(float startX, float startY, float endX,
+						   float endY);
 }

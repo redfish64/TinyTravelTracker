@@ -1182,19 +1182,23 @@ GTGEventListener
 		if(osmMapView != null) {
 			osmMapView.onPause();
 
-			LngLat lp = osmMapView.getMapController().getPosition();
-			float lastZoom = osmMapView.getMapController().getZoom();
+			//sometimes on pause gets called when we're not fully started up
+			if(osmMapView.getMapController() != null) {
+				LngLat lp = osmMapView.getMapController().getPosition();
+				float lastZoom = osmMapView.getMapController().getZoom();
 
-			prefs.lastLat = lp.latitude;
-			prefs.lastLon = lp.longitude;
-			prefs.lastZoom = lastZoom;
+				prefs.lastLat = lp.latitude;
+				prefs.lastLon = lp.longitude;
+				prefs.lastZoom = lastZoom;
 
-			GTG.runBackgroundTask(new Runnable() {
+				GTG.runBackgroundTask(new Runnable() {
 
-				@Override
-				public void run() {
-					GTG.savePreferences(OsmMapGpsTrailerReviewerMapActivity.this);
-				}});
+					@Override
+					public void run() {
+						GTG.savePreferences(OsmMapGpsTrailerReviewerMapActivity.this);
+					}
+				});
+			}
 		}
 
 		if(GTG.cacheCreator != null)

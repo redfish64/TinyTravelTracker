@@ -27,6 +27,7 @@ import android.graphics.Paint;
 import android.graphics.PointF;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Vibrator;
 import android.util.AttributeSet;
 import android.util.Log;
 
@@ -114,15 +115,21 @@ public class OsmMapView extends MapView
 //			p.x = windowWidth;
 //			p.y = pointAreaHeight;
 //			LngLat p2 = mapController.screenPositionToLngLat(p);
-			LngLat p1 = mapController.coordinatesAtScreenPosition(0,0);
-			LngLat p2 = mapController.coordinatesAtScreenPosition(windowWidth, pointAreaHeight);
+
+			//we normalize because mapcontroller lovingly returns values outside of -180/180 longitude
+			//if user wraps world while scrolling
+			LngLat p1 = Util.normalizeLngLat(mapController.coordinatesAtScreenPosition(0,0));
+			LngLat p2 = Util.normalizeLngLat(mapController.coordinatesAtScreenPosition(windowWidth, pointAreaHeight));
 
 			synchronized (this) {
 				//update our internal representation of the screen
-				screenSize = new LngLat(p2.longitude - p1.longitude, p1.latitude - p2.latitude);
+				double lngSize = p2.longitude - p1.longitude;
 
-				normalizeLngLat(p1);
-				normalizeLngLat(p2);
+				//if we are crossing the -180/+180 border
+				if(lngSize < 0)
+					lngSize = 360 + lngSize;
+
+				screenSize = new LngLat(lngSize, p1.latitude - p2.latitude);
 
 				screenTopLeft = p1;
 				screenBottomRight = p2;
@@ -154,12 +161,6 @@ public class OsmMapView extends MapView
 				, 250);
 		}
 
-		private void normalizeLngLat(LngLat p1) {
-			if(p1.longitude < Util.MIN_LON || p1.longitude> Util.MAX_LON) {
-				int wraps = (int) Math.floor((p1.longitude - Util.MIN_LON) / Util.LON_PER_WORLD);
-				p1.longitude -= wraps * Util.LON_PER_WORLD;
-			}
-		}
 	};
 
 	//used to space out our checks for the map position
@@ -186,7 +187,7 @@ public class OsmMapView extends MapView
 	/**
 	 * Must be called after all addOverlay() calls
      */
-	public void init(final SuperThread fileCacheSuperThread, OsmMapGpsTrailerReviewerMapActivity activity)
+	public void init(final SuperThread fileCacheSuperThread, final OsmMapGpsTrailerReviewerMapActivity activity)
 	{
 
 		this.activity = activity;
@@ -197,13 +198,11 @@ public class OsmMapView extends MapView
 			public void onMapReady(final MapController mapController) {
 				OsmMapView.this.mapController = mapController;
 
-				//TODO 1.5 after things settle down a little bit, delete the original cache directory
-				//co: we don't want any user to upgrade, then realize it doesn't work, and have
-				//    to go back to the original one, and then have all their cache deleted.
-				//    so we'll do this next version after we get enough feedback.
-//				File oldCache = new File(GTG.getExternalStorageDirectory().toString()+"/tile_cache");
-//				if(oldCache.exists())
-//					Util.deleteRecursive(new File(GTG.getExternalStorageDirectory().toString()+"/tile_cache"));
+				//delete the old cache if it exists
+				//TODO 3: eventually remove this
+				File oldCache = new File(GTG.getExternalStorageDirectory().toString()+"/tile_cache");
+				if(oldCache.exists())
+					Util.deleteRecursive(new File(GTG.getExternalStorageDirectory().toString()+"/tile_cache"));
 				File cacheDir = new File(GTG.getExternalStorageDirectory().toString()+"/tile_cache2");
 
 				cacheDir.mkdirs();
@@ -240,6 +239,10 @@ public class OsmMapView extends MapView
 				mapController.setPanResponder(new TouchInput.PanResponder() {
 					@Override
 					public boolean onPan(float startX, float startY, float endX, float endY) {
+//						if(duringLongPress)
+//						{
+//							sasRectangleManager.updateRectangleEndPoint(endX, endY);
+//						}
 						Log.d(GTG.TAG,String.format("panning sx %f sy %f ex %f ey %f",startX, startY,
 								endX, endY));
 						mapController.queueEvent(notifyScreenChangeRunnable);
@@ -269,16 +272,52 @@ public class OsmMapView extends MapView
 				mapController.setTapResponder(new TouchInput.TapResponder() {
 					@Override
 					public boolean onSingleTapUp(float x, float y) {
-						Log.d(GTG.TAG, "requesting render!");
-						mapController.requestRender();
 						return false;
 					}
 
 					@Override
 					public boolean onSingleTapConfirmed(float x, float y) {
+						for(GpsOverlay overlay : overlays)
+						{
+							overlay.onTap(x,y);
+						}
 						return false;
 					}
 				});
+
+				mapController.setLongPressResponder(new TouchInput.LongPressResponder() {
+					public float startX;
+					public float startY;
+
+					public void onLongPress(float x, float y) {
+						// Get instance of Vibrator from current Context
+						Vibrator v = (Vibrator) activity.getSystemService(Context.VIBRATOR_SERVICE);
+
+						// Vibrate for a short time
+						v.vibrate(50);
+
+						startX = x;
+						startY = y;
+					}
+
+					@Override
+					public void onLongPressUp(float x, float y) {
+						for(GpsOverlay overlay : overlays)
+						{
+							overlay.onLongPressEnd(startX, startY, x,y);
+						}
+					}
+
+					@Override
+					public boolean onLongPressPan(float movementStartX, float movementStartY, float endX, float endY) {
+						for(GpsOverlay overlay : overlays)
+						{
+							overlay.onLongPressMove(startX, startY, endX,endY);
+						}
+						return false;
+					}
+				});
+
 
 				for(GpsOverlay o : overlays)
 					o.startTask(mapController);
@@ -423,8 +462,8 @@ public class OsmMapView extends MapView
 	public void panAndZoom(int minX, int minY, int maxX, int maxY) {
 		float currZoom = mapController.getZoom();
 
-		LngLat tl = mapController.coordinatesAtScreenPosition(0,0);
-		LngLat br = mapController.coordinatesAtScreenPosition(windowWidth,windowHeight);
+		LngLat tl = Util.normalizeLngLat(mapController.coordinatesAtScreenPosition(0,0));
+		LngLat br = Util.normalizeLngLat(mapController.coordinatesAtScreenPosition(windowWidth,windowHeight));
 
 		int fromMinX= AreaPanel.convertLonToX(tl.longitude);
 		int fromMinY = AreaPanel.convertLatToY(tl.latitude);

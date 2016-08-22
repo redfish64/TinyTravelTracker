@@ -1355,6 +1355,14 @@ public class GpsTrailerCacheCreator extends Thread {
 
 	}
 
+	/**
+	 *
+	 * @param x1
+	 * @param y1
+	 * @param x2
+	 * @param y2
+     * @return true if any current viewable nodes overlap the given rectangle of ap units
+     */
 	public boolean doViewNodesIntersect(int x1, int y1, int x2, int y2) {
 		GTG.cacheCreatorLock.registerReadingThread();
 		viewNodeThreadManager.registerReadingThread();

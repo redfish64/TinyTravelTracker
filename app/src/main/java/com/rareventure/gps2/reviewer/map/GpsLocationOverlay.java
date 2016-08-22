@@ -168,6 +168,21 @@ public class GpsLocationOverlay implements GpsOverlay, LocationListener
 	}
 
 	@Override
+	public boolean onTap(float x, float y) {
+		return false;
+	}
+
+	@Override
+	public boolean onLongPressMove(float startX, float startY, float endX, float endY) {
+		return false;
+	}
+
+	@Override
+	public boolean onLongPressEnd(float startX, float startY, float endX, float endY) {
+		return false;
+	}
+
+	@Override
 	public void onPause() {
 		lm.removeUpdates(this);
 	}
