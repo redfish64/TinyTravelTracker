@@ -24,7 +24,7 @@ It also is useful in situations where you don't have internet access. All map ti
 
 Changelog:
 
-V 1.1.12
+V 1.1.13
 
 * Fixed problem where selecting a item from the selected area set panel (used to view time periods of
 selected points) was not updating screen properly.
