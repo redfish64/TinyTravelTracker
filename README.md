@@ -26,7 +26,7 @@ Changelog:
 
 V 1.1.11
 
-* Selecting points and long pressing to select point areas works again
+* Selecting points and long pressing to select point areas works again (it was broken when moving to Mapzen)
 
 V 1.1.9
 
