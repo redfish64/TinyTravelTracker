@@ -62,6 +62,7 @@ You can contact me at engler@gmail.com
 Donations:
 
 Bitcoin: 19bit8J9VFY9DMGbcYNrH4PzkUPdS8Rx1f
+
 Patreon: https://www.patreon.com/redfish64
 
 
