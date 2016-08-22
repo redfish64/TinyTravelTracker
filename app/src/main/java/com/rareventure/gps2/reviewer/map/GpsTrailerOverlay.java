@@ -747,15 +747,14 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 				//the same time the point was recorded to choose a good timezone.
 				//(Otherwise figuring it out based on where the point is on the earth is rather
 				// complex)
-				//TODO 1.5 figure out how to do this
-//				float distSquared = Util.square(overlay.centerCrossHairs.centerX() - p.x) + Util.square(overlay.centerCrossHairs.centerY() - p.y);
-//
-//				if(distSquared < closestPointDistSquared)
-//				{
-//					closestToCenterEndTimeSec = vn.overlappingRange[1];
-//					closestToCenterAp = areaPanel;
-//					closestPointDistSquared = distSquared;
-//				}
+				float distSquared = Util.square(osmMapView.centerX - p.x) + Util.square(osmMapView.centerY - p.y);
+
+				if(distSquared < closestPointDistSquared)
+				{
+					closestToCenterEndTimeSec = vn.overlappingRange[1];
+					closestToCenterAp = areaPanel;
+					closestPointDistSquared = distSquared;
+				}
 
 			} //while examining pointCount
 
