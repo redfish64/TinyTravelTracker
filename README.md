@@ -16,8 +16,9 @@
     along with Tiny Travel Tracker.  If not, see <http://www.gnu.org/licenses/>.
 
 
-Note to users: If you have an issue you would like to see fixed, please click on the smiley on the right,
-and select thumbs up (or thumbs down). I'll use this information to decide what to work on next. Thanks
+_Note to users: If you have an issue you would like to see fixed, please click on the smiley on the right,
+and select thumbs up (or thumbs down). I'll use this information to decide what to work on next. Thanks_
+
 
 
 Tiny Travel Tracker could be described as a GPS journal. It's different from other GPS trackers because:
