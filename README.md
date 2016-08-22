@@ -41,6 +41,11 @@ It also is useful in situations where you don't have internet access. All map ti
 
 Changelog:
 
+V 1.1.12
+
+* Fixed problem where selecting a item from the selected area set panel (used to view time periods of
+selected points) was not updating screen properly.
+
 V 1.1.11
 
 * Selecting points and long pressing to select point areas works again

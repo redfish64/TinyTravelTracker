@@ -403,7 +403,8 @@ public class OsmMapView extends MapView
 	 * Redraws the map for a change of points displayed or screen
 	 */
 	public void redrawMap() {
-		mapController.queueEvent(notifyScreenChangeRunnable);
+		if(mapController != null)
+			mapController.queueEvent(notifyScreenChangeRunnable);
 	}
 
 	public LngLat getScreenTopLeft() {

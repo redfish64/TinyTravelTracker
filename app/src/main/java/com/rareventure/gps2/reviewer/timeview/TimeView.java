@@ -1175,6 +1175,10 @@ public class TimeView extends View {
 		
 		// redraw
 		invalidate();
+
+		if (listener != null) {
+			listener.notifyTimeViewChange();
+		}
 	}
 
 	public int getMinSelectableTimeSec() {
