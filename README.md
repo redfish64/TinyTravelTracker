@@ -1,9 +1,9 @@
-_Note to users: If you have an issue you would like to see fixed, please click on the smiley on the right on the issue screen,
-and select thumbs up (or thumbs down). I'll use this information to decide what to work on next. Thanks_
+Tiny Travel Tracker could be described as a GPS journal. 
 
+[<img src="https://f-droid.org/badge/get-it-on.png" alt="Get it on F-Droid" height="60">](https://f-droid.org/app/com.rareventure.gps2)
+<a href="https://play.google.com/store/apps/details?id=com.rareventure.gps2_premium"><img src="https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png" height="60"></a>
 
-
-Tiny Travel Tracker could be described as a GPS journal. It's different from other GPS trackers because:
+Tiny Travel Tracker It's different from other GPS trackers because:
 
 * It can be safely left on all the time. It keeps track of it's own battery usage to prevent excessive battery drain.
 * It can handle hundreds of thousands of points-- years with of data, all at once. No need to worry about trying to categorize and save it yourself. It's all there and always available.
@@ -21,6 +21,8 @@ It can find the answer to questions such as:
 * Where was that little shop I visited when I was wandering around Tokyo?
 
 It also is useful in situations where you don't have internet access. All map tiles previously viewed are cached on the phone, so even without internet, you can use the map as long as you've looked at previously viewed area. In addition, since the GPS points are stored on the phone, they are always present, regardless of internet availability.
+
+_Note to users: If you have an issue you would like to see fixed, please click on the smiley on the right on the issue screen, and select thumbs up (or thumbs down). I'll use this information to decide what to work on next. Thanks_
 
 Changelog:
 
@@ -46,19 +48,7 @@ V 1.06
 
 V 1.05
 
-Now uses less battery
-
-----
-
-To install:
-
-Go into home directory and type:
-
-perl other/ttt_install.pl -real /opt/android-sdk-update-manager `pwd` "Tiny Travel Tracker - Free" "Tiny Travel Tracker" com.rareventure.gps2_trial com.rareventure.gps2_premium trial
-
-You can see it here:
-
-https://play.google.com/store/apps/details?id=com.rareventure.gps2_trial
+* Now uses less battery
 
 ----
 
