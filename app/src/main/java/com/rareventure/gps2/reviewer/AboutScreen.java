@@ -29,6 +29,7 @@ import java.util.regex.Pattern;
 
 import com.rareventure.android.Crypt;
 import com.rareventure.android.Util;
+import com.rareventure.gps2.BuildConfig;
 import com.rareventure.gps2.GTG;
 import com.rareventure.gps2.GTGActivity;
 import com.rareventure.gps2.GpsTrailerCrypt;
@@ -49,7 +50,9 @@ public class AboutScreen extends GTGActivity {
 			{
 		Pattern.compile("\\$\\{aes_desc\\}"),
 		Pattern.compile("\\$\\{rsa_desc\\}"),
-		Pattern.compile("\\$\\{pbkdf2_desc\\}")
+		Pattern.compile("\\$\\{pbkdf2_desc\\}"),
+				Pattern.compile("\\$\\{version\\}"),
+					Pattern.compile("\\$\\{build\\}")
 			};
 	
 	@Override
@@ -61,7 +64,9 @@ public class AboutScreen extends GTGActivity {
 			{
 				Crypt.getEncryptDesc(),
 				Crypt.getAsymmetricEncryptionDesc(),
-				Crypt.getSecretKeyDesc()
+				Crypt.getSecretKeyDesc(),
+					BuildConfig.VERSION_NAME,
+					String.valueOf(BuildConfig.VERSION_CODE)
 			};
 		
 		try {
