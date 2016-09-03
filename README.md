@@ -26,6 +26,10 @@ _Note to users: If you have an issue you would like to see fixed, please click o
 
 Changelog:
 
+V 1.1.17
+
+* Now stores accuracy information and prints this out to GPX files as "hdop" (Issue #25)
+
 V 1.1.13
 
 * Fixed problem where selecting a item from the selected area set panel (used to view time periods of

@@ -35,9 +35,12 @@ public class GpsLocationRow extends EncryptedRow
 	public static final Column LATM = new Column("LATM",Integer.class);
 	public static final Column LONM = new Column("LONM",Integer.class);
 	public static final Column ALT = new Column("ALT",Double.class);
-	
+
+	//accuracy of reading. 0 indicates accuracy unknown
+	public static final Column ACCURACY = new Column("ACCURACY",Float.class);
+
 	public static final Column [] COLUMNS = new Column [] {
-		TIME, LATM, LONM, ALT
+		TIME, LATM, LONM, ALT, ACCURACY
 		
 	};
 	
@@ -53,7 +56,13 @@ public class GpsLocationRow extends EncryptedRow
 	
 	public static final TableInfo TABLE_INFO = new TableInfo(TABLE_NAME, COLUMNS, INSERT_STATEMENT, UPDATE_STATEMENT,
 			DELETE_STATEMENT);
-	
+
+	/**
+	 * Estimation of gps_hdop to accuracy value
+	 * TODO: use the actual nmea data rather than hardcode it
+	 */
+	public static final float GPS_HDOP_TO_ACCURACY = 5.f;
+
 	public GpsLocationRow()
 	{
 		super();
@@ -66,13 +75,14 @@ public class GpsLocationRow extends EncryptedRow
 	
 
 
-	public void setData(long time, int latm, int lonm, double alt) {
+	public void setData(long time, int latm, int lonm, double alt, float accuracy) {
 //		Log.d(GTG.TAG,"Creating gps location blob for id "+id);
 		data2 = new byte[DATA_LENGTH];
 		setLong(TIME.pos,time);
 		setInt(LATM.pos,latm);
 		setInt(LONM.pos,lonm);
 		setDouble(ALT.pos,alt);
+		setFloat(ACCURACY.pos,accuracy);
 	}
 
 	public long getTime() {
@@ -81,13 +91,14 @@ public class GpsLocationRow extends EncryptedRow
 
 	public String toString()
 	{
-		return String.format("GpsLocationRow(id=%d,timeMs=%20s,latm=%20d,lonm=%20d,timeSec=%d)"
+		return String.format("GpsLocationRow(id=%d,timeMs=%20s,latm=%20d,lonm=%20d,timeSec=%d,accuracy=%8.3f)"
 //				+",timeZone=%d)",
 				,id,
 				GTG.sdf.format(getLong(TIME)),
 				getInt(LATM),
 				getInt(LONM),
-				getLong(TIME)/1000
+				getLong(TIME)/1000,
+				getFloat(ACCURACY)
 //				,getByte(TIMEZONE)
 				);
 	}
@@ -98,8 +109,31 @@ public class GpsLocationRow extends EncryptedRow
 				getInt(LATM)-latm1, getInt(LONM) - lonm1);
 		
 	}
-	
-//	public long hackRandomize(Random r, long minTime, long startTime, int timeWalk, int mdWalk, int timePower, int mdWalkPower) {
+
+	@Override
+	public void decryptRow(int userDataKeyFk, byte[] encryptedData) {
+		super.decryptRow(userDataKeyFk, encryptedData);
+
+		//data made prior to android version 1.1.17 didn't include accuracy information, so we
+		//add it if it isn't present
+		if (data2.length < DATA_LENGTH) {
+			byte[] data2Copy = new byte[DATA_LENGTH];
+			System.arraycopy(data2, 0, data2Copy, 0, data2.length);
+			setFloat(ACCURACY.pos, 0.0f);
+			data2 = data2Copy;
+		} else {
+			float accuracy = getFloat(ACCURACY);
+			if (accuracy < 1f || accuracy > 1000000f) //TODO 3, for some reason the old gps rows without this columns would
+				//have extra data appended to them, so we have to check for a sane value rather
+				//than just looking for 0.0. On my phone at least, the value that the accuracy
+				//is set to is 0x8080808 which translates to a value near zero.
+				//Since this data isn't so important, and a fix would be somewhat difficult, I
+				//am just using this hack here.
+				setFloat(ACCURACY.pos, 0f);
+		}
+	}
+
+	//	public long hackRandomize(Random r, long minTime, long startTime, int timeWalk, int mdWalk, int timePower, int mdWalkPower) {
 //		while(true)
 //		{
 //			startTime += randomWalk(r,timeWalk, timePower);
@@ -160,4 +194,7 @@ public class GpsLocationRow extends EncryptedRow
 		return getDouble(ALT);
 	}
 
+	public float getAccuracy() {
+		return getFloat(ACCURACY);
+	}
 }

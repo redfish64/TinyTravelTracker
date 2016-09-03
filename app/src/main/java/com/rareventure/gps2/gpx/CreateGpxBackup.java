@@ -46,7 +46,6 @@ import com.rareventure.gps2.GpsTrailerCrypt;
 import com.rareventure.gps2.R;
 import com.rareventure.gps2.database.GpsLocationRow;
 import com.rareventure.gps2.database.TimeZoneTimeRow;
-import com.rareventure.gpx.GpxWriter;
 import com.rareventure.util.OutputStreamToInputStreamPipe;
 
 import de.idyl.winzipaes.AesZipFileEncrypter;
@@ -288,7 +287,8 @@ public class CreateGpxBackup extends ProgressDialogActivity {
 							tzToAdd = null;
 						
 						gis.addPoint(currGpsLocRow.getLatm()/1000000d, currGpsLocRow.getLonm()/1000000d,
-								currGpsLocRow.getAltitude(), currGpsLocRow.getTime(), tzToAdd);
+								currGpsLocRow.getAltitude(), currGpsLocRow.getTime(), tzToAdd,
+								currGpsLocRow.getAccuracy());
 						
 						if(curId % UPDATE_INCREMENT == 0)
 							super.updateProgress(0, total, curId);

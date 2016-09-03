@@ -63,12 +63,12 @@ public class GpsTrailerDataHandler
 		}
 	}
 	
-	public void processGpsData(int lonm, int latm, double alt, long time) {
+	public void processGpsData(int lonm, int latm, double alt, long time, float accuracy) {
 		GTG.initRwtm.registerReadingThread();
 		
 		GpsLocationRow lr = GTG.gpsLocCache.newRow();
 		
-		lr.setData(time, latm, lonm, alt);
+		lr.setData(time, latm, lonm, alt, accuracy);
 		
 		GTG.db.beginTransaction();
 		

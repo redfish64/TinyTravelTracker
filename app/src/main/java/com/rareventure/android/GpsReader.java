@@ -33,8 +33,6 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Looper;
-import android.os.SystemClock;
-import android.util.Log;
 
 public class GpsReader implements DataReader
 {
@@ -54,7 +52,8 @@ public class GpsReader implements DataReader
 			gpsDataBuffer.lon[gpsDataBuffer.rawReadIndex] = location.getLongitude();
 			gpsDataBuffer.alt[gpsDataBuffer.rawReadIndex] = location.getAltitude();
 			gpsDataBuffer.timeRead[gpsDataBuffer.rawReadIndex] = System.currentTimeMillis();
-				
+			gpsDataBuffer.accuracy[gpsDataBuffer.rawReadIndex] = location.getAccuracy();
+
 			synchronized(processThread.lock)
 			{
 				gpsDataBuffer.updateReadIndex();
@@ -92,7 +91,7 @@ public class GpsReader implements DataReader
 	
 	public interface GpsProcessor {
 
-		void processGpsData(double lon, double lat, double alt, long time);
+		void processGpsData(double lon, double lat, double alt, long time, float accuracy);
 	}
 
     public GpsReader(DataOutputStream os, Context ctx, 
@@ -108,7 +107,6 @@ public class GpsReader implements DataReader
     	this.looper = looper;
     	
     	//TODO 3.2: handle multile levels of accuracy
-    	//basically read from every gps system available
         lm = (LocationManager) ctx.getSystemService(Context.LOCATION_SERVICE);
         
         Criteria criteria = new Criteria();
@@ -141,7 +139,8 @@ public class GpsReader implements DataReader
 		gpsProcessor.processGpsData(gpsDataBuffer.lon[gpsDataBuffer.rawProcessIndex],
 				gpsDataBuffer.lat[gpsDataBuffer.rawProcessIndex],
 				gpsDataBuffer.alt[gpsDataBuffer.rawProcessIndex],
-				gpsDataBuffer.timeRead[gpsDataBuffer.rawProcessIndex]);
+				gpsDataBuffer.timeRead[gpsDataBuffer.rawProcessIndex],
+				gpsDataBuffer.accuracy[gpsDataBuffer.rawProcessIndex]);
 		
 		if(os != null)
 			writeTestData();
