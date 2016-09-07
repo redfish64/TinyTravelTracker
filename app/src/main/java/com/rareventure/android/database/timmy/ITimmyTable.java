@@ -27,6 +27,7 @@ import com.rareventure.util.ReadWriteThreadManager;
 public interface ITimmyTable {
 
 	boolean isTableCorrupt();
+	void setTableCorrupt();
 
 	boolean commitTransactionStage2(ReadWriteThreadManager rwtm) throws IOException;
 

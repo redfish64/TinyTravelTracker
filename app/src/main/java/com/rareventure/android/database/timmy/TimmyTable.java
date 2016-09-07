@@ -174,8 +174,7 @@ public class TimmyTable implements ITimmyTable {
 	/**
 	 * Within a transaction, all inserts must be done in sequential order
 	 * @param id
-	 * @param encryptRowWithEncodedUserDataKey
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	//threadsafe since it doesn't touch map
 	public void insertRecord(int id, byte[] record) throws IOException {
@@ -474,7 +473,7 @@ public class TimmyTable implements ITimmyTable {
 			try {
 				if(((long)id) * recordSize + HEADER_SIZE >= rwRaf.length() || id < 0)
 				{
-					setTableCorrupt(true);
+					setTableCorrupt();
 					throw new IllegalStateException("record out of bounds for "+this+". table marked corrupt, got "+id);
 				}
 				
@@ -505,10 +504,10 @@ public class TimmyTable implements ITimmyTable {
 		
 		return result;
 	}
-	
+
 	//threadsafe, called from synchronized block
-	private void setTableCorrupt(boolean isTableCorrupt) {
-		this.isTableCorrupt = isTableCorrupt;
+	public void setTableCorrupt() {
+		this.isTableCorrupt = true;
 		try {
 			rwRaf.seek(IS_CORRUPTED_FIELD_POS);
 			rwRaf.write(1);

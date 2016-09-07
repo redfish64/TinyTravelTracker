@@ -47,6 +47,7 @@ import com.rareventure.android.DbUtil;
 import com.rareventure.android.Util;
 import com.rareventure.android.database.DbDatastoreAccessor;
 import com.rareventure.android.database.timmy.TimmyDatastoreAccessor;
+import com.rareventure.gps2.CacheException;
 import com.rareventure.gps2.GTG;
 import com.rareventure.gps2.GTG.GTGEvent;
 import com.rareventure.gps2.database.TimeZoneTimeRow;
@@ -552,7 +553,7 @@ public class MediaLocTimeMap {
 				}
 				else if(mltId == i) { mltIndex++; }
 				else 
-					throw new IllegalStateException("why two mlts have same id? "+result.get(mltIndex)+result.get(mltIndex-1));
+					throw new CacheException("why two mlts have same id? "+result.get(mltIndex)+result.get(mltIndex-1));
 			}
 		}
 		
@@ -628,9 +629,9 @@ public class MediaLocTimeMap {
 		}
 		
 		if(prevAp.getDepth() != 0)
-			throw new IllegalStateException("prevAp depth... it's wrong! "+prevAp);
+			throw new CacheException("prevAp depth... it's wrong! "+prevAp);
 		if(nextAp.getDepth() != 0)
-			throw new IllegalStateException("nextAp depth... it's wrong! "+nextAp);
+			throw new CacheException("nextAp depth... it's wrong! "+nextAp);
 		
 		
 		//there is a slight chance that a picture was taken at the exact second that 

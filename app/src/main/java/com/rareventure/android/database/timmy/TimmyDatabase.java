@@ -104,7 +104,17 @@ public class TimmyDatabase {
 	{
 		return Integer.parseInt(propertyMap.getFirst(VERSION_KEYWORD));
 	}
-	
+
+	/**
+	 * Marks the database as corrupt. Useful if something has gone horribly wrong and
+	 * the application can recover somehow.
+	 */
+	public void setCorrupt()
+	{
+		for(ITimmyTable tt: this.tables) {
+			tt.setTableCorrupt();
+		}
+	}
 	public boolean isCorrupt()
 	{
 //		if(2==2) return false; //xODO 2 hack!!

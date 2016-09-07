@@ -31,6 +31,7 @@ import android.util.Log;
 import com.rareventure.android.AndroidPreferenceSet.AndroidPreferences;
 import com.rareventure.android.DbUtil;
 import com.rareventure.android.Util;
+import com.rareventure.gps2.CacheException;
 import com.rareventure.gps2.GTG;
 import com.rareventure.gps2.GTG.GTGEvent;
 import com.rareventure.gps2.GpsTrailerCrypt;
@@ -260,7 +261,7 @@ public class GpsTrailerCacheCreator extends Thread {
 				//note that there should always be an encompassing child because startTime is taken from a time range
 				//which means that we have already determined that this time is within some ap somewhere
 				if (bestCurrLevelChildTt == null)
-					throw new IllegalStateException(
+					throw new CacheException(
 							"Couldn't find a child ap encompassing time "
 									+ startTime);
 

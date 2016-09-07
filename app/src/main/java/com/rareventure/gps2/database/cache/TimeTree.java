@@ -26,6 +26,7 @@ import android.util.Log;
 import com.rareventure.android.Util;
 import com.rareventure.android.database.Cache;
 import com.rareventure.android.encryption.EncryptedRow;
+import com.rareventure.gps2.CacheException;
 import com.rareventure.gps2.GTG;
 import com.rareventure.gps2.database.TAssert;
 import com.rareventure.gps2.database.cachecreator.ViewNode;
@@ -143,7 +144,7 @@ public class TimeTree extends EncryptedRow
 			if(timeSecs >= getMaxTimeSecs())
 				return getMaxTimeSecs() - 1;
 			else if (timeSecs < getMinTimeSecs())
-				throw new IllegalStateException("asked for latest previous but we are completely after time, "
+				throw new CacheException("asked for latest previous but we are completely after time, "
 					+timeSecs+", this is "+this);
 		}
 		else
@@ -151,7 +152,7 @@ public class TimeTree extends EncryptedRow
 			if(timeSecs < getMinTimeSecs())
 				return getMinTimeSecs();
 			else if (timeSecs >= getMaxTimeSecs())
-				throw new IllegalStateException("asked for earliest next but we are completely before time, "
+				throw new CacheException("asked for earliest next but we are completely before time, "
 					+timeSecs+", this is "+this);
 		}
 		
@@ -174,7 +175,7 @@ public class TimeTree extends EncryptedRow
 				if(latestPreviousOrEarliestNext)
 				{
 					if(i == 0)
-						throw new IllegalStateException("first child isn't aligned with parent," +
+						throw new CacheException("first child isn't aligned with parent," +
 								" this is "+this+", subTT is "+subTT);
 					return lastEndTime;
 				}
@@ -188,7 +189,7 @@ public class TimeTree extends EncryptedRow
 			lastEndTime = subTT.getMaxTimeSecs();
 		}
 
-		throw new IllegalStateException("last child isn't aligned with parent," +
+		throw new CacheException("last child isn't aligned with parent," +
 				" this is "+this+", subTT is "+getSubNode(NUM_NODES-1));
 		
 	}
@@ -338,7 +339,7 @@ public class TimeTree extends EncryptedRow
 	private TimeTree addTimeTree(TimeTree tt)
 	{
 		if(tt.getMinTimeSecs() < this.getMaxTimeSecs())
-			throw new IllegalStateException("trying to add a tt that is before the end of this one, this: "+this+", tt is "+tt);
+			throw new CacheException("trying to add a tt that is before the end of this one, this: "+this+", tt is "+tt);
 		
 		//since we're always adding to the end of the tree,
 		//we always follow the same pattern, so that all kids have equal depth in the long run
@@ -844,7 +845,7 @@ public class TimeTree extends EncryptedRow
 			}
 					
 			if(i == NUM_NODES)
-				throw new IllegalStateException("Child tt's don't extend to parent t "+tt+" " + tt.getSubNode(i-1));
+				throw new CacheException("Child tt's don't extend to parent t "+tt+" " + tt.getSubNode(i-1));
 		}
 	}
 
@@ -887,7 +888,7 @@ public class TimeTree extends EncryptedRow
 			}
 					
 			if(i == NUM_NODES)
-				throw new IllegalStateException("Child tt's don't extend to parent t "+tt+" " + tt.getSubNode(i-1));
+				throw new CacheException("Child tt's don't extend to parent t "+tt+" " + tt.getSubNode(i-1));
 		}
 	}
 
@@ -937,7 +938,7 @@ public class TimeTree extends EncryptedRow
 			}
 			
 			if(i < 0)
-				throw new IllegalStateException("Child tt's don't extend to parent t " + tt+" "+ tt.getSubNode(i+1));
+				throw new CacheException("Child tt's don't extend to parent t " + tt+" "+ tt.getSubNode(i+1));
 		}
 	}
 
@@ -1010,7 +1011,7 @@ public class TimeTree extends EncryptedRow
 			}
 					
 			if(i == -1)
-				throw new IllegalStateException("Child tt doesn't start at parent t "+tt+" " + tt.getSubNode(0));
+				throw new CacheException("Child tt doesn't start at parent t "+tt+" " + tt.getSubNode(0));
 		}
 	}
 

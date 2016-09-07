@@ -33,6 +33,7 @@ import android.graphics.Point;
 import android.os.Looper;
 
 import com.rareventure.android.Util;
+import com.rareventure.gps2.CacheException;
 import com.rareventure.gps2.GTG;
 import com.rareventure.gps2.database.TimeZoneTimeRow;
 import com.rareventure.gps2.database.cache.AreaPanel;
@@ -1006,7 +1007,8 @@ public class SelectedAreaSet extends Thread {
 							}
 
 							if (nextTTChildIndex == TimeTree.NUM_NODES) {
-								throw new IllegalStateException(
+								throw new CacheException(
+
 										"Couldn't find last tt sibling? "
 												+ lastSiblingTtFk + ": "
 												+ tt.getSubNodeFk(0) + ", "
@@ -1280,7 +1282,7 @@ public class SelectedAreaSet extends Thread {
 			int endTimeSec = Math.min(tr.endTimeSec, requestedEndTimeSec);
 			
 			if(startTimeSec > endTimeSec)
-				throw new IllegalStateException("Why tr out of range? "+this+" tr: "+tr);
+				throw new CacheException("Why tr out of range? "+this+" tr: "+tr);
 			
 			totalTime += endTimeSec - startTimeSec;
 		}

@@ -442,7 +442,7 @@ public class RollBackTimmyTable implements ITimmyTable {
 			
 			if(id > committedNextRowId)
 			{
-				setTableCorrupt(true);
+				setTableCorrupt();
 				throw new IllegalStateException("rollback log attempted to write to a row not in committed set,"
 						+" row id requested: "+id+", this: "+this);
 			}
@@ -613,7 +613,7 @@ public class RollBackTimmyTable implements ITimmyTable {
 			if(c == 0 && recordBoundary)
 				return false;
 			
-			setTableCorrupt(true);
+			setTableCorrupt();
 			throw new IllegalStateException("database corrupted on rollback, got "+c+" bytes, expected "+recordSize+
 					", bytes: "+Arrays.toString(buf));
 		}
@@ -632,7 +632,7 @@ public class RollBackTimmyTable implements ITimmyTable {
 		
 		if (!Arrays.equals(ROLLBACK_MAGIC, magicBuffer))
 		{
-			setTableCorrupt(true);
+			setTableCorrupt();
 			throw new IOException("Bad magic for rollback file of timmy table " + this
 					+ ", got " + Arrays.toString(magicBuffer));
 		}
@@ -652,7 +652,7 @@ public class RollBackTimmyTable implements ITimmyTable {
 			try {
 				if(((long)id) * recordSize + HEADER_SIZE >= rwRaf.length() || id < 0)
 				{
-					setTableCorrupt(true);
+					setTableCorrupt();
 					throw new IllegalStateException("record out of bounds for "+this+". table marked corrupt, got "+id);
 				}
 				
@@ -663,11 +663,11 @@ public class RollBackTimmyTable implements ITimmyTable {
 			catch(IOException e)
 			{
 				try {
-					setTableCorrupt(true);
+					setTableCorrupt();
 					throw new IllegalStateException("id is "+id+" recordSize is "+recordSize+" pos is "+
 							(id * recordSize)+", rwRaf.limit is "+rwRaf.length(), e);
 				} catch (IOException e1) {
-					setTableCorrupt(true);
+					setTableCorrupt();
 					throw new IllegalStateException("id is "+id+" recordSize is "+recordSize+" pos is "+
 							(id * recordSize)+", can't read rwRaf.limit", e);
 				}
@@ -683,8 +683,8 @@ public class RollBackTimmyTable implements ITimmyTable {
 	}
 	
 	//threadsafe, called from synchronized block
-	private void setTableCorrupt(boolean isTableCorrupt) {
-		this.isTableCorrupt = isTableCorrupt;
+	public void setTableCorrupt() {
+		this.isTableCorrupt = true;
 		try {
 			rwRaf.seek(IS_CORRUPTED_FIELD_POS);
 			rwRaf.write(1);

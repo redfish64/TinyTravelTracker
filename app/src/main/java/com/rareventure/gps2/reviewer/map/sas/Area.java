@@ -24,6 +24,7 @@ import java.util.TreeSet;
 
 import android.util.Log;
 
+import com.rareventure.gps2.CacheException;
 import com.rareventure.gps2.GTG;
 import com.rareventure.gps2.database.cache.AreaPanel;
 import com.rareventure.gps2.database.cache.AreaPanelCache;
@@ -122,7 +123,7 @@ public class Area {
 				apiList.add(new AreaPanelInfo(index, ap.id));
 				lastSiblingApId = parentPath.remove(parentPath.size() - 1);
 			} else if (ap.getDepth() < minDepth) {
-				throw new IllegalStateException(
+				throw new CacheException(
 						"since we are rounding the area, all min depth ap's should be encompassed, got "+ap);
 			} else { // go to children
 				int nextChildIndex = lastSiblingApId == -1 ? 0 : ap
@@ -177,7 +178,7 @@ public class Area {
 
 		public TimeTree tt() {
 			if(currTtId == -1)
-				throw new IllegalStateException("-1 tt: "+this);
+				throw new CacheException("-1 tt: "+this);
 			return GTG.ttCache.getRow(currTtId);
 		}
 
@@ -207,11 +208,11 @@ public class Area {
 		@Override
 		public int compareTo(AreaPanelInfo another) {
 			if (another.currTtStartTime == Integer.MAX_VALUE)
-				throw new IllegalStateException(
+				throw new CacheException(
 						"other area panel info is dead and shouldn't be compared "
 								+ another);
 			if (currTtStartTime == Integer.MAX_VALUE)
-				throw new IllegalStateException(
+				throw new CacheException(
 						"area panel info is dead and shouldn't be compared "
 								+ this);
 

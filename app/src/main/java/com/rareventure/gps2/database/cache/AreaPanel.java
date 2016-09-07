@@ -27,6 +27,7 @@ import android.util.Log;
 import com.rareventure.android.Util;
 import com.rareventure.android.database.Cache;
 import com.rareventure.android.encryption.EncryptedRow;
+import com.rareventure.gps2.CacheException;
 import com.rareventure.gps2.GTG;
 import com.rareventure.gps2.database.TAssert;
 import com.rareventure.gps2.database.cache.TimeTree.IntersectsTimeStatus;
@@ -361,7 +362,7 @@ public class AreaPanel extends EncryptedRow {
 				{
 					subPrevAp = prevAp.getSubAreaPanel(prevX, prevY);
 					if(subPrevAp == null)
-						throw new IllegalStateException("What? why is there a prevAp but not a subPrevAp? "+prevAp+" prevX "+prevX+" prevY "+prevY);
+						throw new CacheException("What? why is there a prevAp but not a subPrevAp? "+prevAp+" prevX "+prevX+" prevY "+prevY);
 				}
 				
 				childAreaPanel.addPoint(id, prevAp == null ? null : subPrevAp,
@@ -688,7 +689,7 @@ public class AreaPanel extends EncryptedRow {
 
 	public int getMaxX() {
 		if(getDepth() >= DEPTH_TO_WIDTH.length || getDepth() < 0)
-			throw new IllegalStateException("bad depth "+getDepth()+" dtow is "+DEPTH_TO_WIDTH.length);
+			throw new CacheException("bad depth "+getDepth()+" dtow is "+DEPTH_TO_WIDTH.length);
 		return getX() + DEPTH_TO_WIDTH[getDepth()];
 	}
 	
@@ -815,7 +816,7 @@ public class AreaPanel extends EncryptedRow {
 				} //for each candidate
 				
 				if(bestAp == null)
-					throw new IllegalStateException("no good candidates?");
+					throw new CacheException("no good candidates?");
 			} //if there is more than one candidate
 			else
 			{
@@ -937,7 +938,7 @@ public class AreaPanel extends EncryptedRow {
 			}
 			
 			if(i == -1)
-				throw new IllegalStateException("Parent contains time, but child does not");
+				throw new CacheException("Parent contains time, but child does not");
 		}
 	}
 
