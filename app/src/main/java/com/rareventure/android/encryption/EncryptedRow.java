@@ -19,6 +19,8 @@
 */
 package com.rareventure.android.encryption;
 
+import android.util.Log;
+
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.security.SecureRandom;
@@ -186,7 +188,14 @@ public abstract class EncryptedRow extends CachableRow {
 		if(data2 == null || data2.length < dataLength)
 			data2 = new byte [dataLength];
 		
-		c.crypt.decryptData(data2, encryptedData);
+	   try {
+			   c.crypt.decryptData(data2, encryptedData);
+	   }
+	   catch(Exception e)
+	   {
+			   Log.e(GTG.TAG,"Decryption failed for row "+this.id,e);
+			   Log.e(GTG.TAG,"... row is "+this.toString(),e);
+	   }
 	}
 
 	

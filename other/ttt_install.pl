@@ -76,6 +76,12 @@ run("cp -r $proj_dir/gradle $temp_dir/gradle");
 system("cp $proj_dir/app/* $temp_dir/app");
 system("cp $proj_dir/* $temp_dir/");
 
+my ($version_name,$version_code) = read_from_file("$temp_dir/app/src/main/AndroidManifest.xml",
+						  'android:versionName="(.*?)"',
+						  'android:versionCode="(.*?)"'
+    );
+
+print "VERSION IS $version_name, $version_code\n";
 
 
 my @rv_src_files = (get_files("$temp_dir/app/src/main/java/com/rareventure","*.java"),
@@ -101,6 +107,12 @@ replace_in_files(["$temp_dir/app/src/main/AndroidManifest.xml"], ['package=".*?"
 		 #everything must be fully qualified "com.rareventure.gps.<class>
 		 ['name="\.', undef ],  #undef means to die
 		 ['android:icon="\@drawable\/.*?"', 'android:icon="\@drawable\/icon_${pt}"']
+    );
+
+replace_in_files(["$temp_dir/app/src/main/java/com/rareventure/gps2/reviewer/AboutScreen.java"],
+		 ['BuildConfig\.VERSION_NAME',"\"$version_name\""],
+		 ['BuildConfig\.VERSION_CODE',$version_code],
+		 ['import com.rareventure.gps2.BuildConfig;','']
     );
 
 #<application android:icon="@drawable/icon" android:label="
@@ -262,3 +274,29 @@ sub obsfucate
 	     map { $v = ($v ^ ord($_) ^ $s ^ 42); } (split //, $arg))." })";
 }
 
+
+sub read_from_file
+{
+    my ($file,@regexps) = @_;
+
+    my @out;
+
+    open(IN,$file) || die "Couldn't open $file for reading";
+
+    my $l;
+
+    while($l = <IN>)
+    {
+	for(my $i = 0; $i < @regexps; $i++)
+	{
+	    my $regexp = $regexps[$i];
+
+	    if($l =~ m/$regexp/)
+	    {
+		$out[$i] = $1;
+	    }
+	}
+    }
+
+    return @out;
+}
