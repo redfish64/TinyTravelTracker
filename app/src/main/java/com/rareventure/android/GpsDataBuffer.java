@@ -26,15 +26,13 @@ public class GpsDataBuffer extends DataBuffer
 	public double[] lat;
 	public double[] lon;
 	public double[] alt;
-	public float[] accuracy;
-
+	
 	public GpsDataBuffer(int size)
 	{
 		super(size);
 		lat = new double[size];
 		lon = new double[size];
 		alt = new double[size];
-		accuracy = new float[size];
 	}
 
 

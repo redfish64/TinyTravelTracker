@@ -92,10 +92,10 @@ public class GpsTrailerManager implements GpsReader.GpsProcessor, WirelessAdapte
 	}
 
 	@Override
-	public void processGpsData(double lon, double lat, double alt, long time, float accuracy)
+	public void processGpsData(double lon, double lat, double alt, long time) 
 	{
 		strategy.gotReading();
-		dataHandler.processGpsData((int)Math.round(lon*1000000), (int)Math.round(lat*1000000), alt, time, accuracy);
+		dataHandler.processGpsData((int)Math.round(lon*1000000), (int)Math.round(lat*1000000), alt, time);
 		
 		
 		//notify the cache creator that we got another point

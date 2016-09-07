@@ -25,7 +25,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
 import java.util.TimeZone;
+import java.util.TreeSet;
 import java.util.regex.Pattern;
 import java.util.zip.DataFormatException;
 import java.util.zip.ZipEntry;
@@ -52,15 +54,18 @@ import com.lamerman.SelectionMode;
 import com.rareventure.android.DbUtil;
 import com.rareventure.android.ProgressDialogActivity;
 import com.rareventure.android.database.DbDatastoreAccessor;
+import com.rareventure.android.database.timmy.TimmyDatabase;
 import com.rareventure.gps2.GTG;
 import com.rareventure.gps2.GpsTrailerDb;
 import com.rareventure.gps2.GpsTrailerDbProvider;
 import com.rareventure.gps2.GpsTrailerService;
 import com.rareventure.gps2.R;
+import com.rareventure.gps2.GTG.Requirement;
 import com.rareventure.gps2.database.GpsLocationRow;
 import com.rareventure.gps2.database.TimeZoneTimeRow;
 import com.rareventure.gps2.gpx.RestoreGpxBackup.ValidateAndRestoreGpxBackupTask.TaskList;
 import com.rareventure.gps2.reviewer.PasswordDialogFragment;
+import com.rareventure.gps2.reviewer.SettingsActivity;
 import com.rareventure.util.ByteCounterInputStream;
 
 import de.idyl.winzipaes.AesZipFileDecrypter;
@@ -544,12 +549,11 @@ public class RestoreGpxBackup extends ProgressDialogActivity {
 				}
 				
 				@Override
-				public void readTrkPt(double lon, double lat, double elevation, long timeMs,
-									  TimeZone tz, float hdop) {
+				public void readTrkPt(double lon, double lat, double elevation, long timeMs, 
+						java.util.TimeZone tz) {
 					if(GpxReader.isValidLocation(lon, lat) && timeMs > lastMs)
 					{
-						gpr.setData(timeMs, (int)(lat*1000000), (int)(lon*1000000), elevation,
-								hdop*GpsLocationRow.GPS_HDOP_TO_ACCURACY);
+						gpr.setData(timeMs, (int)(lat*1000000), (int)(lon*1000000), elevation);
 						gpr.id = currIndex;
 						
 						da.insertRow(gpr);
