@@ -17,7 +17,7 @@
     along with Tiny Travel Tracker.  If not, see <http://www.gnu.org/licenses/>.
 
 */
-package com.rareventure.gps2.gpx;
+package com.rareventure.gpx;
 
 import java.util.Locale;
 import java.util.TimeZone;
@@ -26,7 +26,6 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
-import com.rareventure.gps2.database.GpsLocationRow;
 import com.rareventure.gps2.database.TimeZoneTimeRow;
 import com.rareventure.gps2.gpx.GpxReader;
 import com.rareventure.util.OutputStreamToInputStreamPipe;
@@ -98,34 +97,21 @@ public class GpxWriter
         ISODateTimeFormat.dateTime().withZone(DateTimeZone.UTC);
 
 	
-	public void addPoint(double lat, double lon, double alt, long time, TimeZoneTimeRow tz, float accuracy)
+	public void addPoint(double lat, double lon, double alt, long time, TimeZoneTimeRow tz)
 	{
 		String timeStr = XML_DATE_TIME_FORMAT.print(time);
-
-		//note that we need tos et the locale to english when we format floats, or for other countries
-		//sometimes a "," is used rather than a "." for the decimal point, which is illegal in the
-		//gpx format
-
-		StringBuffer trackData=
-				new StringBuffer(
-				String.format(Locale.ENGLISH,
-						"\t\t\t\t<ele>%f</ele>\n"+
-						"\t\t\t\t<time>%s</time>\n",alt,timeStr));
-
-		if(accuracy != 0f)
-			trackData.append(String.format(Locale.ENGLISH,"\t\t\t\t<hdop>%f</hdop>\n",accuracy
-					/ GpsLocationRow.GPS_HDOP_TO_ACCURACY));
-
-		if(tz != null)
-			//in some cases we don't know the time zone (if we restored and the input data didn't have it)
-			//and in this case we want to show the users current timezone, so we set it as unknown
-			trackData.append(
-					"\t\t\t\t<extensions><rareventure:"+GpxReader.TAG_NEW_TIME_ZONE+" id=\""+(tz.getTimeZone() == null ? "UNKNOWN" : tz.getTimeZone().getID())+"\" />" +
-						"</extensions>\n");
-
+		
 		write(String.format(Locale.ENGLISH,"\t\t\t<trkpt lat=\"%f\" lon=\"%f\" >\n"+
-				"%s"+
-				"\t\t\t</trkpt>\n", lat, lon, trackData));
+				"\t\t\t\t<ele>%f</ele>\n"+
+				"\t\t\t\t<time>%s</time>\n"+
+				(tz == null ? "" :
+
+					"\t\t\t\t<extensions><rareventure:"+GpxReader.TAG_NEW_TIME_ZONE+" id=\""+(tz.getTimeZone() == null ? "UNKNOWN" : tz.getTimeZone().getID())+"\" />" +
+							"</extensions>\n")+
+				"\t\t\t</trkpt>\n", lat, lon, alt, timeStr
+				//in some cases we don't know the time zone (if we restored and the input data didn't have it)
+				//and in this case we want to show the users current timezone, so we set it as unknown
+				));
 	}
 
 	public void endSegment() {

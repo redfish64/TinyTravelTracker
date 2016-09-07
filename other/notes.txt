@@ -2019,19 +2019,3 @@ The script scripts/travis/script_deploy_android_snapshot.sh seems to build what 
 But it clones https://github.com/mapzen/android-config.git and calls
 "gradle uploadArchives" at the end.
 
-
----
-
-Adding extra data to gpslocation.
-
-The problem is that gpslocation is an encrypted table, so we just have a blob. So we can't just
-upgrade the database and add some extra columns. There might be a better way, though.
-
-It seems as if we can just add the columns, and as long as we take care when reading the old data,
-we'll be fine.
-
-The next issue is that to test this, we'll want to be able to go back to the original data quickly,
-so we need to be able to backup the gps data.
-
-We should be able to just backup the database, and the timmy tables, but... it'd be better to
-wipe out and reinstall the whole thing and see if we can get it back.

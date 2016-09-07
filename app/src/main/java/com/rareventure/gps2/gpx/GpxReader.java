@@ -54,6 +54,8 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import com.rareventure.android.Util;
 
+import android.location.Location;
+
 /**
  * Imports GPX file to My Tracks.
  */
@@ -71,7 +73,6 @@ public class GpxReader extends DefaultHandler {
 	private static final String TAG_TRACK_POINT = "trkpt";
 	private static final String TAG_TRACK_SEGMENT = "trkseg";
 	private static final String TAG_GPX = "gpx";
-	private static final String TAG_HDOP = "hdop"; //accuracy / 5.
 
 	private static final String ATT_LAT = "lat";
 	private static final String ATT_LON = "lon";
@@ -87,15 +88,16 @@ public class GpxReader extends DefaultHandler {
 		public void readTrkSeg();
 
 		/**
-		 *  @param lon
+		 * 
+		 * @param lon
 		 * @param lat
 		 * @param elevation
 		 * @param timeMs
 		 * @param tz local timezone associated with gps point. If null, it means
-		 * @param hdop
+		 *   that timezone is unknown
 		 */
 		public void readTrkPt(double lon, double lat, double elevation,
-							  long timeMs, TimeZone tz, float hdop);
+				long timeMs, TimeZone tz);
 	}
 
 	private GpxReaderCallback grc;
@@ -107,7 +109,6 @@ public class GpxReader extends DefaultHandler {
 	private double latitudeValue;
 	private double longitudeValue;
 	private double elevation;
-	private float hdop;
 
 	private long timeMs;
 
@@ -195,8 +196,6 @@ public class GpxReader extends DefaultHandler {
 			onTrackPointElementEnd();
 		} else if (localName.equals(TAG_ALTITUDE)) {
 			onAltitudeElementEnd();
-		} else if (localName.equals(TAG_HDOP)) {
-			onHdopElementEnd();
 		} else if (localName.equals(TAG_EXTENSIONS)) {
 			onExtensionsElementEnd();
 		} else if (localName.equals(TAG_NEW_TIME_ZONE)) {
@@ -293,10 +292,6 @@ public class GpxReader extends DefaultHandler {
 					createErrorMessage("Unable to parse latitude/longitude: "
 							+ latitude + "/" + longitude), e);
 		}
-
-		//hdop is optional, so we set a default value so we don't copy the previous
-		//hdop value
-		hdop = 0.f;
 	}
 
 	private void onNewTimeZoneElementStart(Attributes attributes)
@@ -331,7 +326,7 @@ public class GpxReader extends DefaultHandler {
 	 * On track point element end.
 	 */
 	private void onTrackPointElementEnd() throws SAXException {
-		grc.readTrkPt(longitudeValue, latitudeValue, elevation, timeMs, tz,hdop);
+		grc.readTrkPt(longitudeValue, latitudeValue, elevation, timeMs, tz);
 	}
 
 	/**
@@ -347,16 +342,12 @@ public class GpxReader extends DefaultHandler {
 		}
 	}
 
-	private void onHdopElementEnd() throws SAXException {
-		try {
-			hdop = Float.parseFloat(content);
-		} catch (NumberFormatException e) {
-			throw new SAXException(
-					createErrorMessage("Unable to parse altitude: " + content),
-					e);
-		}
-	}
-
+	/**
+	 * On time element end. Sets location time and doing additional calculations
+	 * as this is the last value required for the location. Also sets the start
+	 * time for the trip statistics builder as there is no start time in the
+	 * track root element.
+	 */
 	private void onTimeElementEnd() throws SAXException {
 		// Parse the time
 		try {

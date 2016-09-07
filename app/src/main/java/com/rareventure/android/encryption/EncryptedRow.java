@@ -19,8 +19,6 @@
 */
 package com.rareventure.android.encryption;
 
-import android.util.Log;
-
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.security.SecureRandom;
@@ -34,7 +32,7 @@ import com.rareventure.gps2.GpsTrailerCrypt;
 public abstract class EncryptedRow extends CachableRow {
 
 	/**
-	 * Amount of extra data to add to the array when inserting an int (or other things, I guess)
+	 * Amout of extra data to add to the array when inserting an int (or other things, I guess)
 	 */
 	private static final int EXTRA_DATA_TO_ADD_AT_A_TIME = 8 * (Integer.SIZE>>3);
 
@@ -181,21 +179,14 @@ public abstract class EncryptedRow extends CachableRow {
 	}
 	
 	
-	public void decryptRow(int userDataKeyFk, byte [] encryptedData) {
+	public final void decryptRow(int userDataKeyFk, byte [] encryptedData) {
 		GpsTrailerCrypt c = GpsTrailerCrypt.instance(userDataKeyFk);
 		
 		int dataLength = c.getDecryptedSize(encryptedData.length);
 		if(data2 == null || data2.length < dataLength)
 			data2 = new byte [dataLength];
-
-		try {
-			c.crypt.decryptData(data2, encryptedData);
-		}
-		catch(Exception e)
-		{
-			Log.e(GTG.TAG,"Decryption failed for row "+this.id,e);
-			Log.e(GTG.TAG,"... row is "+this.toString(),e);
-		}
+		
+		c.crypt.decryptData(data2, encryptedData);
 	}
 
 	
