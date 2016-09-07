@@ -26,6 +26,17 @@ _Note to users: If you have an issue you would like to see fixed, please click o
 
 Changelog:
 
+V 1.1.20
+
+* Reverted code from 1.1.17, which was failing to store points and corrupting the cache 
+  in some cases. Added new code which will mark the cache corrupt if an error occurs that 
+  indicates this might be the case, so that the next time the application starts it will
+  automatically regenerate it.
+
+V 1.1.17
+
+* Now stores accuracy information and prints this out to GPX files as "hdop" (Issue #25)
+
 V 1.1.13
 
 * Fixed problem where selecting a item from the selected area set panel (used to view time periods of
