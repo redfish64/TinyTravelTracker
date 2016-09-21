@@ -26,6 +26,11 @@ _Note to users: If you have an issue you would like to see fixed, please click o
 
 Changelog:
 
+V 1.1.21
+
+* Hopefully fixed issue #50, cpu was never allowed to sleep. Added option to log to a separate file 
+  when cpu is kept on under settings.
+
 V 1.1.20
 
 * Reverted code from 1.1.17, which was failing to store points and corrupting the cache 
