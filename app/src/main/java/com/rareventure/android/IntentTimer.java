@@ -22,9 +22,11 @@ package com.rareventure.android;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.util.Date;
 
 import com.rareventure.gps2.GTG;
+import com.rareventure.gps2.R;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -47,7 +49,7 @@ public class IntentTimer {
 
 	private WakeLock wakeLock;
 	
-//	private BufferedWriter debugOut;
+	private BufferedWriter debugOut;
 	
 	/**
 	 * 
@@ -63,13 +65,16 @@ public class IntentTimer {
         PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
         wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK , 
         		"rareventure intent timer");
-        
-//        try {
-//			debugOut = new BufferedWriter(new FileWriter("/sdcard/wake_lock_debug.txt", true));
-//			writeDebug("IntentTimer constructor");
-//		} catch (IOException e) {
-//			Log.e(GTG.TAG, "Couldn't out wake lock debug file",e);
-//		}
+
+		if(GTG.prefs.writeGpsWakeLockDebug) {
+			try {
+				debugOut = new BufferedWriter(new FileWriter(context.getString(R.string.gps_wake_lock_filename), true));
+				writeDebug("IntentTimer constructor");
+			} catch (IOException e) {
+				Log.e(GTG.TAG, "Couldn't out wake lock debug file", e);
+			}
+		}
+
 	}
 	
 	/**
@@ -80,60 +85,58 @@ public class IntentTimer {
 	 * 
 	 * @param timeToWake time this all goes down
 	 */
-	public void sleepUntil(long timeToWake)
+	public synchronized void sleepUntil(long timeToWake)
 	{
-//		writeDebug("sleep until "+new Date(timeToWake));
-//		if(wakeLock.isHeld())
-//		{
-//			writeDebug("releasing wake lock for sleep");
-//			wakeLock.release();
-//		}
+		writeDebug("sleep until "+new Date(timeToWake));
+		if(wakeLock.isHeld())
+		{
+			writeDebug("releasing wake lock for sleep");
+			wakeLock.release();
+		}
 		
         alarmManager.set(AlarmManager.RTC_WAKEUP, timeToWake, sender);
 	}	
 	
-	public void cancel()
+	public synchronized void cancel()
 	{
-//		writeDebug("cancel");
+		writeDebug("cancel");
         alarmManager.cancel(sender);
 	}
 
 	/**
 	 * Acquire a lock on the cpu to stay awake
 	 */
-	public void acquireWakeLock() {
-//		writeDebug("trying to acquire wake lock");
+	public synchronized void acquireWakeLock() {
 		if(!wakeLock.isHeld())
 		{
-//			try {
-//				writeDebug("acquiring wake lock");
-//				debugOut.flush();
-//			} catch (IOException e) {
-//				Log.e(GTG.TAG, "Couldn't out wake lock debug file",e);
-//			}
+			writeDebug("acquiring wake lock");
 			wakeLock.acquire();
 		}
+//		else
+//			writeDebug("acquireWakeLock() wake lock already held");
 	}
 
-	public void releaseWakeLock() {
-//		writeDebug("wake lock release called");
+	public synchronized void releaseWakeLock() {
 		if(wakeLock.isHeld())
 		{
-//			writeDebug("releasing wake lock");
+			writeDebug("releasing wake lock");
 			wakeLock.release();
 		}
+//		else
+//			writeDebug("releaseWakeLock(), wake lock already released");
 	}
 
-//	public synchronized void writeDebug(String string) {
-//		try {
-//		/* ttt_installer:remove_line */Log.i("IntentTimer", string);
-//			debugOut.write(new Date().toString()+" ");
-//			debugOut.write(string);
-//			debugOut.write("\n");
-//			debugOut.flush();
-//		} catch (IOException e) {
-//			Log.e(GTG.TAG, "Couldn't out wake lock debug file",e);
-//		}
-//	}
+	public synchronized void writeDebug(String string) {
+		if(GTG.prefs.writeGpsWakeLockDebug && debugOut != null)
+		try {
+		/* ttt_installer:remove_line */Log.i("IntentTimer", string);
+			debugOut.write(new Date().toString()+" ");
+			debugOut.write(string);
+			debugOut.write("\n");
+			debugOut.flush();
+		} catch (IOException e) {
+			Log.e(GTG.TAG, "Couldn't write to wake lock debug file",e);
+		}
+	}
 
 }

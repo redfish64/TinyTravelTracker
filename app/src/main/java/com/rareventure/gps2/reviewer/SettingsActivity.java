@@ -28,6 +28,7 @@ import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
+import android.preference.PreferenceCategory;
 import android.preference.PreferenceScreen;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -109,6 +110,7 @@ public class SettingsActivity extends GTGPreferenceActivity implements OnPrefere
 					15 * 60 * 1000,
 					30 * 60 * 1000,
 					60 * 60 * 1000};
+	private CheckBoxPreference writeGpsWakeLockDebugFile;
 
 
 	@Override
@@ -239,6 +241,20 @@ public class SettingsActivity extends GTGPreferenceActivity implements OnPrefere
         aboutPref.setOnPreferenceClickListener(this);
         aboutPref.setTitle(R.string.about);
         root.addPreference(aboutPref);
+
+		PreferenceCategory advancedCategory = new PreferenceCategory(this);
+		advancedCategory.setTitle("Advanced");
+		root.addPreference(advancedCategory);
+
+		writeGpsWakeLockDebugFile = new CheckBoxPreference(this);
+		writeGpsWakeLockDebugFile.setTitle(R.string.write_to_gps_wake_lock_log);
+		writeGpsWakeLockDebugFile.setSummary(
+				String.format(getString(R.string.write_to_gps_wake_lock_log_summary),
+						getString(R.string.gps_wake_lock_filename)));
+		writeGpsWakeLockDebugFile.setChecked(GTG.prefs.writeGpsWakeLockDebug);
+		writeGpsWakeLockDebugFile.setOnPreferenceClickListener(this);
+
+		advancedCategory.addPreference(writeGpsWakeLockDebugFile);
     }
     
 
@@ -428,6 +444,11 @@ public class SettingsActivity extends GTGPreferenceActivity implements OnPrefere
 		else if(preference == isCollectData)
 		{
 			GTG.prefs.isCollectData = isCollectData.isChecked();
+			GTG.runBackgroundTask(SAVE_PREFS_AND_RESTART_COLLECTOR);
+		}
+		else if(preference == writeGpsWakeLockDebugFile)
+		{
+			GTG.prefs.writeGpsWakeLockDebug = writeGpsWakeLockDebugFile.isChecked();
 			GTG.runBackgroundTask(SAVE_PREFS_AND_RESTART_COLLECTOR);
 		}
 		else if(preference == createBackupFilePref)

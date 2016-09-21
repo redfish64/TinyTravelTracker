@@ -742,6 +742,8 @@ public class GTG {
 					GTG.prefs.useMetric);
 			res.put(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.GTG.Preferences.passwordTimeoutMS",
 					GTG.prefs.passwordTimeoutMS);
+			res.put(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.GTG.Preferences.writeGpsWakeLockDebug",
+					GTG.prefs.writeGpsWakeLockDebug);
 
 			res.put(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.reviewer.map.OsmMapGpsTrailerReviewerMapActivity.Preferences.lastLon",
 					OsmMapGpsTrailerReviewerMapActivity.prefs.lastLon);
@@ -795,6 +797,8 @@ public class GTG {
 				GTG.prefs.useMetric = Boolean.parseBoolean(value);
 			else if(name.equals(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.GTG.Preferences.passwordTimeoutMS"))
 				GTG.prefs.passwordTimeoutMS = Long.parseLong(value);
+			else if(name.equals(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.GTG.Preferences.writeGpsWakeLockDebug"))
+				GTG.prefs.writeGpsWakeLockDebug = Boolean.parseBoolean(value);
 
 			else if(name.equals(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.reviewer.map.OsmMapGpsTrailerReviewerMapActivity.Preferences.lastLon"))
 				OsmMapGpsTrailerReviewerMapActivity.prefs.lastLon = Double.parseDouble(value);
@@ -1302,6 +1306,11 @@ public class GTG {
 		 * not inside the app
 		 */
 		public long passwordTimeoutMS;
+
+		/**
+		 * If true will write to the gps wake lock debug file
+		 */
+		public boolean writeGpsWakeLockDebug = false;
 	}
 	
 	public static int COMPASS_DATA_XOR = -1016932754;

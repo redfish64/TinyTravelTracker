@@ -354,7 +354,7 @@ public class GpsTrailerGpsStrategy {
 								//phone, it may not work for other phones, so to be sure, we
 								//keep the cpu on
 								//co: tim trying this off to see what happen
-//								if(!wantGps)
+								if(!wantGps)
 								{
 									intentTimer.sleepUntil(nextSignificantEvent);
 									/* ttt_installer:remove_line */Log.d(GTG.TAG,"Turned off wake lock");
@@ -362,7 +362,8 @@ public class GpsTrailerGpsStrategy {
 
 								if(isShutdownRequested)
 									return;
-								
+
+								time = System.currentTimeMillis();
 								GpsTrailerGpsStrategy.this.wait(nextSignificantEvent - time );
 								time = System.currentTimeMillis();
 								
@@ -393,9 +394,9 @@ public class GpsTrailerGpsStrategy {
 						}
 						/* ttt_installer:remove_line */Log.d(GTG.TAG,"Looping while not shutdown");
 						
-					}
+					} //while running
 					
-					/* ttt_installer:remove_line */Log.d(GTG.TAG,"Gps Strateg is shutdown");
+					/* ttt_installer:remove_line */Log.d(GTG.TAG,"Gps Strategy is shutdown");
 				} catch (Exception e)
 				{
 					e.printStackTrace();
@@ -438,7 +439,7 @@ public class GpsTrailerGpsStrategy {
 //			
 		};
 
-	} // end class GpsBatteryMeter
+	} // end class GpsBatteryManager
 	
 	public static class Preferences implements AndroidPreferences
 	{
