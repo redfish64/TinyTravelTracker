@@ -53,7 +53,7 @@ public class IntentTimer {
 	
 	/**
 	 * 
-	 * @param component class type can either be a BroadcastReceiver, a Service, or an Activity
+	 * @param componentClass class type can either be a BroadcastReceiver, a Service, or an Activity
 	 */
 	public IntentTimer(Context context, Class<?> componentClass) {
 		Intent intent = new Intent(context, componentClass);
@@ -137,6 +137,7 @@ public class IntentTimer {
 		} catch (IOException e) {
 			Log.e(GTG.TAG, "Couldn't write to wake lock debug file",e);
 		}
+		Log.d(GTG.TAG,string);
 	}
 
 }

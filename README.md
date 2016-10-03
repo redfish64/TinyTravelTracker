@@ -26,9 +26,17 @@ _Note to users: If you have an issue you would like to see fixed, please click o
 
 Changelog:
 
+V 1.1.22
+
+* Found and fixed another old bug releated to #50. The amount of time to be allocated to the gps wasn't being
+calculated properly. This would manifest itself under the following conditions:
+
+  TTT has been running for a long time uninterrupted
+  A GPS signal was not able to be found, or only sporadically.
+
 V 1.1.21
 
-* Hopefully fixed issue #50, cpu was never allowed to sleep. Added option to log to a separate file 
+* Hopefully fixed issue #50, cpu was never allowed to sleep. Added option to log to a separate file
   when cpu is kept on under settings.
 
 V 1.1.20

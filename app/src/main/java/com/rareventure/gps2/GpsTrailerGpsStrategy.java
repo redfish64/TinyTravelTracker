@@ -125,7 +125,6 @@ public class GpsTrailerGpsStrategy {
 	
 	/**
 	 * Notify that the user has started moving
-	 * @param startTime 
 	 */
 	public void moving() {
 		boolean callUpdate = false;
@@ -179,8 +178,8 @@ public class GpsTrailerGpsStrategy {
 				TestUtil.writeLong("shortTimeWanted", os, this.desireManager.shortTimeWanted);
 				Log.d(GTG.TAG, "gps use perc is "+prefs.batteryGpsOnTimePercentage );
 			} catch (IOException e) {
-	//			e.printStackTrace();
-				throw new IllegalStateException(e);
+				e.printStackTrace();
+//				throw new IllegalStateException(e);
 			} 
 		}
 	}
@@ -223,6 +222,9 @@ public class GpsTrailerGpsStrategy {
 		private boolean gpsOn;
 		
 		/**
+		 * This looks at the current stats and determines whether to turn gps on or
+		 * leave it off.
+		 *
 		 * This method must be called from the strategy thread only (to prevent
 		 * deadlocks). If you want to update, synchronize notify the strategy thread
 		 * @param currTimeMs currentTime
@@ -234,33 +236,34 @@ public class GpsTrailerGpsStrategy {
 			//first lets update the stats so far
 			if(gpsOn)
 			{
-				//find out how long the gps has been running since we last checked
+				//increment how long the gps has been running since we last checked
 				long startTime = lastGpsStatsUpdate >  gpsAttemptStartedMs ? lastGpsStatsUpdate : 
 					gpsAttemptStartedMs;
 				totalTimeGpsRunningMs += currTimeMs - startTime;
 			}
-			
-			//we don't want to allow too much gps time. This is to prevent wasting the battery needlessly if we 
+
+			//total time available for running gps, subtracting time already spent
+			long gpsTimeAvailable = calcFreeGpsTimeMs(currTimeMs);
+
+			//we don't want to allow too much gps time. This is to prevent wasting the battery needlessly if we
 			// had a stroke of luck and we're able to get the gps time very easily
 			//Were basically truncating the amount of time we have allocated to use gps
-			if((currTimeMs - startTimeMs) * prefs.batteryGpsOnTimePercentage - totalTimeGpsRunningMs >
-				prefs.maxGpsTimeMs)
+			if(gpsTimeAvailable > prefs.maxGpsTimeMs)
 			{
-				//set it so we have prefs.maxGpsTimeMs of time left to allocate
+				//fudge the stats so we have at most prefs.maxGpsTimeMs of time left to allocate
+				//TODO 3 maybe we shouldn't be fudging this value.
 				totalTimeGpsRunningMs = (long)((currTimeMs - startTimeMs) * prefs.batteryGpsOnTimePercentage) 
 				- prefs.maxGpsTimeMs + 1;
+				gpsTimeAvailable = prefs.maxGpsTimeMs;
 			}
-			
-			//now lets see what we need to do
-			//the output of this is wantedGpsStatus (although we do exit in the following code block
-			//if there is nothing to do)
-			long gpsTimeAvailable = calcFreeGpsTimeMs(currTimeMs);
 			
 			if(gpsOn)
 			{
 				long currentTimeGpsRunning = currTimeMs - gpsAttemptStartedMs;
 				
-				//we want to turn gps off (because we were unsuccessful)
+				//if the desiremanager is satisfied, we successfully read a gps point, or
+				//the absolute time left to perform a gps reading is used up,
+				// we turn the gps off
 				if(currentTimeGpsRunning >= desireManager.currTimeWanted || gpsTimeAvailable <= 0 || lastReadingSuccessful)
 				{
 					gpsAttemptEndedMs = currTimeMs;
@@ -292,10 +295,24 @@ public class GpsTrailerGpsStrategy {
 				{
 					//we want to turn it on
 					gpsAttemptStartedMs = currTimeMs;
-					nextSignificantEvent = desireManager.currTimeWanted + currTimeMs;
+
+					long timeToLeaveGpsOn = desireManager.currTimeWanted;
+
+					if(desireManager.currTimeWanted > gpsTimeAvailable)
+					{
+						//TODO 3 this is a hack to print a warning out to the wake lock debug file
+						// I should probably have just a general file for extended log messages
+						intentTimer.writeDebug("WARNING: gps desire manager has asked for more than allowed time,"
+								+" gpsTimeAvailable: "+gpsTimeAvailable
+								+", desireManager.currTimeWanted: "+desireManager.currTimeWanted);
+						timeToLeaveGpsOn = gpsTimeAvailable;
+					}
+
+					nextSignificantEvent = timeToLeaveGpsOn + currTimeMs;
 					
 					gpsAttempts++;
-					
+
+
 					return true;
 				}
 				else
@@ -308,16 +325,21 @@ public class GpsTrailerGpsStrategy {
 			}
 		} //end GpsBatteryMeter.update()
 
+		/**
+		 * Returns total time that is allowed to be allocated to gps, given the time we
+		 * have already spent
+		 * @param currTimeMs
+         * @return
+         */
 		public long calcFreeGpsTimeMs(long currTimeMs) {
-			return (long) (prefs.batteryGpsOnTimePercentage 
-					* (currTimeMs - startTimeMs));
+			return (long) ((currTimeMs - startTimeMs) * prefs.batteryGpsOnTimePercentage -
+					totalTimeGpsRunningMs);
 			}
 
 		public void start() {
 			desireManager.updateDesiresForStart();
 			
 			//we start with a 5 minute leeway so the code can turn on gps right away, rather than waiting
-			//TODO 3: compute this better (later -- I'm not sure what this means???)
 			gpsAttemptEndedMs = startTimeMs = System.currentTimeMillis() - prefs.extraTimeForStartMs;
 			strategyThread.start();
 
@@ -486,9 +508,15 @@ public class GpsTrailerGpsStrategy {
 		public long initialLongTimeWanted = 2 * 60 * 1000;
 
 		/**
-		 * One to one ratio between short time and spare time multiplier
+		 * This describes the amount of extra time to save when we take a short gps readings.
+		 * Basically, we have a bank of gps time, and when we run a short gps reading, we subtract
+		 * from that bank.
+		 * <p>So, everytime we run a short gps reading, we set the wait time longer than would be
+		 * required to save so we can do a long reading</p>
+		 * <p>This multiplied by the current short time gps is the time we target to save
+		 * when we lengthen the wait time.</p>
 		 */
-		public float spareTimeMultiplier = 1f;
+		public float extraWaitTimeShortTimeMultiplier = 1f;
 
 		/**
 		 * Multiplier to reduce short time after a successful gps reading
@@ -545,7 +573,7 @@ public class GpsTrailerGpsStrategy {
 		/**
 		 * Extra time for when we start so we turn on gps right away
 		 */
-		public long extraTimeForStartMs = (long) (initialShortTimeWantedMs * (this.spareTimeMultiplier + 1) / batteryGpsOnTimePercentage) + 1;
+		public long extraTimeForStartMs = (long) (initialShortTimeWantedMs * (this.extraWaitTimeShortTimeMultiplier + 1) / batteryGpsOnTimePercentage) + 1;
 
 	}
 
@@ -591,7 +619,13 @@ public class GpsTrailerGpsStrategy {
 			currTimeWanted = shortTimeWanted;
 			waitTimeMs = 0;
 		}
-		
+
+		/**
+		 * Updates what this strategy wants to do next given
+		 * that the last gps reading was successful
+		 *
+		 * @param readingTimeMs it took to read from the GPS
+		 */
 		private void updateDesiresForSuccessfulReading(long readingTimeMs)
 		{
 			//if the reading time is less than the current short time
@@ -603,26 +637,39 @@ public class GpsTrailerGpsStrategy {
 				 / prefs.shortTimeUnsuccessfulMultipler)+1 ;
 				if(shortTimeWanted < prefs.shortTimeMinMs)
 					shortTimeWanted = prefs.shortTimeMinMs;
+
+				//if it took x seconds to read the gps last time, we don't want to reduce
+				//the gps reader to take less than x seconds this time.
 				if(shortTimeWanted < readingTimeMs * prefs.minReadingTimeMultipler)
 					shortTimeWanted = (long) (readingTimeMs * prefs.minReadingTimeMultipler)+1;
 			}
-			
+
+			//reset long time wanted back to the minimum whenever we get a reading
 			longTimeWanted = (long) (prefs.minLongTimeOfShortTimeMultiplier * shortTimeWanted) + 1;
 			
-			waitTimeMs = calculateAbsTimeNeeded((long) (shortTimeWanted * prefs.spareTimeMultiplier + shortTimeWanted)+1);
+			waitTimeMs = calculateAbsTimeNeeded((long) (shortTimeWanted * prefs.extraWaitTimeShortTimeMultiplier + shortTimeWanted)+1);
 			currTimeWanted = shortTimeWanted;
 		}
 	
 		/**
 		 * Updates what this strategy wants to do next given
 		 * that the last gps reading was unsuccessful
+		 *
+		 * @param spareReadingTime the amount of time we are allowed to read from the gps.
+		 *                         Ex. if the user has the gps on set to 10%, TTT has been
+		 *                         running for 100 minutes, we've turned on GPS for 5 minutes
+		 *                         already, then we have 100 * .10 - 5 = 5 minutes allowed to
+		 *                         read from the gps.
 		 */
 		private void updateDesiresForUnsuccessfulReading(long spareReadingTime) {
-			long totalShortTimeMs = (long) (shortTimeWanted * prefs.spareTimeMultiplier + shortTimeWanted)+1;
-			waitTimeMs = calculateAbsTimeNeeded(totalShortTimeMs);
+			//we need to budget our time for gps so we can run short runs periodically, and
+			//if enough time has passed, then do a long run
+
+			long totalWantedGpsTimeMs = (long) (shortTimeWanted * prefs.extraWaitTimeShortTimeMultiplier + shortTimeWanted)+1;
+			waitTimeMs = calculateAbsTimeNeeded(totalWantedGpsTimeMs);
 			
 			//if there is enough time to do a long run
-			if(totalShortTimeMs + spareReadingTime >= longTimeWanted)
+			if(totalWantedGpsTimeMs + spareReadingTime >= longTimeWanted)
 			{
 				currTimeWanted = longTimeWanted;
 				
