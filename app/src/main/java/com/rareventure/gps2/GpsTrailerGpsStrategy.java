@@ -22,6 +22,7 @@ package com.rareventure.gps2;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import android.os.SystemClock;
 import android.util.Log;
 
 import com.rareventure.android.GpsReader;
@@ -70,9 +71,7 @@ public class GpsTrailerGpsStrategy {
 
 	
 	/**
-	 * 
-	 * TODO 3: the following is a little bizarre
-	 * @param gpsReader Turns gps reader on and off, but does not read directly from it!
+	 * @param gpsReader Turns gps reader on and off, but does not read directly from it
 	 */
 	public GpsTrailerGpsStrategy(DataOutputStream os, GpsReader gpsReader, IntentTimer intentTimer)
 	{
@@ -147,11 +146,12 @@ public class GpsTrailerGpsStrategy {
 	{
 		synchronized(this)
 		{
-			gpsBatteryManager.lastGpsReadingMs = System.currentTimeMillis();
+			gpsBatteryManager.lastGpsReadingFromBootMs = SystemClock.elapsedRealtime();
 			
 			gpsBatteryManager.lastReadingSuccessful = true;
 			this.notify();
 			successfulGpsAttempts++;
+			intentTimer.writeDebug("Got reading");
 		}
 	}
 	
@@ -160,18 +160,18 @@ public class GpsTrailerGpsStrategy {
 		synchronized(TestUtil.class)
 		{
 			try {
-				long time = System.currentTimeMillis();
+				long timeSincePhoneBoot = SystemClock.elapsedRealtime();
 				TestUtil.writeMode(os, WriteConstants.MODE_WRITE_STRATEGY_STATUS);
 				TestUtil.writeBoolean("gpsOn", os, this.gpsBatteryManager.gpsOn);
-				TestUtil.writeTime("gpsAttemptStartedMs", os, this.gpsBatteryManager.gpsAttemptStartedMs);
-				TestUtil.writeTime("gpsAttemptEndedMs", os, this.gpsBatteryManager.gpsAttemptEndedMs);
-				TestUtil.writeTime("lastGpsReadingMs", os, this.gpsBatteryManager.lastGpsReadingMs);
-				TestUtil.writeTime("lastGpsStatsUpdate", os, this.gpsBatteryManager.lastGpsStatsUpdate);
-				TestUtil.writeLong("nextSignificantEventTime", os, this.nextSignificantEvent - time);
-				TestUtil.writeLong("freeGpsTimeMs", os, this.gpsBatteryManager.calcFreeGpsTimeMs(time));
+				TestUtil.writeTime("gpsAttemptStartedFromPhoneBootMs", os, this.gpsBatteryManager.gpsAttemptStartedFromPhoneBootMs);
+				TestUtil.writeTime("gpsAttemptEndedFromPhoneBootMs", os, this.gpsBatteryManager.gpsAttemptEndedFromPhoneBootMs);
+				TestUtil.writeTime("lastGpsReadingFromBootMs", os, this.gpsBatteryManager.lastGpsReadingFromBootMs);
+				TestUtil.writeTime("lastGpsStatsUpdateFromPhoneBootMs", os, this.gpsBatteryManager.lastGpsStatsUpdateFromPhoneBootMs);
+				TestUtil.writeLong("nextSignificantEventTime", os, this.nextSignificantEvent - timeSincePhoneBoot);
+				TestUtil.writeLong("freeGpsTimeMs", os, this.gpsBatteryManager.calcFreeGpsTimeMs(timeSincePhoneBoot));
 				TestUtil.writeLong("totalTimeGpsRunningMs", os, this.gpsBatteryManager.totalTimeGpsRunningMs);
-				TestUtil.writeLong("totalTimeNotRunningGpsMs", os, time 
-						- this.gpsBatteryManager.startTimeMs - this.gpsBatteryManager.totalTimeGpsRunningMs);
+				TestUtil.writeLong("totalTimeNotRunningGpsMs", os, timeSincePhoneBoot
+						- this.gpsBatteryManager.startTimeFromPhoneBootMs - this.gpsBatteryManager.totalTimeGpsRunningMs);
 				TestUtil.writeLong("totalSuccessfulGpsTries", os, successfulGpsAttempts);
 				TestUtil.writeLong("totalGpsTries", os, gpsAttempts);
 				TestUtil.writeLong("longTimeWanted", os, this.desireManager.longTimeWanted);
@@ -192,27 +192,27 @@ public class GpsTrailerGpsStrategy {
 		 * The time we started the program in general. NOTE: this number is fudged a little
 		 * to faciliate starting gps right away
 		 */
-		private long startTimeMs;
+		private long startTimeFromPhoneBootMs;
 		
 		/**
 		 * Last time we updated the gps stats
 		 */
-		private long lastGpsStatsUpdate;
+		private long lastGpsStatsUpdateFromPhoneBootMs;
 		
 		/**
 		 * The start of the last gps session (see also gpsOn)
 		 */
-		private long gpsAttemptStartedMs;
+		private long gpsAttemptStartedFromPhoneBootMs;
 		
 		/**
 		 * The end of the last gps session (see also gpsOn)
 		 */
-		private long gpsAttemptEndedMs;
+		private long gpsAttemptEndedFromPhoneBootMs;
 		
 		/**
 		 * The last time a successful gps reading was taken.
 		 */
-		private long lastGpsReadingMs;
+		private long lastGpsReadingFromBootMs;
 
 		/**
 		 * Total time gps has been running since we started
@@ -227,23 +227,23 @@ public class GpsTrailerGpsStrategy {
 		 *
 		 * This method must be called from the strategy thread only (to prevent
 		 * deadlocks). If you want to update, synchronize notify the strategy thread
-		 * @param currTimeMs currentTime
+		 * @param currTimeFromPhoneBootMs currentTime
 		 * 
 		 * @return whether to turn gps on or not (which must be turned on or off in 
 		 *  a non synchronized block
 		 */
-		protected boolean updateFromStrategyThreadOnly(long currTimeMs) {
+		protected boolean updateFromStrategyThreadOnly(long currTimeFromPhoneBootMs) {
 			//first lets update the stats so far
 			if(gpsOn)
 			{
 				//increment how long the gps has been running since we last checked
-				long startTime = lastGpsStatsUpdate >  gpsAttemptStartedMs ? lastGpsStatsUpdate : 
-					gpsAttemptStartedMs;
-				totalTimeGpsRunningMs += currTimeMs - startTime;
+				long startTime = lastGpsStatsUpdateFromPhoneBootMs > gpsAttemptStartedFromPhoneBootMs ? lastGpsStatsUpdateFromPhoneBootMs :
+						gpsAttemptStartedFromPhoneBootMs;
+				totalTimeGpsRunningMs += currTimeFromPhoneBootMs - startTime;
 			}
 
 			//total time available for running gps, subtracting time already spent
-			long gpsTimeAvailable = calcFreeGpsTimeMs(currTimeMs);
+			long gpsTimeAvailable = calcFreeGpsTimeMs(currTimeFromPhoneBootMs);
 
 			//we don't want to allow too much gps time. This is to prevent wasting the battery needlessly if we
 			// had a stroke of luck and we're able to get the gps time very easily
@@ -252,49 +252,49 @@ public class GpsTrailerGpsStrategy {
 			{
 				//fudge the stats so we have at most prefs.maxGpsTimeMs of time left to allocate
 				//TODO 3 maybe we shouldn't be fudging this value.
-				totalTimeGpsRunningMs = (long)((currTimeMs - startTimeMs) * prefs.batteryGpsOnTimePercentage) 
+				totalTimeGpsRunningMs = (long)((currTimeFromPhoneBootMs - startTimeFromPhoneBootMs) * prefs.batteryGpsOnTimePercentage)
 				- prefs.maxGpsTimeMs + 1;
 				gpsTimeAvailable = prefs.maxGpsTimeMs;
 			}
 			
 			if(gpsOn)
 			{
-				long currentTimeGpsRunning = currTimeMs - gpsAttemptStartedMs;
+				long currentTimeGpsRunning = currTimeFromPhoneBootMs - gpsAttemptStartedFromPhoneBootMs;
 				
 				//if the desiremanager is satisfied, we successfully read a gps point, or
 				//the absolute time left to perform a gps reading is used up,
 				// we turn the gps off
 				if(currentTimeGpsRunning >= desireManager.currTimeWanted || gpsTimeAvailable <= 0 || lastReadingSuccessful)
 				{
-					gpsAttemptEndedMs = currTimeMs;
+					gpsAttemptEndedFromPhoneBootMs = currTimeFromPhoneBootMs;
 					
 					if(lastReadingSuccessful)
 					{
-						desireManager.updateDesiresForSuccessfulReading(gpsAttemptEndedMs - gpsAttemptStartedMs);
+						desireManager.updateDesiresForSuccessfulReading(gpsAttemptEndedFromPhoneBootMs - gpsAttemptStartedFromPhoneBootMs);
 						lastReadingSuccessful = false;
 					}
 					else
 						desireManager.updateDesiresForUnsuccessfulReading(gpsTimeAvailable);
 					
-					nextSignificantEvent = desireManager.waitTimeMs + currTimeMs;
+					nextSignificantEvent = desireManager.waitTimeMs + currTimeFromPhoneBootMs;
 					
 					return false;
 				}
 				else //we want to keep gps on
 				{
-					nextSignificantEvent = desireManager.currTimeWanted - currentTimeGpsRunning + currTimeMs;
+					nextSignificantEvent = desireManager.currTimeWanted - currentTimeGpsRunning + currTimeFromPhoneBootMs;
 					
 					return true;
 				}
 			}
 			else // gps is off
 			{
-				long currentTimeWaiting = currTimeMs - gpsAttemptEndedMs;
+				long currentTimeWaiting = currTimeFromPhoneBootMs - gpsAttemptEndedFromPhoneBootMs;
 				
 				if(currentTimeWaiting >= desireManager.waitTimeMs)
 				{
 					//we want to turn it on
-					gpsAttemptStartedMs = currTimeMs;
+					gpsAttemptStartedFromPhoneBootMs = currTimeFromPhoneBootMs;
 
 					long timeToLeaveGpsOn = desireManager.currTimeWanted;
 
@@ -308,7 +308,7 @@ public class GpsTrailerGpsStrategy {
 						timeToLeaveGpsOn = gpsTimeAvailable;
 					}
 
-					nextSignificantEvent = timeToLeaveGpsOn + currTimeMs;
+					nextSignificantEvent = timeToLeaveGpsOn + currTimeFromPhoneBootMs;
 					
 					gpsAttempts++;
 
@@ -317,7 +317,7 @@ public class GpsTrailerGpsStrategy {
 				}
 				else
 				{
-					nextSignificantEvent = desireManager.waitTimeMs + gpsAttemptEndedMs;
+					nextSignificantEvent = desireManager.waitTimeMs + gpsAttemptEndedFromPhoneBootMs;
 					
 					return false;
 					
@@ -332,7 +332,7 @@ public class GpsTrailerGpsStrategy {
          * @return
          */
 		public long calcFreeGpsTimeMs(long currTimeMs) {
-			return (long) ((currTimeMs - startTimeMs) * prefs.batteryGpsOnTimePercentage -
+			return (long) ((currTimeMs - startTimeFromPhoneBootMs) * prefs.batteryGpsOnTimePercentage -
 					totalTimeGpsRunningMs);
 			}
 
@@ -340,7 +340,7 @@ public class GpsTrailerGpsStrategy {
 			desireManager.updateDesiresForStart();
 			
 			//we start with a 5 minute leeway so the code can turn on gps right away, rather than waiting
-			gpsAttemptEndedMs = startTimeMs = System.currentTimeMillis() - prefs.extraTimeForStartMs;
+			gpsAttemptEndedFromPhoneBootMs = startTimeFromPhoneBootMs = SystemClock.elapsedRealtime() - prefs.extraTimeForStartMs;
 			strategyThread.start();
 
 			
@@ -363,13 +363,20 @@ public class GpsTrailerGpsStrategy {
 						//to determine how long to wait and how much time to use for each gps reading
 						synchronized(GpsTrailerGpsStrategy.this)
 						{
+							//we used elapsed real time, because using System.currentTimeMillis() is unreliable:
+							//From http://developer.android.com/reference/android/os/SystemClock.html
+							//The wall clock can be set by the user or the phone network (see setCurrentTimeMillis(long)),
+							// so the time may jump backwards or forwards unpredictably. This clock should only be used when
+							// correspondence with real-world dates and times is important, such as in a calendar or alarm
+							// clock application. Interval or elapsed time measurements should use a different clock. If you
+							// are using System.currentTimeMillis(), consider listening to the ACTION_TIME_TICK,
+							// ACTION_TIME_CHANGED and ACTION_TIMEZONE_CHANGED Intent broadcasts to find out when the time changes.
+							long timeFromPhoneBootMs = SystemClock.elapsedRealtime();
 							
-							long time = System.currentTimeMillis();
-							
-							if(nextSignificantEvent > time)
+							if(nextSignificantEvent > timeFromPhoneBootMs)
 							{
 								
-								/* ttt_installer:remove_line */Log.d(GTG.TAG,"About to wait for "+(nextSignificantEvent - time));
+								/* ttt_installer:remove_line */Log.d(GTG.TAG,"About to wait for "+(nextSignificantEvent - timeFromPhoneBootMs));
 								
 								//we only turn off our wake lock if we aren't running gps
 								//note, not sure if this is necessary, but even if it works for my
@@ -385,20 +392,20 @@ public class GpsTrailerGpsStrategy {
 								if(isShutdownRequested)
 									return;
 
-								time = System.currentTimeMillis();
-								GpsTrailerGpsStrategy.this.wait(nextSignificantEvent - time );
-								time = System.currentTimeMillis();
+								timeFromPhoneBootMs = SystemClock.elapsedRealtime();
+								GpsTrailerGpsStrategy.this.wait(nextSignificantEvent - timeFromPhoneBootMs );
+								timeFromPhoneBootMs = SystemClock.elapsedRealtime();
 								
 								intentTimer.acquireWakeLock();
 
-								/* ttt_installer:remove_line */Log.d(GTG.TAG,"Acquired wake lock, done waiting for "+(nextSignificantEvent - time));
+								/* ttt_installer:remove_line */Log.d(GTG.TAG,"Acquired wake lock, done waiting for "+(nextSignificantEvent - timeFromPhoneBootMs));
 							}
 							
 							if(isShutdownRequested)
 								break;
 							/* ttt_installer:remove_line */Log.d(GTG.TAG,"About to update strategy");
-							wantGps = updateFromStrategyThreadOnly(time);
-							lastGpsStatsUpdate = time;
+							wantGps = updateFromStrategyThreadOnly(timeFromPhoneBootMs);
+							lastGpsStatsUpdateFromPhoneBootMs = timeFromPhoneBootMs;
 						}
 						/* ttt_installer:remove_line */Log.d(GTG.TAG,"About to update gpsReader to "+wantGps);
 						

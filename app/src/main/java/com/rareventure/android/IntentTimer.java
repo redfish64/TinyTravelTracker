@@ -34,6 +34,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
+import android.os.SystemClock;
 import android.util.Log;
 
 /**
@@ -83,18 +84,18 @@ public class IntentTimer {
 	 * class to decide what to do. The wakeLock will still be released when we wake
 	 * up.
 	 * 
-	 * @param timeToWake time this all goes down
+	 * @param timeToWakeFromPhoneBoot time to wake, *this is in millis since the phone was started*
 	 */
-	public synchronized void sleepUntil(long timeToWake)
+	public synchronized void sleepUntil(long timeToWakeFromPhoneBoot)
 	{
-		writeDebug("sleep until "+new Date(timeToWake));
+		writeDebug("sleep until "+new Date(System.currentTimeMillis() + timeToWakeFromPhoneBoot - SystemClock.elapsedRealtime()));
 		if(wakeLock.isHeld())
 		{
 			writeDebug("releasing wake lock for sleep");
 			wakeLock.release();
 		}
 		
-        alarmManager.set(AlarmManager.RTC_WAKEUP, timeToWake, sender);
+        alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, timeToWakeFromPhoneBoot, sender);
 	}	
 	
 	public synchronized void cancel()
