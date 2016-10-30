@@ -28,10 +28,12 @@ import java.util.Date;
 import com.rareventure.gps2.GTG;
 import com.rareventure.gps2.R;
 
+import android.annotation.TargetApi;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.os.SystemClock;
@@ -89,14 +91,25 @@ public class IntentTimer {
 	public synchronized void sleepUntil(long timeToWakeFromPhoneBoot)
 	{
 		writeDebug("sleep until "+new Date(System.currentTimeMillis() + timeToWakeFromPhoneBoot - SystemClock.elapsedRealtime()));
+		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+			SetAlarmMarshmallow.setAlarm(alarmManager,AlarmManager.ELAPSED_REALTIME_WAKEUP, timeToWakeFromPhoneBoot, sender);
+		else
+	        alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, timeToWakeFromPhoneBoot, sender);
+
 		if(wakeLock.isHeld())
 		{
 			writeDebug("releasing wake lock for sleep");
 			wakeLock.release();
 		}
-		
-        alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, timeToWakeFromPhoneBoot, sender);
-	}	
+	}
+
+	@TargetApi(Build.VERSION_CODES.M)
+	private static class SetAlarmMarshmallow {
+		public static void setAlarm(AlarmManager alarmManager, int elapsedRealtimeWakeup, long timeToWakeFromPhoneBoot, PendingIntent sender)
+		{
+			alarmManager.setAndAllowWhileIdle(AlarmManager.ELAPSED_REALTIME_WAKEUP, timeToWakeFromPhoneBoot, sender);
+		}
+	}
 	
 	public synchronized void cancel()
 	{
@@ -112,6 +125,7 @@ public class IntentTimer {
 		{
 			writeDebug("acquiring wake lock");
 			wakeLock.acquire();
+			writeDebug("acquired wake lock");
 		}
 //		else
 //			writeDebug("acquireWakeLock() wake lock already held");
@@ -122,6 +136,7 @@ public class IntentTimer {
 		{
 			writeDebug("releasing wake lock");
 			wakeLock.release();
+			writeDebug("released wake lock");
 		}
 //		else
 //			writeDebug("releaseWakeLock(), wake lock already released");
