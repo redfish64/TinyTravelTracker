@@ -236,6 +236,7 @@ public class GpsTrailerGpsStrategy {
 		 *  a non synchronized block
 		 */
 		protected boolean updateFromStrategyThreadOnly(long deltaTimeMs) {
+			intentTimer.writeDebug("deltaTimeMs "+deltaTimeMs);
 			long timeFromPhoneBootMs = SystemClock.elapsedRealtime();
 
 			//first lets update the stats so far
@@ -254,7 +255,9 @@ public class GpsTrailerGpsStrategy {
 			{
 				//fudge the stats so we have at most prefs.maxGpsTimeMs of time left to allocate
 				//TODO 3 maybe we shouldn't be fudging this value.
-				totalTimeGpsRunningMs = (long)(deltaTimeMs * prefs.batteryGpsOnTimePercentage)
+//				gpsTimeAvailable = (long) ((timeFromPhoneBootMs - startTimeFromPhoneBootMs) * prefs.batteryGpsOnTimePercentage -
+//						totalTimeGpsRunningMs);
+				totalTimeGpsRunningMs = (long)((timeFromPhoneBootMs - startTimeFromPhoneBootMs) * prefs.batteryGpsOnTimePercentage)
 				- prefs.maxGpsTimeMs + 1;
 				gpsTimeAvailable = prefs.maxGpsTimeMs;
 			}
@@ -300,11 +303,11 @@ public class GpsTrailerGpsStrategy {
 
 					long timeToLeaveGpsOn = desireManager.currTimeWanted;
 
-					if(desireManager.currTimeWanted > gpsTimeAvailable)
+					if(desireManager.currTimeWanted > calcFreeGpsTimeMs(timeFromPhoneBootMs+desireManager.currTimeWanted))
 					{
 						//TODO 3 this is a hack to print a warning out to the wake lock debug file
 						// I should probably have just a general file for extended log messages
-						intentTimer.writeDebug("WARNING: gps desire manager has asked for more than allowed time,"
+						intentTimer.writeDebug("gps desire manager has asked for more than allowed time,"
 								+" gpsTimeAvailable: "+gpsTimeAvailable
 								+", desireManager.currTimeWanted: "+desireManager.currTimeWanted);
 						timeToLeaveGpsOn = gpsTimeAvailable;
@@ -334,6 +337,8 @@ public class GpsTrailerGpsStrategy {
          * @return
          */
 		public long calcFreeGpsTimeMs(long currTimeMs) {
+			intentTimer.writeDebug("currTimeMs "+currTimeMs+" startTimeFromPhoneBoot "+startTimeFromPhoneBootMs
+			+"totalTimeGpsRunning "+totalTimeGpsRunningMs);
 			return (long) ((currTimeMs - startTimeFromPhoneBootMs) * prefs.batteryGpsOnTimePercentage -
 					totalTimeGpsRunningMs);
 			}
