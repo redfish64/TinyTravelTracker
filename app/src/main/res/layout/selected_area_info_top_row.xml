@@ -1,174 +1,194 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="300dp"
-    android:layout_height="wrap_content"
-    android:orientation="vertical" >
+<?xml version='1.0' encoding='utf-8'?>
+  <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="300dp"
+  android:layout_height="wrap_content"
+  android:orientation="vertical">
 
-    <TableLayout
+  <TableLayout android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:shrinkColumns="1">
+
+    <TableRow android:id="@+id/tableRow1"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content">
+
+      <TextView android:id="@+id/totalTimeLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Total Time:"
+        android:textColor="@android:color/white"/>
+
+      <TextView android:id="@+id/totalTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="6 hours"
+        android:layout_marginLeft="5dp"
+        android:textColor="@android:color/white"/>
+    </TableRow>
+
+    <TableRow android:id="@+id/tableRow1"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content">
+
+      <TextView android:id="@+id/totalDistLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Total Dist:"
+        android:textColor="@android:color/white"/>
+
+      <TextView android:id="@+id/totalDist"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:shrinkColumns="1"
-        android:layout_below="@+id/linearLayout1" >
+        android:text="25 miles"
+        android:layout_marginLeft="5dp"
+        android:textColor="@android:color/white"/>
+    </TableRow>
 
-        <TableRow
-            android:id="@+id/tableRow1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
+    <TableRow android:id="@+id/tableRow1"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content">
 
-            <TextView
-                android:id="@+id/totalTimeLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Total Time:"
-                android:textColor="@android:color/white" />
+      <TextView android:id="@+id/timesInAreaLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Times in area:"
+        android:textColor="@android:color/white"/>
 
-            <TextView
-                android:id="@+id/totalTime"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="6 hours"
-                android:layout_marginLeft="5dp"
-                android:textColor="@android:color/white" />
-        </TableRow>
+      <TextView android:id="@+id/timesInArea"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="20"
+        android:layout_marginLeft="5dp"
+        android:textColor="@android:color/white"/>
+    </TableRow>
+    <!--
 
-        <TableRow
-            android:id="@+id/tableRow1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
-
-            <TextView
-                android:id="@+id/totalDistLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Total Dist:"
-                android:textColor="@android:color/white" />
-
-            <TextView
-                android:id="@+id/totalDist"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="25 miles"
-                android:layout_marginLeft="5dp"
-                android:textColor="@android:color/white" />
-        </TableRow>
-
-        <TableRow
-            android:id="@+id/tableRow1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
-
-            <TextView
-                android:id="@+id/timesInAreaLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Times in area:"
-                android:textColor="@android:color/white" />
-
-            <TextView
-                android:id="@+id/timesInArea"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="20"
-                android:layout_marginLeft="5dp"
-                android:textColor="@android:color/white" />
-        </TableRow>
-
-        <!--
            <TableRow
+
             android:id="@+id/tableRow1"
+
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" >
+
+            android:layout_height="wrap_content"
+              >
+              
 
             <TextView
+
                 android:id="@+id/firstStartTimeLabel"
+
                 android:layout_width="match_parent"
+
                 android:layout_height="wrap_content"
+
                 android:text="Earliest in Area:"
-                android:textColor="@android:color/white" />
+
+                android:textColor="@android:color/white"
+                  />
+                  
 
             <TextView
+
                 android:id="@+id/firstStartTime"
+
                 android:layout_width="match_parent"
+
                 android:layout_height="wrap_content"
+
                 android:text="2012, Jan 31st, Wed, 12:00 AM"
-                android:textColor="@android:color/white" />
+
+                android:textColor="@android:color/white"
+                  />
         </TableRow>
+          
 
         <TableRow
+
             android:id="@+id/tableRow1"
+
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" >
+
+            android:layout_height="wrap_content"
+              >
+              
 
             <TextView
+
                 android:id="@+id/lastEndTimeLabel"
+
                 android:layout_width="match_parent"
+
                 android:layout_height="wrap_content"
+
                 android:text="Latest in Area:"
-                android:textColor="@android:color/white" />
+
+                android:textColor="@android:color/white"
+                  />
+                  
 
             <TextView
+
                 android:id="@+id/endTime"
+
                 android:layout_width="match_parent"
+
                 android:layout_height="wrap_content"
+
                 android:text="2012, Feb 31st, Wed, 12:00 PM "
-                android:textColor="@android:color/white" />
+
+                android:textColor="@android:color/white"
+                  />
         </TableRow>
+
         -->
 
-        <TableRow
-            android:id="@+id/timeZoneTableRow"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
+    <TableRow android:id="@+id/timeZoneTableRow"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content">
 
-            <TextView
-                android:id="@+id/timezoneLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Time Zone:"
-                android:textColor="@android:color/white" />
-
-            <TextView
-                android:id="@+id/timezone"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="America/Los Angeles"
-                android:layout_marginLeft="5dp"
-                android:textColor="@android:color/white" />
-        </TableRow>
-    </TableLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
+      <TextView android:id="@+id/timezoneLabel"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-        android:orientation="horizontal" >
+        android:text="Time Zone:"
+        android:textColor="@android:color/white"/>
 
-            <TextView
-                android:id="@+id/startTime"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight=".4"
-                android:text="@string/start_time"
-                android:textColor="@android:color/white" />
+      <TextView android:id="@+id/timezone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="America/Los Angeles"
+        android:layout_marginLeft="5dp"
+        android:textColor="@android:color/white"/>
+    </TableRow>
+    <!--Removed ObsoleteLayoutParam: layout_alignParentLeft-->
+    <!--Removed ObsoleteLayoutParam: layout_below-->
+  </TableLayout>
 
-            <TextView
-                android:id="@+id/endTime"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight=".4"
-		        android:layout_marginLeft="3dp"
-                android:text="@string/end_time"
-                android:textColor="@android:color/white" />
+  <LinearLayout android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="5dp"
+    android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/distance"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-		        android:layout_marginLeft="3dp"
-                android:layout_weight=".2"
-                android:text="@string/dist"
-                android:textColor="@android:color/white" />
-        </LinearLayout>
+    <TextView android:id="@+id/startTime"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_weight=".4"
+      android:text="@string/start_time"
+      android:textColor="@android:color/white"/>
 
+    <TextView android:id="@+id/endTime"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_weight=".4"
+      android:layout_marginLeft="3dp"
+      android:text="@string/end_time"
+      android:textColor="@android:color/white"/>
+
+    <TextView android:id="@+id/distance"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_marginLeft="3dp"
+      android:layout_weight=".2"
+      android:text="@string/dist"
+      android:textColor="@android:color/white"/>
+  </LinearLayout>
 </LinearLayout>
