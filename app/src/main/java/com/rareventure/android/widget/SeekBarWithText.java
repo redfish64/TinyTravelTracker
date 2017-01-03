@@ -63,6 +63,9 @@ public class SeekBarWithText extends RelativeLayout {
         divisions = a.getInt(R.styleable.com_rareventure_android_widget_SeekBarWithText_steps, Math.round(maxValue - minValue * 10));
         logScale = a.getFloat(R.styleable.com_rareventure_android_widget_SeekBarWithText_steps, 0);
         printfFormat = a.getString(R.styleable.com_rareventure_android_widget_SeekBarWithText_printfFormat);
+		if (a != null) {
+			a.recycle();
+		}
         if(printfFormat == null)
         	printfFormat = "%.1f";
 

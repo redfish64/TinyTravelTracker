@@ -62,6 +62,9 @@ public class SeekBarDialogPreference extends DialogPreference {
         maxValue = a.getFloat(R.styleable.SeekBarDialogPreference_maxValue, 100);
         divisions = a.getInt(R.styleable.SeekBarDialogPreference_steps, Math.round(maxValue - minValue * 10));
         printfFormat = a.getString(R.styleable.SeekBarDialogPreference_printfFormat).toString();
+		if (a != null) {
+			a.recycle();
+		}
         
 		setSummary(desc);
 	}
