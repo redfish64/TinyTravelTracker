@@ -25,6 +25,16 @@ It also is useful in situations where you don't have internet access. All map ti
 _Note to users: If you have an issue you would like to see fixed, please click on the smiley on the right on the issue screen, and select thumbs up (or thumbs down). I'll use this information to decide what to work on next. Thanks_
 
 Changelog:
+V 1.1.27
+
+Tangram updated their map server to be no longer compatible with the version I was using, so I updated it. However, there was a lot of changes on tangram's side and a few bugs are still present. Better than not having maps though.
+
+Specifically:
+
+* blinking dots whenever moving around map. (I may not be able to fix this completely but I will see)
+* tiles in offline mode are slow to load. 
+
+I'll try to fix this soonish.
 
 V 1.1.22
 
