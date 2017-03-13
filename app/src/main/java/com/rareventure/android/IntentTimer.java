@@ -107,7 +107,7 @@ public class IntentTimer {
 	private static class SetAlarmMarshmallow {
 		public static void setAlarm(AlarmManager alarmManager, int elapsedRealtimeWakeup, long timeToWakeFromPhoneBoot, PendingIntent sender)
 		{
-			alarmManager.setAndAllowWhileIdle(AlarmManager.ELAPSED_REALTIME_WAKEUP, timeToWakeFromPhoneBoot, sender);
+			alarmManager.setExactAndAllowWhileIdle(AlarmManager.ELAPSED_REALTIME_WAKEUP, timeToWakeFromPhoneBoot, sender);
 		}
 	}
 	

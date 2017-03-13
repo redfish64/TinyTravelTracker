@@ -20,6 +20,7 @@
 package com.rareventure.gps2.reviewer.map;
 
 import android.graphics.Point;
+import android.graphics.PointF;
 import android.os.Debug;
 import android.os.Handler;
 import android.os.Looper;
@@ -962,7 +963,7 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 	private void getApUnitsFromPixels(Point p, float x, float y) {
 		//co; doesn't work when zoomed out all the way for some reason, x value is off
 		//requestedStBox.apUnitsToPixels();
-		LngLat l = Util.normalizeLngLat(mapController.coordinatesAtScreenPosition(x,y));
+		LngLat l = Util.normalizeLngLat(mapController.screenPositionToLngLat(new PointF(x, y)));
 		p.x = AreaPanel.convertLonToX(l.longitude);
 		p.y = AreaPanel.convertLatToY(l.latitude);
 	}

@@ -7,16 +7,16 @@ import android.util.Log;
 import com.mapzen.tangram.HttpHandler;
 import com.rareventure.android.SuperThread;
 import com.rareventure.gps2.GTG;
-import com.squareup.okhttp.Cache;
-import com.squareup.okhttp.Callback;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Protocol;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
-import com.squareup.okhttp.ResponseBody;
-import com.squareup.okhttp.internal.DiskLruCache;
-import com.squareup.okhttp.internal.Util;
-import com.squareup.okhttp.internal.io.FileSystem;
+import okhttp3.Cache;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Protocol;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
+import okhttp3.internal.Util;
+import okhttp3.internal.io.FileSystem;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -24,6 +24,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import okhttp3.Response;
 import okio.BufferedSource;
 
 /**
@@ -52,7 +53,9 @@ import okio.BufferedSource;
  *     may not be the freshest copy.
  * </p>
  */
-public class GpsTrailerMapzenHttpHandler extends HttpHandler {
+public class GpsTrailerMapzenHttpHandler extends HttpHandler
+{
+/*
     private static final long MAX_TILE_LENGTH = 1024*1024*10;
     private static Preferences prefs = new Preferences();
     private final File cacheDir;
@@ -65,7 +68,7 @@ public class GpsTrailerMapzenHttpHandler extends HttpHandler {
     }
 
     @Override
-    public boolean onRequest(final String url, final Callback cb) {
+    public boolean onRequest(String url, Callback cb) {
         superThread.addTask(new RequestTask(url, cb));
         return true;
     }
@@ -95,7 +98,7 @@ public class GpsTrailerMapzenHttpHandler extends HttpHandler {
         private CacheState cs = CacheState.NOT_TRIED;
         private boolean savedNetworkResponseToCache = false;
         private IOException networkFailException;
-        private Request networkFailRequest;
+        private Call networkFailCall;
 
         @Override
         public String toString() {
@@ -116,15 +119,15 @@ public class GpsTrailerMapzenHttpHandler extends HttpHandler {
             this.cb = cb;
             this.myCb = new Callback() {
                 @Override
-                public void onFailure(Request request, IOException e) {
+                public void onFailure(Call c, IOException e) {
                     RequestTask.this.ns = NetworkState.FAIL;
                     RequestTask.super.stNotify(RequestTask.this);
-                    networkFailRequest = request;
+                    networkFailCall = c;
                     networkFailException = e;
                 }
 
                 @Override
-                public void onResponse(Response response) {
+                public void onResponse(Call c, Response response) {
                     if(!response.isSuccessful()) {
                         RequestTask.this.ns = NetworkState.FAIL;
                     }
@@ -157,12 +160,14 @@ public class GpsTrailerMapzenHttpHandler extends HttpHandler {
             return new File(fileName);
         }
 
-        /**
+        */
+/**
          * The main loop of the task.
          * <p>We take a look at the state, and decide what needs to be done accordingly,
          * whether checking the cache or going out to the network
          * </p>
-         */
+         *//*
+
         @Override
         protected void doWork() {
 //            Log.d(GTG.TAG,"GpsTrailerMapzenHttpHandler.doWork() "+this);
@@ -197,7 +202,7 @@ public class GpsTrailerMapzenHttpHandler extends HttpHandler {
                     else
                     {
                         //the cache is empty and the network failed so we give up
-                        cb.onFailure(networkFailRequest, networkFailException);
+                        cb.onFailure(networkFailCall, networkFailException);
 //                        Log.d(GTG.TAG,"Task finished unsuccesfully for "+RequestTask.this);
                         stExit();
                         return;
@@ -314,6 +319,7 @@ public class GpsTrailerMapzenHttpHandler extends HttpHandler {
 
 
     }
+*/
     public static class Preferences
     {
         /**

@@ -118,8 +118,8 @@ public class OsmMapView extends MapView
 
 			//we normalize because mapcontroller lovingly returns values outside of -180/180 longitude
 			//if user wraps world while scrolling
-			LngLat p1 = Util.normalizeLngLat(mapController.coordinatesAtScreenPosition(0,0));
-			LngLat p2 = Util.normalizeLngLat(mapController.coordinatesAtScreenPosition(windowWidth, pointAreaHeight));
+			LngLat p1 = Util.normalizeLngLat(mapController.screenPositionToLngLat(new PointF(0,0)));
+			LngLat p2 = Util.normalizeLngLat(mapController.screenPositionToLngLat(new PointF(windowWidth, pointAreaHeight)));
 
 			synchronized (this) {
 				//update our internal representation of the screen
@@ -209,10 +209,10 @@ public class OsmMapView extends MapView
 
 //				Log.d(GTG.TAG, "cacheDir is "+cacheDir);
 
-				GpsTrailerMapzenHttpHandler mapHandler =
-						new GpsTrailerMapzenHttpHandler(cacheDir, fileCacheSuperThread);
-
-				mapController.setHttpHandler(mapHandler);
+//				GpsTrailerMapzenHttpHandler mapHandler =
+//						new GpsTrailerMapzenHttpHandler(cacheDir, fileCacheSuperThread);
+//
+//				mapController.setHttpHandler(mapHandler);
 
 				mapController.setShoveResponder(new TouchInput.ShoveResponder() {
 					@Override
@@ -463,8 +463,8 @@ public class OsmMapView extends MapView
 	public void panAndZoom(int minX, int minY, int maxX, int maxY) {
 		float currZoom = mapController.getZoom();
 
-		LngLat tl = Util.normalizeLngLat(mapController.coordinatesAtScreenPosition(0,0));
-		LngLat br = Util.normalizeLngLat(mapController.coordinatesAtScreenPosition(windowWidth,windowHeight));
+		LngLat tl = Util.normalizeLngLat(mapController.screenPositionToLngLat(new PointF(0,0)));
+		LngLat br = Util.normalizeLngLat(mapController.screenPositionToLngLat(new PointF(windowWidth,windowHeight)));
 
 		int fromMinX= AreaPanel.convertLonToX(tl.longitude);
 		int fromMinY = AreaPanel.convertLatToY(tl.latitude);
