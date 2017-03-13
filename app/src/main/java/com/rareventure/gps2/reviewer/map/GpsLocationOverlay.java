@@ -135,10 +135,10 @@ public class GpsLocationOverlay implements GpsOverlay, LocationListener
 		props.clear();
 		props.put("rotation", Double.toString(lastCompass));
 
-		mapData.beginChangeBlock();
+		//mapData.beginChangeBlock();
 		mapData.clear();
 		mapData.addPoint(lastLoc, props);
-		mapData.endChangeBlock();
+		//mapData.endChangeBlock();
 
 		mapController.requestRender();
 	}
