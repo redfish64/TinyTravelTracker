@@ -37,3 +37,5 @@ app/build/
 build/
 import-summary.txt
 
+#this gets built in a subproject
+app/libs/tangram-release.aar
