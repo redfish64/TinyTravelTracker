@@ -28,7 +28,7 @@
 #ACRA specifics
 # we need line numbers in our stack traces otherwise they are pretty useless
 -renamesourcefileattribute SourceFile
--keepattributes SourceFile,LineNumberTable
+-keepattributes SourceFile,LineNumberTable,Exceptions,InnerClasses
 
 # ACRA needs "annotations" so add this... 
 -keepattributes *Annotation*
@@ -66,6 +66,9 @@ public org.acra.ErrorReporter$ReportsSenderWorker handleSilentException(java.lan
     *;
     }
 
+-keep public class com.mapzen.tangram.** {
+    *;
+    }
 
 -dontwarn android.**
 -dontwarn retrofit.**
