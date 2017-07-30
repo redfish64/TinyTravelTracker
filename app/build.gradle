@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "23.0.3"
+    buildToolsVersion '25.0.0'
     useLibrary  'org.apache.http.legacy'
 
     defaultConfig {
@@ -38,6 +38,8 @@ dependencies {
     compile(name:'tangram-full-release', ext:'aar')
     compile 'com.squareup.okhttp3:okhttp:3.5.0'
     compile 'com.android.support:support-annotations:25.0.0'
+    compile 'com.yayandroid:LocationManager:2.0.3'
+    compile 'com.google.android.gms:play-services-location:9.6.1'
 }
 repositories{
     flatDir{

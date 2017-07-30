@@ -26,6 +26,10 @@ _Note to users: If you have an issue you would like to see fixed, please click o
 
 Changelog:
 
+V 1.1.28
+
+Fixed problem in release binary stripped out too many classes and caused immediate crash on open.
+
 V 1.1.27
 
 Tangram updated their map server to be no longer compatible with the version I was using, so I updated it. However, there was a lot of changes on tangram's side and a few bugs are still present. Better than not having maps though.

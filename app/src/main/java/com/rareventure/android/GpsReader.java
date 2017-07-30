@@ -25,12 +25,14 @@ import java.io.IOException;
 import com.rareventure.android.AndroidPreferenceSet.AndroidPreferences;
 import com.rareventure.gps2.GTG;
 import com.rareventure.gps2.GTG.GTGEvent;
+import com.yayandroid.locationmanager.LocationManager;
+import com.yayandroid.locationmanager.configuration.Configurations;
+import com.yayandroid.locationmanager.configuration.LocationConfiguration;
+import com.yayandroid.locationmanager.listener.LocationListener;
 
 import android.content.Context;
 import android.location.Criteria;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Looper;
 import android.os.SystemClock;
@@ -47,7 +49,13 @@ public class GpsReader implements DataReader
 	private LocationListener locationListener = new LocationListener() {
 
 		@Override
+		public void onProcessTypeChanged(int processType) {
+
+		}
+
+		@Override
 		public void onLocationChanged(Location location) {
+			GTG.alert( GTGEvent.ERROR_GPS_DISABLED, false);
 			//store the location
 				
 			gpsDataBuffer.lat[gpsDataBuffer.rawReadIndex] = location.getLatitude();
@@ -60,6 +68,16 @@ public class GpsReader implements DataReader
 				gpsDataBuffer.updateReadIndex();
 				processThread.lock.notify();
 			}
+		}
+
+		@Override
+		public void onLocationFailed(int type) {
+			GTG.alert( GTGEvent.ERROR_GPS_DISABLED);
+		}
+
+		@Override
+		public void onPermissionGranted(boolean alreadyHadPermission) {
+
 		}
 
 		@Override
@@ -86,7 +104,6 @@ public class GpsReader implements DataReader
 	
 	private Looper looper;
 	private String tag;
-	private String providerName;
 	private DataOutputStream os;
 	private Context ctx;
 	
@@ -109,18 +126,9 @@ public class GpsReader implements DataReader
     	
     	//TODO 3.2: handle multile levels of accuracy
     	//basically read from every gps system available
-        lm = (LocationManager) ctx.getSystemService(Context.LOCATION_SERVICE);
-        
-        Criteria criteria = new Criteria();
-        criteria.setSpeedRequired(false);
-        criteria.setAccuracy(Criteria.ACCURACY_FINE);
-        criteria.setAltitudeRequired(false);
-        criteria.setBearingRequired(false);
-        criteria.setCostAllowed(false);
-//        criteria.setPowerRequirement(Criteria.POWER_HIGH);
-        
-        providerName =  lm.getBestProvider(criteria, true);
-        
+		LocationConfiguration lc = Configurations.silentConfiguration(false); //false == don't keep tracking
+		LocationManager lm = new LocationManager.Builder(ctx).notify(locationListener).build();
+		lm.get();
     }
     
     
@@ -177,17 +185,16 @@ public class GpsReader implements DataReader
 	public void turnOn() {
     	synchronized(lock)
     	{
-			if(!lm.isProviderEnabled( LocationManager.GPS_PROVIDER))
-			{
-				GTG.alert( GTGEvent.ERROR_GPS_DISABLED);
-				return;
-			}
+			//TODO 2.2 reenable check for not having viable gps
+//			if(!lm.isProviderEnabled( LocationManager.GPS_PROVIDER))
+//			{
+//				return;
+//			}
     		if(gpsOn)
     			return; //already on
 			gpsOn = true;
-			
-			lm.requestLocationUpdates(providerName, prefs.gpsRecurringTimeMs, 0, 
-					locationListener, looper);
+
+			lm.get();
     	}
 	}
 	
@@ -197,7 +204,7 @@ public class GpsReader implements DataReader
     		if(!gpsOn)
     			return; //already off
 			gpsOn = false;
-			lm.removeUpdates(locationListener);
+			lm.cancel();
     	}
     	
     	//TODO x1: HACK ADDDS FAKE GPS LOCATION DATA
