@@ -22,10 +22,6 @@ package com.rareventure.android;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import com.mapzen.android.lost.api.LocationListener;
-import com.mapzen.android.lost.api.LocationRequest;
-import com.mapzen.android.lost.api.LocationServices;
-import com.mapzen.android.lost.api.LostApiClient;
 import com.rareventure.android.AndroidPreferenceSet.AndroidPreferences;
 import com.rareventure.gps2.GTG;
 import com.rareventure.gps2.GTG.GTGEvent;
@@ -33,6 +29,8 @@ import com.rareventure.gps2.GTG.GTGEvent;
 import android.content.Context;
 import android.location.Criteria;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Looper;
 import android.os.SystemClock;
@@ -40,64 +38,58 @@ import android.util.Log;
 
 public class GpsReader implements DataReader
 {
-	private final LostApiClient lostApiClient;
 	private Object lock = new Object();
 	private GpsProcessor gpsProcessor;
 	private GpsDataBuffer gpsDataBuffer;
 	
 	private ProcessThread processThread;
-
-	private boolean connected;
-	private final LostApiClient.ConnectionCallbacks ccListener = new LostApiClient.ConnectionCallbacks() {
-		@Override
-		public void onConnected() {
-			synchronized(lock) {
-				connected = true;
-				if (activateOnConnect) {
-					activateOnConnect = false;
-					activateGps();
-				}
-			}
-		}
-
-		@Override
-		public void onConnectionSuspended() {
-
-		}
-	};
 	
 	private LocationListener locationListener = new LocationListener() {
 
 		@Override
 		public void onLocationChanged(Location location) {
 			//store the location
-
+				
 			gpsDataBuffer.lat[gpsDataBuffer.rawReadIndex] = location.getLatitude();
 			gpsDataBuffer.lon[gpsDataBuffer.rawReadIndex] = location.getLongitude();
 			gpsDataBuffer.alt[gpsDataBuffer.rawReadIndex] = location.getAltitude();
 			gpsDataBuffer.timeRead[gpsDataBuffer.rawReadIndex] = System.currentTimeMillis();
-
+				
 			synchronized(processThread.lock)
 			{
 				gpsDataBuffer.updateReadIndex();
 				processThread.lock.notify();
 			}
+		}
 
+		@Override
+		public void onProviderDisabled(String provider) {
+//			Log.d(GTG.TAG,"GPS provider disabled: "+provider);
+			GTG.alert( GTG.GTGEvent.ERROR_GPS_DISABLED);
+		}
+
+		@Override
+		public void onProviderEnabled(String provider) {
+//			Log.d(GTG.TAG,"GPS provider enabled: "+provider);
+			GTG.alert( GTG.GTGEvent.ERROR_GPS_DISABLED, false);
+		}
+
+		@Override
+		public void onStatusChanged(String provider, int status,
+				Bundle extras) {
 		}
 	};
 
+	private LocationManager lm;
+	
 	private boolean gpsOn;
 	
 	private Looper looper;
 	private String tag;
+	private String providerName;
 	private DataOutputStream os;
 	private Context ctx;
-
-	private LocationRequest request = LocationRequest.create()
-			.setInterval(5000)
-			.setSmallestDisplacement(5)
-			.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-
+	
 	public interface GpsProcessor {
 
 		void processGpsData(double lon, double lat, double alt, long time);
@@ -114,11 +106,21 @@ public class GpsReader implements DataReader
     	this.gpsDataBuffer = new GpsDataBuffer(16);
     	
     	this.looper = looper;
-
-		lostApiClient = new LostApiClient.Builder(ctx).addConnectionCallbacks(ccListener).build();
-		//TODO 1 onconnetlistener
-		lostApiClient.connect();
-
+    	
+    	//TODO 3.2: handle multile levels of accuracy
+    	//basically read from every gps system available
+        lm = (LocationManager) ctx.getSystemService(Context.LOCATION_SERVICE);
+        
+        Criteria criteria = new Criteria();
+        criteria.setSpeedRequired(false);
+        criteria.setAccuracy(Criteria.ACCURACY_FINE);
+        criteria.setAltitudeRequired(false);
+        criteria.setBearingRequired(false);
+        criteria.setCostAllowed(false);
+//        criteria.setPowerRequirement(Criteria.POWER_HIGH);
+        
+        providerName =  lm.getBestProvider(criteria, true);
+        
     }
     
     
@@ -171,39 +173,21 @@ public class GpsReader implements DataReader
 		}        
 	}
 
-	private boolean activateOnConnect;
-
-	private void activateGps()
-	{
-		synchronized(lock) {
-
-			if (!connected) {
-				activateOnConnect = true;
-			} else
-				LocationServices.FusedLocationApi.requestLocationUpdates(lostApiClient, request, locationListener);
-		}
-	}
-
-	private void deactivateGps() {
-		synchronized(lock) {
-			activateOnConnect = false;
-			LocationServices.FusedLocationApi.removeLocationUpdates(lostApiClient, locationListener);
-		}
-	}
 
 	public void turnOn() {
     	synchronized(lock)
     	{
-			//TODO 2.2 reenable check for not having viable gps
-//			if(!lm.isProviderEnabled( LocationManager.GPS_PROVIDER))
-//			{
-//				return;
-//			}
+			if(!lm.isProviderEnabled( LocationManager.GPS_PROVIDER))
+			{
+				GTG.alert( GTGEvent.ERROR_GPS_DISABLED);
+				return;
+			}
     		if(gpsOn)
     			return; //already on
 			gpsOn = true;
-
-			activateGps();
+			
+			lm.requestLocationUpdates(providerName, prefs.gpsRecurringTimeMs, 0, 
+					locationListener, looper);
     	}
 	}
 	
@@ -213,11 +197,9 @@ public class GpsReader implements DataReader
     		if(!gpsOn)
     			return; //already off
 			gpsOn = false;
-			deactivateGps();
+			lm.removeUpdates(locationListener);
     	}
-
-    	//TODO 2: add passive gps somehow
-
+    	
     	//TODO x1: HACK ADDDS FAKE GPS LOCATION DATA
 //    	Location l = new Location("test");
 //    	l.setAltitude(9999);
@@ -226,7 +208,7 @@ public class GpsReader implements DataReader
 //    	l.setBearing(0);
 //    	this.locationListener.onLocationChanged(l);
 	}
-
+	
 	public Preferences prefs = new Preferences();
 	
 	public static class Preferences implements AndroidPreferences
