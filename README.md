@@ -26,6 +26,14 @@ _Note to users: If you have an issue you would like to see fixed, please click o
 
 Changelog:
 
+V 1.1.30
+
+Reverted back to V 1.1.28. Mapzen's LOST is too inaccurate even when specifying "high precision"
+
+V 1.1.29
+
+Now uses mapzen's LOST (https://mapzen.com/blog/lets-get-lost/) library to help with gps tracking.
+
 V 1.1.28
 
 Fixed problem in release binary stripped out too many classes and caused immediate crash on open.
