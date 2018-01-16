@@ -1,0 +1,90 @@
+import:
+    - https://tangrams.github.io/blocks/filter/grain.yaml
+
+scene:
+    background:
+        color: '#555'
+
+sources:
+    osm:
+        type: MVT
+        url: 'https://b.tiles.mapbox.com/v4/openmaptiles.805mi4we/{z}/{x}/{y}.vector.pbf?access_token=pk.eyJ1Ijoib3Blbm1hcHRpbGVzIiwiYSI6ImNpdnY3eTJxZzAwMGMyb3BpdWJmajcxNzcifQ.hP1BxcxldIhakMcPSJLQ1Q'
+        max_zoom: 16
+
+cameras:
+    cam:
+        type: flat
+
+lights:
+    dir:
+        type: directional
+        direction: [.1, .5, -1]
+        diffuse: .7
+        ambient: .5
+
+layers:
+    water:
+        data:
+            source: osm
+            layer: water
+        draw:
+            water:
+                order: 10
+                color: [0.224, 0.224, 0.224, 1.00]
+    waterway:
+        data:
+            source: osm
+            layer: waterway
+        draw:
+            lines:
+                order: 11
+                color: '#353535'
+                width: 1.3px
+    landuse:
+        data:
+            source: osm
+            layer: landuse
+            filter:
+                class: residential
+        draw:
+            landuse:
+                order: 5
+                color: [0.349, 0.349, 0.349, 1.00]
+    park:
+        data:
+            source: osm
+            layer: park
+        draw:
+            park:
+                order: 5
+                color: [0.290, 0.290, 0.290, 1.00]
+    boundary:
+        data:
+            source: osm
+            layer: boundary
+        draw:
+            lines:
+                order: 30
+                color: [0.388, 0.388, 0.388, 1.00]
+                width: 1.2px
+    transportation:
+        data:
+            source: osm
+            layer: transportation
+        draw:
+            lines:
+                order: 30
+                color: [0.314, 0.314, 0.314, 1.00]
+                width: 1.2px
+styles:
+    water:
+        base: polygons
+        mix: filter-grain
+    landuse:
+        base: polygons
+        mix: filter-grain
+    park:
+        base: polygons
+        mix: filter-grain
+    boundary:
+        base: lines

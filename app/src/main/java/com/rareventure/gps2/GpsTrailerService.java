@@ -19,6 +19,7 @@
 */
 package com.rareventure.gps2;
 
+import org.acra.ACRA;
 import org.acra.ErrorReporter;
 
 import android.app.Notification;
@@ -419,7 +420,7 @@ public class GpsTrailerService extends Service {
 		}
 		catch (Exception e) {
 			shutdownWithException(e);
-			ErrorReporter.getInstance().handleException(e);
+			ACRA.getErrorReporter().handleException(e);
 		}
 	}
 

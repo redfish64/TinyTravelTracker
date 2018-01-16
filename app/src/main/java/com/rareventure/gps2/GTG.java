@@ -1487,23 +1487,6 @@ public class GTG {
 		}
 	}
 	
-	/**
-	 * Kills our app without triggering arca. Useful when data that was
-	 * assumed never supposed to change did and there is way too much code
-	 * to figure out how to clean out all of the caches that depend on it.
-	 * In other words, there are monsters under the bed, and I'd rather 
-	 * just ignore them and throw them a bone occasionally then try to 
-	 * fight them.
-	 */
-	public static void killSelf()
-	{
-		//disable acra, or it will report our early exit
-		ACRA.getErrorReporter().removeAllReportSenders();
-
-		System.exit(0);
-	}
-
-
 	public static void setAppPasswordNotEntered() {
 		if(Requirement.PASSWORD_ENTERED.isFulfilled())
 			GTG.lastGtgClosedMS = System.currentTimeMillis();

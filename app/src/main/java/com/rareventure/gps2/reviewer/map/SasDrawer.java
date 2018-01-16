@@ -58,7 +58,7 @@ public class SasDrawer
 
     public void setRectangle(int x1, int y1, int x2, int y2)
     {
-        mapData.beginChangeBlock();;
+        //mapData.beginChangeBlock();;
         mapData.clear();
         double lon1 = AreaPanel.convertXToLon(x1);
         double lat1 = AreaPanel.convertYToLat(y1);
@@ -70,7 +70,7 @@ public class SasDrawer
 //        for(LngLat l : rectList)
 //            mapData.addPoint(l,null);
 
-        mapData.endChangeBlock();
+//        mapData.endChangeBlock();
 
         mapController.requestRender();
     }

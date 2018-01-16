@@ -24,6 +24,7 @@ package com.rareventure.android;
 
 import java.util.ArrayList;
 
+import org.acra.ACRA;
 import org.acra.ErrorReporter;
 
 import android.content.Context;
@@ -117,7 +118,7 @@ public class ProcessThread extends WorkerThread
 		{
 			e.printStackTrace();
 			GTG.alert(GTGEvent.ERROR_SERVICE_INTERNAL_ERROR);
-			ErrorReporter.getInstance().handleException(e);
+			ACRA.getErrorReporter().handleException(e);
 
 			synchronized(lock)
 	        {

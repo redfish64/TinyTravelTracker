@@ -35,6 +35,7 @@ import com.mapzen.tangram.LngLat;
 import com.mapzen.tangram.MapController;
 import com.mapzen.tangram.MapView;
 
+import com.mapzen.tangram.SceneError;
 import com.mapzen.tangram.TouchInput;
 import com.rareventure.gps2.R;
 import com.rareventure.android.SuperThread;
@@ -78,8 +79,6 @@ public class OsmMapView extends MapView
 
 
 	private OsmMapGpsTrailerReviewerMapActivity activity;
-
-	private MapController mapController;
 
 	private Handler notifyScreenChangeHandler = new Handler();
 
@@ -192,141 +191,10 @@ public class OsmMapView extends MapView
 
 		this.activity = activity;
 
-		// This starts a background process to set up the map.
-		getMapAsync(new MapView.OnMapReadyCallback(){
-			@Override
-			public void onMapReady(final MapController mapController) {
-				OsmMapView.this.mapController = mapController;
+		//this initializes the mapController protected variable
+		getMap(mySceneLoadListener);
 
-				//delete the old cache if it exists
-				//TODO 3: eventually remove this
-				File oldCache = new File(GTG.getExternalStorageDirectory().toString()+"/tile_cache");
-				if(oldCache.exists())
-					Util.deleteRecursive(new File(GTG.getExternalStorageDirectory().toString()+"/tile_cache"));
-				File cacheDir = new File(GTG.getExternalStorageDirectory().toString()+"/tile_cache2");
-
-				cacheDir.mkdirs();
-
-//				Log.d(GTG.TAG, "cacheDir is "+cacheDir);
-
-//				GpsTrailerMapzenHttpHandler mapHandler =
-//						new GpsTrailerMapzenHttpHandler(cacheDir, fileCacheSuperThread);
-//
-//				mapController.setHttpHandler(mapHandler);
-
-				mapController.setShoveResponder(new TouchInput.ShoveResponder() {
-					@Override
-					public boolean onShove(float distance) {
-						//this rotates the screen downwards for more 3d look. We don't allow it currently
-						//because it would mess up our calculations as to what points to
-						//display
-						//TODO 3 allow shoving
-						return true;
-					}
-				});
-
-				mapController.setRotateResponder(new TouchInput.RotateResponder() {
-					@Override
-					public boolean onRotate(float x, float y, float rotation) {
-						//this rotates the screen to change the northern direction. We don't allow it currently
-						//because it would mess up our calculations as to what points to
-						//display
-						//TODO 3 allow rotation
-						return true;
-					}
-				});
-
-				mapController.setPanResponder(new TouchInput.PanResponder() {
-					@Override
-					public boolean onPan(float startX, float startY, float endX, float endY) {
-//						if(duringLongPress)
-//						{
-//							sasRectangleManager.updateRectangleEndPoint(endX, endY);
-//						}
-						Log.d(GTG.TAG,String.format("panning sx %f sy %f ex %f ey %f",startX, startY,
-								endX, endY));
-						mapController.queueEvent(notifyScreenChangeRunnable);
-						return false;
-					}
-
-					@Override
-					public boolean onFling(float posX, float posY, float velocityX, float velocityY) {
-						Log.d(GTG.TAG,String.format("flinging px %f py %f vx %f vy %f",
-								posX, posY, velocityX, velocityY));
-
-						mapController.queueEvent(notifyScreenChangeRunnable);
-						return false;
-					}
-				});
-
-				mapController.setScaleResponder(new TouchInput.ScaleResponder() {
-					@Override
-					public boolean onScale(float x, float y, float scale, float velocity) {
-						Log.d(GTG.TAG,String.format("scaling x %f y %f sx %f sy %f",
-								x, y, scale, velocity));
-						mapController.queueEvent(notifyScreenChangeRunnable);
-						return false;
-					}
-				});
-
-				mapController.setTapResponder(new TouchInput.TapResponder() {
-					@Override
-					public boolean onSingleTapUp(float x, float y) {
-						return false;
-					}
-
-					@Override
-					public boolean onSingleTapConfirmed(float x, float y) {
-						for(GpsOverlay overlay : overlays)
-						{
-							overlay.onTap(x,y);
-						}
-						return false;
-					}
-				});
-
-				mapController.setLongPressResponder(new TouchInput.LongPressResponder() {
-					public float startX;
-					public float startY;
-
-					public void onLongPress(float x, float y) {
-						// Get instance of Vibrator from current Context
-						Vibrator v = (Vibrator) activity.getSystemService(Context.VIBRATOR_SERVICE);
-
-						// Vibrate for a short time
-						v.vibrate(50);
-
-						startX = x;
-						startY = y;
-					}
-
-					@Override
-					public void onLongPressUp(float x, float y) {
-						for(GpsOverlay overlay : overlays)
-						{
-							overlay.onLongPressEnd(startX, startY, x,y);
-						}
-					}
-
-					@Override
-					public boolean onLongPressPan(float movementStartX, float movementStartY, float endX, float endY) {
-						for(GpsOverlay overlay : overlays)
-						{
-							overlay.onLongPressMove(startX, startY, endX,endY);
-						}
-						return false;
-					}
-				});
-
-
-				for(GpsOverlay o : overlays)
-					o.startTask(mapController);
-
-				panAndZoom2(OsmMapGpsTrailerReviewerMapActivity.prefs.lastLon,
-						OsmMapGpsTrailerReviewerMapActivity.prefs.lastLat,
-						OsmMapGpsTrailerReviewerMapActivity.prefs.lastZoom);
-			}
-		},"map_style.yaml");
+		mapController.loadSceneFile("map_style.yaml");
 	}
 
 	/**
@@ -416,7 +284,7 @@ public class OsmMapView extends MapView
 	}
 
 	public MapController getMapController() {
-		return mapController;
+		return super.getMapInstance();
 	}
 
 	public static class Preferences implements AndroidPreferences
@@ -434,7 +302,7 @@ public class OsmMapView extends MapView
         try {
 		tickPaint = new Paint();
 		tickPaint.setColor(0xFF000000);
-		
+
 
         }
         finally {
@@ -619,4 +487,142 @@ public class OsmMapView extends MapView
 
 //		memoryCache.setWidthAndHeight(getWidth(), getHeight());
 	}
+
+		private MapController.SceneLoadListener mySceneLoadListener = new MapController.SceneLoadListener() {
+
+			@Override
+			public void onSceneReady(int sceneId, SceneError sceneError) {
+				Log.e(GTG.TAG, "HOW OFTEN DO YOU CALL ME, HMM???");
+
+				//delete the old cache if it exists
+				//TODO 3: eventually remove this
+				File oldCache = new File(GTG.getExternalStorageDirectory().toString()+"/tile_cache");
+				if(oldCache.exists())
+					Util.deleteRecursive(new File(GTG.getExternalStorageDirectory().toString()+"/tile_cache"));
+				File cacheDir = new File(GTG.getExternalStorageDirectory().toString()+"/tile_cache2");
+
+				cacheDir.mkdirs();
+
+//				Log.d(GTG.TAG, "cacheDir is "+cacheDir);
+
+//				GpsTrailerMapzenHttpHandler mapHandler =
+//						new GpsTrailerMapzenHttpHandler(cacheDir, fileCacheSuperThread);
+//
+//				mapController.setHttpHandler(mapHandler);
+
+				mapController.setShoveResponder(new TouchInput.ShoveResponder() {
+					@Override
+					public boolean onShove(float distance) {
+						//this rotates the screen downwards for more 3d look. We don't allow it currently
+						//because it would mess up our calculations as to what points to
+						//display
+						//TODO 3 allow shoving
+						return true;
+					}
+				});
+
+				mapController.setRotateResponder(new TouchInput.RotateResponder() {
+					@Override
+					public boolean onRotate(float x, float y, float rotation) {
+						//this rotates the screen to change the northern direction. We don't allow it currently
+						//because it would mess up our calculations as to what points to
+						//display
+						//TODO 3 allow rotation
+						return true;
+					}
+				});
+
+				mapController.setPanResponder(new TouchInput.PanResponder() {
+					@Override
+					public boolean onPan(float startX, float startY, float endX, float endY) {
+//						if(duringLongPress)
+//						{
+//							sasRectangleManager.updateRectangleEndPoint(endX, endY);
+//						}
+						Log.d(GTG.TAG,String.format("panning sx %f sy %f ex %f ey %f",startX, startY,
+								endX, endY));
+						mapController.queueEvent(notifyScreenChangeRunnable);
+						return false;
+					}
+
+					@Override
+					public boolean onFling(float posX, float posY, float velocityX, float velocityY) {
+						Log.d(GTG.TAG,String.format("flinging px %f py %f vx %f vy %f",
+								posX, posY, velocityX, velocityY));
+
+						mapController.queueEvent(notifyScreenChangeRunnable);
+						return false;
+					}
+				});
+
+				mapController.setScaleResponder(new TouchInput.ScaleResponder() {
+					@Override
+					public boolean onScale(float x, float y, float scale, float velocity) {
+						Log.d(GTG.TAG,String.format("scaling x %f y %f sx %f sy %f",
+								x, y, scale, velocity));
+						mapController.queueEvent(notifyScreenChangeRunnable);
+						return false;
+					}
+				});
+
+				mapController.setTapResponder(new TouchInput.TapResponder() {
+					@Override
+					public boolean onSingleTapUp(float x, float y) {
+						return false;
+					}
+
+					@Override
+					public boolean onSingleTapConfirmed(float x, float y) {
+						for(GpsOverlay overlay : overlays)
+						{
+							overlay.onTap(x,y);
+						}
+						return false;
+					}
+				});
+
+				mapController.setLongPressResponder(new TouchInput.LongPressResponder() {
+					public float startX;
+					public float startY;
+
+					public void onLongPress(float x, float y) {
+						// Get instance of Vibrator from current Context
+						Vibrator v = (Vibrator) activity.getSystemService(Context.VIBRATOR_SERVICE);
+
+						// Vibrate for a short time
+						v.vibrate(50);
+
+						startX = x;
+						startY = y;
+					}
+
+					//TODO 1.5 reimplement these long press things
+//					@Override
+//					public void onLongPressUp(float x, float y) {
+//						for(GpsOverlay overlay : overlays)
+//						{
+//							overlay.onLongPressEnd(startX, startY, x,y);
+//						}
+//					}
+//
+//					@Override
+//					public boolean onLongPressPan(float movementStartX, float movementStartY, float endX, float endY) {
+//						for(GpsOverlay overlay : overlays)
+//						{
+//							overlay.onLongPressMove(startX, startY, endX,endY);
+//						}
+//						return false;
+//					}
+				});
+
+				for(GpsOverlay o : overlays)
+					o.startTask(mapController);
+
+				panAndZoom2(OsmMapGpsTrailerReviewerMapActivity.prefs.lastLon,
+						OsmMapGpsTrailerReviewerMapActivity.prefs.lastLat,
+						OsmMapGpsTrailerReviewerMapActivity.prefs.lastZoom);
+			}
+		};
+
+
 }

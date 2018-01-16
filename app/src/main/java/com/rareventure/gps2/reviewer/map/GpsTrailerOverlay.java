@@ -696,7 +696,7 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 
 			Map<String, String> props = new HashMap<>();
 
-			mapData.beginChangeBlock();
+//			mapData.beginChangeBlock();
 			mapData.clear();
 
 			//co:hack to show top and bottom of view area
@@ -767,7 +767,7 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 
 			} //while examining pointCount
 
-			mapData.endChangeBlock();
+//			mapData.endChangeBlock();
 			mapController.requestRender();
 
 			if(closestToCenterAp != null)
