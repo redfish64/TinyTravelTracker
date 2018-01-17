@@ -30,6 +30,7 @@ import android.util.Log;
 import com.mapzen.tangram.LngLat;
 import com.mapzen.tangram.MapController;
 import com.mapzen.tangram.MapData;
+import com.mapzen.tangram.SceneUpdate;
 import com.rareventure.android.AndroidPreferenceSet;
 import com.rareventure.android.SortedBestOfIntArray;
 import com.rareventure.android.SuperThread;
@@ -48,6 +49,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -71,6 +73,8 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 	private final int minCirclePxRadius;
 	//this is where we write our data to, which gets picked up by mapzen and drawn
 	//using the yaml file to style the points and lines
+	//We use two buffers and swap between them to avoid flickering
+	private MapData mapData1, mapData2;
 	private MapData mapData;
 
 	private final OsmMapView osmMapView;
@@ -130,6 +134,16 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 	 */
 	private boolean selectedAreaAddLock;
 	private SasDrawer sasDrawer;
+
+	private List<SceneUpdate> mapData1SceneUpdate =
+			Arrays.asList(new SceneUpdate[] {
+					new SceneUpdate("global.ttt_use_point_set1", "true")
+			});
+	private List<SceneUpdate> mapData2SceneUpdate =
+			Arrays.asList(new SceneUpdate[] {
+					new SceneUpdate("global.ttt_use_point_set1", "false")
+			});
+
 
 	public GpsTrailerOverlay(OsmMapGpsTrailerReviewerMapActivity activity,
 							   SuperThread superThread,
@@ -696,6 +710,7 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 
 			Map<String, String> props = new HashMap<>();
 
+			mapData = mapData == mapData1 ? mapData2 : mapData1;
 //			mapData.beginChangeBlock();
 			mapData.clear();
 
@@ -768,6 +783,8 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 			} //while examining pointCount
 
 //			mapData.endChangeBlock();
+			mapController.updateSceneAsync(mapData == mapData1 ? mapData1SceneUpdate :
+					mapData2SceneUpdate);
 			mapController.requestRender();
 
 			if(closestToCenterAp != null)
@@ -912,7 +929,9 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 	@Override
 	public void startTask(MapController mapController) {
 		this.mapController = mapController;
-		mapData = mapController.addDataLayer("gt_point");
+		mapData1 = mapData = mapController.addDataLayer("gt_point1");
+		mapData2 = mapController.addDataLayer("gt_point2");
+		mapController.updateSceneAsync(mapData1SceneUpdate);
 		sasDrawer = new SasDrawer(sas,mapController);
 		superThread.addTask(this);
 	}

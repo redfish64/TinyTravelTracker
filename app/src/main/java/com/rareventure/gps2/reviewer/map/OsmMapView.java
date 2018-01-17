@@ -490,8 +490,12 @@ public class OsmMapView extends MapView
 
 		private MapController.SceneLoadListener mySceneLoadListener = new MapController.SceneLoadListener() {
 
+			public boolean calledBefore;
+
 			@Override
 			public void onSceneReady(int sceneId, SceneError sceneError) {
+				if(calledBefore) return; //TODO 2: this is a hack
+				calledBefore = true;
 				Log.e(GTG.TAG, "HOW OFTEN DO YOU CALL ME, HMM???");
 
 				//delete the old cache if it exists

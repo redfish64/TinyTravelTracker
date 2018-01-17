@@ -1,7 +1,9 @@
 Author: Geraldine Sarmiento, Nathaniel V. Kelso, Patricio Gonzalez Vivo, Brett Camper, Peter Richardson
 
 global:
-    sdk_mapzen_api_key: mapzen-bzc7UkQ     # TTT author: please don't use my key
+    #sdk_mapzen_api_key: mapzen-bzc7UkQ     # TTT author: please don't use my key
+    ttt_use_point_set1: true          # TTT, we flip between displaying two buffers of points, so that
+                                      # the screen doesn't blink during redraw
 
     #ux/ui
     ux_language: false             # l10n language code, trusting OSM in v0.10 tiles, fixed in v1.0 tiles
@@ -743,15 +745,15 @@ fonts:
           url: fonts/Quicksand-Regular.woff
 
 sources:
-    mapzen:
-        # EraserMaps the app only supports MVT format tiles
+    osm:
         type:  MVT #TopoJSON
-        url:  https://tile.mapzen.com/mapzen/vector/v1/all/{z}/{x}/{y}.mvt
+        url: 'https://free.tilehosting.com/data/v3/{z}/{x}/{y}.pbf.pict?key=F4sTzzXiI7pfgslJxUx'
+	#url:  https://tile.mapzen.com/mapzen/vector/v1/all/{z}/{x}/{y}.mvt
         #url:  http://tile.dev.mapzen.com/mapzen/vector/v1/all/{z}/{x}/{y}.mvt
         #url:  //localhost:8080/vector/all/{z}/{x}/{y}.mvt
         # road labels in Tangram JS are broken when overzooming, set max_zoom: 18 to preview fix
-        url_params:
-            api_key: global.sdk_mapzen_api_key
+	#url_params:
+        #    api_key: global.sdk_mapzen_api_key
         max_zoom: 16
 
 #    # Only enable this for local debug, should not be enabled for prod (app inserts these at runtime)
@@ -1200,14 +1202,25 @@ layers:
                 transition: { show: { time: 0s }, hide: { time: 0s } }
 
     #GPS Trailer points
-    gt_point:
-        data: { source: gt_point }
+    gt_point1:
+        data: { source: gt_point1 }
+        filter: function() { return global.ttt_use_point_set1; }
         draw:
             points:
                 collide: false
                 size: function() { return feature.size; }
                 order: 1000
                 color: function() { return feature.color; }
+
+    gt_point2:
+        data: { source: gt_point2 }
+        filter: function() { return !global.ttt_use_point_set1; }
+        draw:
+            points:
+                collide: false
+                size: function() { return feature.size; }
+                order: 1000
+                color: "#FF00FF" #function() { return feature.color; }
 
     # used for user to create a rectangular area to select multiple points
     gt_selected_area_rect:
@@ -1357,7 +1370,7 @@ layers:
 
     # Basemap styling
     water:
-        data: { source: mapzen, layer: water }
+        data: { source: osm, layer: water }
         draw:
             grid:
                 order: global.feature_order
@@ -1624,7 +1637,7 @@ layers:
 
 
     transit-basemap:
-        data: { source: mapzen, layer: transit }
+        data: { source: osm, layer: transit }
         subway-light-rail:
             filter: { not: { kind: [platform] }, $zoom: { min: 14 } }
             draw:
@@ -1692,7 +1705,7 @@ layers:
 
 #    # useful to example road geometry merging & Tangram labeling w/r/t tile boundaries
 #    z-randomColor:
-#        data: { source: mapzen, layer: roads }
+#        data: { source: osm, layer: roads }
 #        draw:
 #            lines:
 #                order: 1000
@@ -1701,7 +1714,7 @@ layers:
 #                width: [[13,0.5px],[14,1px],[16,2px]]
 
     roads:
-        data: { source: mapzen, layer: roads }
+        data: { source: osm, layer: roads }
         draw:
             lines:
                 # let roads sort themselves past zoom 14 (using server value)
@@ -3592,7 +3605,7 @@ layers:
                                 order: function() { return feature.sort_key || 305; }
 
     buildings:
-        data: { source: mapzen, layer: buildings }
+        data: { source: osm, layer: buildings }
         filter:
             not: { location: underground }
         # set default footprint and extrusion draw properties, but don't draw by default (rules below will turn visibility on)
@@ -3834,7 +3847,7 @@ layers:
                         stroke: { color: global.text_stroke_address, width: 4 }
 
     boundaries:
-        data: { source: mapzen, layer: boundaries }
+        data: { source: osm, layer: boundaries }
         # country subdivisions (states, provinces)
         draw:
             lines:
@@ -3949,7 +3962,7 @@ layers:
                     width: [[14, 0.5px], [15, 1.0px], [16, 1.5px], [17, 2.0px], [19, 1.5m]]
 
     places:
-        data: { source: mapzen, layer: places }
+        data: { source: osm, layer: places }
         filter:
             name: true
         draw:
@@ -4700,7 +4713,7 @@ layers:
                         font:
                             size: 17px
     pois:
-        data: { source: mapzen, layer: pois }
+        data: { source: osm, layer: pois }
         #visible: global.label_visible_poi_landuse
         filter:
             all:
@@ -5319,7 +5332,7 @@ layers:
                                 weight: 600
 
     earth-labels:
-        data: { source: mapzen, layer: earth }
+        data: { source: osm, layer: earth }
         filter: { name: true }
         draw:
             text-blend-order:
@@ -5356,7 +5369,7 @@ layers:
                         #transform: uppercase
 
     landuse:
-        data: { source: mapzen }
+        data: { source: osm }
         draw:
             dots:
                 order: global.feature_order
@@ -5862,7 +5875,7 @@ layers:
                     color: [[4,[0.965,0.600,0.882]],[6,[0.965,0.600,0.882]],[7,[0.882,0.639,0.827]],[8,[0.757,0.729,0.753]]]
 
     transit-overlay-rail-lines:
-        data: { source: mapzen, layer: transit }
+        data: { source: osm, layer: transit }
         filter:
             all:
                 - not: { kind: [platform, railway] }
@@ -6047,7 +6060,7 @@ layers:
                             stroke: { color: white, width: 3px }
 
 #    transit-bus-roads:
-#        data: { source: mapzen, layer: roads }
+#        data: { source: osm, layer: roads }
 #        filter: { is_bus_route: true }
 #        draw:
 #            lines:
@@ -6062,7 +6075,7 @@ layers:
 #                    order: 487
 
     transit-overlay-station-labels:
-        data: { source: mapzen, layer: pois }
+        data: { source: osm, layer: pois }
         filter:
             kind: [station, tram_stop, bus_station, subway_entrance, halt, stop, platform, bus_stop, stop_position ]
             any:
@@ -6255,7 +6268,7 @@ layers:
                             stroke: { color: white, width: 4 }
 
 #    transit-platforms:
-#        data: { source: mapzen, layer: transit }
+#        data: { source: osm, layer: transit }
 #        filter: { kind: platform, $zoom: { min: 15 }, $geometry: [polygon,line] }
 #        draw:
 #            lines:
