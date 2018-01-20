@@ -785,7 +785,7 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 //			mapData.endChangeBlock();
 			mapController.updateSceneAsync(mapData == mapData1 ? mapData1SceneUpdate :
 					mapData2SceneUpdate);
-			mapController.requestRender();
+			//mapController.requestRender();
 
 			if(closestToCenterAp != null)
 			{
