@@ -25,12 +25,14 @@ import java.util.ArrayList;
 import android.content.Context;
 import android.graphics.Paint;
 import android.graphics.PointF;
+import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Vibrator;
 import android.util.AttributeSet;
 import android.util.Log;
 
+import com.mapzen.tangram.ConfigChooser;
 import com.mapzen.tangram.LngLat;
 import com.mapzen.tangram.MapController;
 import com.mapzen.tangram.MapView;
@@ -162,6 +164,19 @@ public class OsmMapView extends MapView
 
 	};
 
+	@Override
+	protected void configureGLSurfaceView() {
+		//we override this method so we can create a special glsurfaceview that
+		//can provide its onTouchListener. This way we can override the ontouchlistener
+		//to provide different functionality for long press, without altering the original
+		//tangram library (which is a very big pain)
+		glSurfaceView = new MyGLSurfaceView(getContext());
+		glSurfaceView.setEGLContextClientVersion(2);
+		glSurfaceView.setPreserveEGLContextOnPause(true);
+		glSurfaceView.setEGLConfigChooser(new ConfigChooser(8, 8, 8, 0, 16, 8));
+		addView(glSurfaceView);
+	}
+
 	//used to space out our checks for the map position
 	private Runnable notifyScreenChangeHandlerRunnable =
 		new Runnable() {
@@ -181,6 +196,11 @@ public class OsmMapView extends MapView
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+	}
+
+	@Override
+	protected MapController getMapInstance() {
+		return new MyMapController(glSurfaceView);
 	}
 
 	/**
@@ -284,7 +304,7 @@ public class OsmMapView extends MapView
 	}
 
 	public MapController getMapController() {
-		return super.getMapInstance();
+		return mapController;
 	}
 
 	public static class Preferences implements AndroidPreferences
@@ -585,7 +605,7 @@ public class OsmMapView extends MapView
 					}
 				});
 
-				mapController.setLongPressResponder(new TouchInput.LongPressResponder() {
+				((MyMapController)mapController).setLongPressResponderExt(new MyTouchInput.LongPressResponder() {
 					public float startX;
 					public float startY;
 
@@ -600,23 +620,22 @@ public class OsmMapView extends MapView
 						startY = y;
 					}
 
-					//TODO 1.5 reimplement these long press things
-//					@Override
-//					public void onLongPressUp(float x, float y) {
-//						for(GpsOverlay overlay : overlays)
-//						{
-//							overlay.onLongPressEnd(startX, startY, x,y);
-//						}
-//					}
-//
-//					@Override
-//					public boolean onLongPressPan(float movementStartX, float movementStartY, float endX, float endY) {
-//						for(GpsOverlay overlay : overlays)
-//						{
-//							overlay.onLongPressMove(startX, startY, endX,endY);
-//						}
-//						return false;
-//					}
+					@Override
+					public void onLongPressUp(float x, float y) {
+						for(GpsOverlay overlay : overlays)
+						{
+							overlay.onLongPressEnd(startX, startY, x,y);
+						}
+					}
+
+					@Override
+					public boolean onLongPressPan(float movementStartX, float movementStartY, float endX, float endY) {
+						for(GpsOverlay overlay : overlays)
+						{
+							overlay.onLongPressMove(startX, startY, endX,endY);
+						}
+						return false;
+					}
 				});
 
 				for(GpsOverlay o : overlays)

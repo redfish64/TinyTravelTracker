@@ -162,7 +162,7 @@
     <string name="restore_backup_dialog_title">Restoring Backup</string>
     <string name="restore_dialog_cleaning_previous_points">Clearing previous GPS points</string>
     <string name="loading_media">Indexing pictures and videos</string>
-    <string name="map_attrition">Map by <a href="http://mapzen.com/">Mapzen</a></string>
+    <string name="map_attrition"><a href="http://www.openmaptiles.org/">© OpenMapTiles</a></string>
     <string name="view_image_menu_view_in_gallery">View in Gallery</string> 
     <string name="info_notice_cant_verify_license">There was a problem verifying your license. GPS points will no longer be recorded.</string> 
     <string name="delete">Delete</string> 

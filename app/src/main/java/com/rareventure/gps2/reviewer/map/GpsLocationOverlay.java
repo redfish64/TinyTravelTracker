@@ -132,9 +132,10 @@ public class GpsLocationOverlay implements GpsOverlay, LocationListener
 			if(mapData == null)
 				return;
 		}
-		props.clear();
-		props.put("rotation", Double.toString(lastCompass));
+		//props.clear();
+		//props.put("rotation", Double.toString(lastCompass));
 
+		//TODO FIXME 1
 		//mapData.beginChangeBlock();
 		mapData.clear();
 		mapData.addPoint(lastLoc, props);

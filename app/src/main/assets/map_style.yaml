@@ -1,19 +1,8 @@
-# Cinnabar is a classic look and should be your go-to for general mapping applications.
-# Give OpenStreetMap data a refined basemap skin using the Tangram graphics library and
-# Mapzen's versatile Vector Tiles.
-#
-# This style is a High Road influenced evolution of the Traditional style Stamen created
-# for Mapzen's Open Android app in 2014. Please use and adapt the open source scene file
-# in your own projects!
-#
-# Authors: Nathaniel V. Kelso, Geraldine Sarmiento
-# Read more: https://github.com/tangrams/cinnabar-style
-#
 
-# import:
+import:
 #     - themes/color-cinnabar.yaml
 #     - themes/label-5.yaml
-#     - themes/cinnabar-icons.yaml
+    - themes/cinnabar-icons.yaml
 
 global:
     order:
@@ -352,6 +341,7 @@ styles:
                     st -= .5;
                     color.a = 1.- step(dotSize, dot(st,st)*2.);
 
+
     lines_transparent:
         base: lines
         blend: overlay
@@ -435,7 +425,7 @@ fonts:
 
 scene:
     background:
-        color: white
+        color: "#f8f4f0"
 
 layers:
     # Map overlays for styling the server response (using special source layer names) for route line, current location, and search result pins
@@ -680,85 +670,376 @@ layers:
                 width: 0px
 
 
+    gt_point:
+        data: { source: gt_point }
+        #filter: function() { return global.ttt_use_point_set1; }
+        draw:
+            points:
+                collide: false
+                size: function() { return feature.size; }
+                order: 1000
+                color: function() { return feature.color; }
+
+    # used for user to create a rectangular area to select multiple points
+    gt_selected_area_rect:
+        data: { source: gt_selected_area_rect }
+        draw:
+            sdk-line-overlay:
+            #dashedline:
+                color: '#000000'
+                order: 1001
+                width: 3px
+
     # Basemap styling
+
+    # Ordering is don in the same order as
+    # https://github.com/openmaptiles/osm-bright-gl-style/blob/master/style.json
+    # Order is incremented by 10 for each item
+    landcover-glacier:
+        data:
+            source: mapzen
+            layer: landcover
+        filter:
+            subclass: glacier
+        draw:
+            polygons:
+                order: 10
+                color: '#FFFFFF'
+
+    landuse-residential:
+        data:
+            source: mapzen
+            layer: landuse
+        filter:
+              class: residential
+        draw:
+            polygons:
+                order: 20
+                color: 'hsl(30, 19%, 90%)'
+    landuse-commercial:
+        data:
+            source: mapzen
+            layer: landuse
+        filter:
+              class: residential
+        draw:
+            polygons:
+                order: 30
+                color: 'hsl(0, 60%, 87%)'
+
+    landuse-industrial:
+        data:
+            source: mapzen
+            layer: landuse
+        filter:
+              class: industrial
+        draw:
+            polygons:
+                order: 40
+                color: 'hsl(49, 100%, 88%)'
+
+    park:
+        data:
+            source: mapzen
+            layer: park
+        draw:
+            polygons:
+              order: 50
+              color: '#d8e8c8'
+            lines:
+              order: 55
+              color: 'hsl(96, 40%, 49%)'
+              width: [[14, 1px], [16, 2px], [18, 3m]]
+
+    landuse-cemetary:
+        data:
+            source: mapzen
+            layer: landuse
+        filter:
+              class: cemetary
+        draw:
+            polygons:
+                order: 60
+                color: '#e0e4dd'
+
+    landuse-hospital:
+        data:
+            source: mapzen
+            layer: landuse
+        filter:
+              class: cemetary
+        draw:
+            polygons:
+                order: 70
+                color: '#ffddee'
+
+    landuse-school:
+        data:
+            source: mapzen
+            layer: landuse
+        filter:
+              class: school
+        draw:
+            polygons:
+                order: 80
+                color: '#f0e8f8'
+
+    landuse-railway:
+        data:
+            source: mapzen
+            layer: landuse
+        filter:
+              class: railway
+        draw:
+            polygons:
+                order: 90
+                color: 'hsl(30, 19%, 90%)'
+
+    landcover-wood:
+        data:
+            source: mapzen
+            layer: landcover
+        filter:
+              class: wood
+        draw:
+            polygons:
+                order: 100
+                color: '#66aa44'
+
+    landcover-grass:
+        data:
+            source: mapzen
+            layer: landcover
+        filter:
+              class: grass
+        draw:
+            polygons:
+                order: 110
+                color: '#d8e8c8'
+
+    landcover-grass-park:
+        data:
+            source: mapzen
+            layer: landcover
+        filter:
+              class: public_park
+        draw:
+            polygons:
+                order: 120
+                color: '#d8e8c8'
+
+    waterway:
+        data:
+            source: mapzen
+            layer: waterway
+        draw:
+            lines:
+              order: 130
+              color: '#a0c8f0'
+              width: [[14, 1px], [16, 2px], [18, 3m]]
+
     water:
         data:
             source: mapzen
             layer: water
-            filter:
-              type: Polygon
         draw:
             polygons:
                 order: global.order.water_p
                 color: '#AAAAFF'
             lines:
-                order: global.order.water_l
+                order: 140
 
-    #co: for some reason water labels get drawn all over the place
-    # ("gulf of mexico" is drawn near alaska for instance)
-    # can't find an openmaptiles map that has water labels
-    # I tried using generate_label_centroids, but that doesn't work
-    # so I give up
-    # water-labels:
-    #   data:
-    #     source: mapzen
-    #     layer: water_name
-    #   filter:
-    #     $geometry: point
-    #   draw:
-    #     text:
-    #       #anchor: center
-    #       #move_into_tile: true
-    #       #text_source: global.ux_language_text_source
-    #       visible: true # set to false because for some reason water labels get
-    #       #drawn all over the place
-    #       # ("gulf of mexico" is drawn near alaska for instance)
-    #       font:
-    #         fill: global.text_fill_water
-    #         family: global.text_font_family
-    #         weight: normal
+    landcover-ice-shelf:
+        data:
+            source: mapzen
+            layer: landcover
+        filter:
+              subclass: ice_shelf
+        draw:
+            polygons:
+                order: 150
+                color: '#ffffff'
 
-    #    transit-basemap:
-    #        data: { source: mapzen, layer: transportation }
-    #        rail:
-    #          filter:
-    #            class: rail
-    #          draw:
-    #            lines:
-    #              order: global.order.transit_rail
-    #              color: grey
-    #              width: [[14, 1px], [16, 2px], [18, 3m]]
-    #
-    #
-    #        roads:
-    #          filter:
-    #            class: [ motorway, trunk, primary, secondary, tertiary, minor, service, raceway, transit ]
-    #          draw:
-    #            lines:
-    #                color: black
-    #                width: 1px
-    #                order: global.order.transit_rail
-    #                # but give them all the same outline
-    #                # outline:
-    #                #     order: global.order.transit_roads
-    #
-    #    transit-labels:
-    #      data:
-    #        source: mapzen
-    #        layer: transportation_name
-    #      draw:
-    #        text:
-    #          anchor: top
-    #          text_source: global.ux_language_text_source
-    #          visible: true
-    #          font:
-    #            fill: white
-    #            family: global.text_font_family
-    #            weight: bold
-    #            stroke: { color: black, width: 2 }
-    #          outline:
-    #            width: 3px
-    #            color: black
+    building:
+        data:
+            source: mapzen
+            layer: building
+        draw:
+            polygons:
+                order: 160
+                color: '#f2eae2'
+
+    transit-basemap:
+        data: { source: mapzen, layer: transportation }
+        rail:
+          filter:
+            class: rail
+          draw:
+            lines:
+              order: global.order.transit_rail
+              color: grey
+              width: [[14, 1px], [16, 2px], [18, 3m]]
+
+
+        motorway:
+          filter:
+            class: motorway
+          draw:
+            lines:
+                color: '#ffcc88'
+                width: [[15, 2px], [18, 10px]]
+                order: 180
+                outline:
+                  color: '#e9ac77'
+                  width: 1px
+        
+        trunk:
+          filter:
+            class: [ trunk, primary ]
+          draw:
+            lines:
+                color: '#fff4c6'
+                width: [[15, 2px], [18, 10px]]
+                order: 180
+                outline:
+                  color: '#e9ac77'
+                  width: 1px
+        
+        secondary:
+          filter:
+            class: [ secondary, tertiary, unclassified ]
+          draw:
+            lines:
+                color: '#fea'
+                width: [[15, 2px], [18, 10px]]
+                order: 180
+                outline:
+                  color: '#e9ac77'
+                  width: 1px
+
+        #default (smallish roads)
+        draw:
+          lines:
+            color: '#fff'
+            width: 12
+            order: 180
+            outline:
+              color: '#cfcdca'
+              width: 1px
+            
+    transit-names:
+        data: { source: mapzen, layer: transportation_name }
+        
+        transit-motorway-names:
+          filter:
+            class: [ motorway, rail]
+          draw:
+            mapzen_icon_library:
+              priority: 20
+              # you need to match any custom shield to the vector tile `network` values
+              sprite: function() { return ('sdk_shield-' + feature.ref.length + 'char'); }
+              sprite_default: sdk_shield_5char
+              color: grey
+
+              # Size is specified below
+              repeat_group: shields
+              repeat_distance: [[8,90px],[10,40px],[13,30px]]
+              placement: midpoint
+              placement_min_length_ratio:
+                - [8, 0.1]
+                - [9, 0.25]
+                - [10, 0.25]
+                - [11, 0.15]
+                - [12, 1]
+                - [13, 1.50]
+                - [14, 2.0]
+              cull_from_tile: true # TIM: can't find doc for this???
+              #                    visible: false
+              text:
+                offset: [0px, -0.5px]
+                repeat_distance: 200px
+                anchor: center
+                text_source: function() { if( feature.ref.length < 6 ) { return feature.ref; } else { return ''; } }
+                font:
+                  family: Montserrat
+                  fill: function() { if(feature.colour == 'yellow') { return '#555'; } else { return 'white'; } }
+                  weight: 700
+                  size: [[7,7px],[12,8px],[16,11px]]
+                  stroke: { width: 0px }
+
+          width_1char:
+            filter: function() { return (feature.ref.length === 1); }
+            draw:
+              mapzen_icon_library:
+                size: [[6,[16px,16px]],[13,[18px,18px]],[16,[21px,21px]]]
+          width_2char:
+            filter: function() { return (feature.ref.length === 2); }
+            draw:
+              mapzen_icon_library:
+                size: [[6,[21px,16px]],[13,[24px,18px]],[16,[28px,21px]]]
+          width_3char:
+            filter: function() { return (feature.ref.length === 3); }
+            draw:
+              mapzen_icon_library:
+                size: [[6,[27px,16px]],[13,[31px,18px]],[16,[36px,21px]]]
+          width_4char:
+            filter: function() { return (feature.ref.length === 4); }
+            draw:
+              mapzen_icon_library:
+                size: [[6,[32px,16px]],[13,[36px,18px]],[16,[41px,21px]]]
+
+            early:
+              filter: { $zoom: { max: 14 } }
+              draw:
+                mapzen_icon_library:
+                  visible: false
+          width_5char:
+            filter: function() { return (feature.ref.length === 5); }
+            draw:
+              mapzen_icon_library:
+                size: [[6,[37px,16px]],[13,[41px,18px]],[16,[48px,21px]]]
+
+              # London is too crowded
+              early:
+                filter: { $zoom: { max: 14 } }
+                draw:
+                  mapzen_icon_library:
+                    visible: false
+          # this is kinda a hack
+          width_longggggg:
+            filter: function() { return (feature.ref.length > 5); }
+            draw:
+              mapzen_icon_library:
+                visible: false
+
+        # roads:
+        #   filter:
+        #     class: [ motorway, trunk, primary, secondary, tertiary, minor, service, raceway, transit ]
+        #   draw:
+        #     lines:
+        #         color: black
+        #         width: 1px
+        #         order: global.order.transit_rail
+        #         # but give them all the same outline
+        #         # outline:
+        #         #     order: global.order.transit_roads
+
+    transit-labels:
+      data:
+        source: mapzen
+        layer: transportation_name
+      draw:
+        text:
+          anchor: top
+          text_source: global.ux_language_text_source
+          visible: true
+          font:
+            fill: black
+            size: 14px
+            weight: bold
+          outline:
+            width: 2px
+            color: white
 
     #     arrows:
     #         # oneway arrows and shields are distinct groups!
@@ -4482,3 +4763,27 @@ layers:
 #                # but give them all the same outline
 #                outline:
 #                    order: 487
+    #co: for some reason water labels get drawn all over the place
+    # ("gulf of mexico" is drawn near alaska for instance)
+    # can't find an openmaptiles map that has water labels
+    # I tried using generate_label_centroids, but that doesn't work
+    # so I give up
+    # water-labels:
+    #   data:
+    #     source: mapzen
+    #     layer: water_name
+    #   filter:
+    #     $geometry: point
+    #   draw:
+    #     text:
+    #       #anchor: center
+    #       #move_into_tile: true
+    #       #text_source: global.ux_language_text_source
+    #       visible: true # set to false because for some reason water labels get
+    #       #drawn all over the place
+    #       # ("gulf of mexico" is drawn near alaska for instance)
+    #       font:
+    #         fill: global.text_fill_water
+    #         family: global.text_font_family
+    #         weight: normal
+

@@ -2019,3 +2019,41 @@ The script scripts/travis/script_deploy_android_snapshot.sh seems to build what 
 But it clones https://github.com/mapzen/android-config.git and calls
 "gradle uploadArchives" at the end.
 
+1/25/18
+
+Old mapzen server is very slow as well.
+
+So this means that maybe the problem is the latest version of tangram
+Or at least how we are using it
+
+1/29/18
+
+Ok so, we need to override touchinput.
+
+MapController creates a touch input in its constructor and its private so we have no access.
+
+We can override all the methods for touchinput within MapController, but there are some private
+methods that MapController calls for these things.
+nativeHandleFlingGesture(mapPointer, posX, posY, velocityX, velocityY) for example.
+
+If we can get a hold of touchInput, we can proxy it.
+
+Touch input is held by a GLSurfaceView.
+
+It doesn't seem there is any get method to retrieve it. no getOnTouchListener()
+
+We have a handle on the GLSurfaceView before we call the MapController in OsmMapView.
+
+However, we can override configureGLSurfaceView() so we can construct our own, including
+one where we can create an getOnTouchListener().
+
+So we do that, and then, we need to make our OnTouchListener be a proxy for the original.
+
+It would only have the longpressresponder, and ferry everything else to the original.
+Then we can re-setOnTouchListener in the glsurfaceview.
+
+A hack on a hack. So frustrating. This is why I hate working in java.
+
+Besides this, we also need to make MyTouchInput handle all messages and call TouchInput
+when necessary. This way we can override some other things, sigh too much to explain.
+A monstrous puzzle.

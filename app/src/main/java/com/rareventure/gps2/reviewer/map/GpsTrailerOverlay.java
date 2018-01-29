@@ -71,10 +71,6 @@ import java.util.Map.Entry;
 public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 {
 	private final int minCirclePxRadius;
-	//this is where we write our data to, which gets picked up by mapzen and drawn
-	//using the yaml file to style the points and lines
-	//We use two buffers and swap between them to avoid flickering
-	private MapData mapData1, mapData2;
 	private MapData mapData;
 
 	private final OsmMapView osmMapView;
@@ -134,16 +130,6 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 	 */
 	private boolean selectedAreaAddLock;
 	private SasDrawer sasDrawer;
-
-	private List<SceneUpdate> mapData1SceneUpdate =
-			Arrays.asList(new SceneUpdate[] {
-					new SceneUpdate("global.ttt_use_point_set1", "true")
-			});
-	private List<SceneUpdate> mapData2SceneUpdate =
-			Arrays.asList(new SceneUpdate[] {
-					new SceneUpdate("global.ttt_use_point_set1", "false")
-			});
-
 
 	public GpsTrailerOverlay(OsmMapGpsTrailerReviewerMapActivity activity,
 							   SuperThread superThread,
@@ -269,7 +255,9 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 
 				///* ttt_installer:remove_line */Log.d("GPS","times looking up time trees is "+TimeTree.hackTimesLookingUpTimeTrees);
 
-				allLinesCalculated = calcLines(localApStbox, minDepth);
+				//TODO 2 one day fix lines again
+				//allLinesCalculated = calcLines(localApStbox, minDepth);
+				allLinesCalculated = true;
 
 				//PERF: it would be faster to store the pixel locations
 
@@ -279,7 +267,7 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 				{
 					if(drawLines(localApStbox, minDepth))
 					{
-						///* ttt_installer:remove_line */Log.d("GPS", "setting all lines calculated false");
+						/* ttt_installer:remove_line */Log.d("GPS", "setting all lines calculated false");
 						allLinesCalculated = false;
 					}
 				}
@@ -296,13 +284,14 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 
 				boolean stBoxNotChanged;
 
-				synchronized(this)
-				{
+				synchronized(this) {
 					//we only say view is up to date if its up to date according to the requeted stbox
 					// (which may have changed while we were calculating)
-					if((stBoxNotChanged = localApStbox.equals(requestedStBox)) && allLinesCalculated
+					if ((stBoxNotChanged = localApStbox.equals(requestedStBox)) && allLinesCalculated
 							&& !stillMoreNodesToCalc)
 						viewUpToDate = true;
+					Log.d(GTG.TAG,"View up to date set to "+viewUpToDate+
+					" a: "+stBoxNotChanged+" l: "+allLinesCalculated+" s: "+stillMoreNodesToCalc);
 				}
 
 				if(stBoxNotChanged)
@@ -682,6 +671,8 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 	 */
 	private int drawPoints(AreaPanelSpaceTimeBox apStBox)
 	{
+		Log.d(GTG.TAG,"drawPoints!",new Exception());
+
 		//note, technically, this isn't needed, since writing to the view nodes will
 		//never interfere with code at this point to read them. But to make the code
 		//clearer, we do it anyway
@@ -710,7 +701,7 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 
 			Map<String, String> props = new HashMap<>();
 
-			mapData = mapData == mapData1 ? mapData2 : mapData1;
+			//mapData = mapData == mapData1 ? mapData2 : mapData1;
 //			mapData.beginChangeBlock();
 			mapData.clear();
 
@@ -783,9 +774,9 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 			} //while examining pointCount
 
 //			mapData.endChangeBlock();
-			mapController.updateSceneAsync(mapData == mapData1 ? mapData1SceneUpdate :
-					mapData2SceneUpdate);
-			//mapController.requestRender();
+//			mapController.updateSceneAsync(mapData == mapData1 ? mapData1SceneUpdate :
+//					mapData2SceneUpdate);
+			mapController.requestRender();
 
 			if(closestToCenterAp != null)
 			{
@@ -881,6 +872,7 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 
 				requestedStBox = newStBox;
 
+				Log.d(GTG.TAG,"notifyScreenChanged invoked redraw");
 				this.stNotify(this);
 			}
 		}
@@ -902,6 +894,7 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 			{
 				viewUpToDate = false;
 				distanceUpToDate = false;
+				Log.d(GTG.TAG,"notifyViewNodesChanged invoked redraw");
 				this.stNotify(this);
 			}
 		}
@@ -920,6 +913,7 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 				requestedStBox = new AreaPanelSpaceTimeBox(requestedStBox);
 				requestedStBox.pathList = sas.getResultPaths();
 				viewUpToDate = false;
+				Log.d(GTG.TAG,"notifyPathsChanged invoked redraw");
 				this.stNotify(this);
 			}
 		}
@@ -929,9 +923,7 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 	@Override
 	public void startTask(MapController mapController) {
 		this.mapController = mapController;
-		mapData1 = mapData = mapController.addDataLayer("gt_point1");
-		mapData2 = mapController.addDataLayer("gt_point2");
-		mapController.updateSceneAsync(mapData1SceneUpdate);
+		mapData = mapController.addDataLayer("gt_point");
 		sasDrawer = new SasDrawer(sas,mapController);
 		superThread.addTask(this);
 	}
