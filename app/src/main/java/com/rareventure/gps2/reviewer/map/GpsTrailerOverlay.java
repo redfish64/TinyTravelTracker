@@ -276,7 +276,8 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 				}
 
 				calcStartAndEndTimeOnScreen();
-				int currPoints = drawPoints(localApStbox);
+				if(!stillMoreNodesToCalc)
+					drawPoints(localApStbox);
 
 				//TODO 2 handle photos
 //				if(OsmMapGpsTrailerReviewerMapActivity.prefs.showPhotos)
