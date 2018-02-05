@@ -76,9 +76,9 @@ run("cp -r $proj_dir/gradle $temp_dir/gradle");
 system("cp $proj_dir/app/* $temp_dir/app");
 system("cp $proj_dir/* $temp_dir/");
 
-my ($version_name,$version_code) = read_from_file("$temp_dir/app/src/main/AndroidManifest.xml",
-						  'android:versionName="(.*?)"',
-						  'android:versionCode="(.*?)"'
+my ($version_name,$version_code) = read_from_file("$temp_dir/app/build.gradle",
+						  'versionName "(.*?)"',
+						  'versionCode (\d+)'
     );
 
 print "VERSION IS $version_name, $version_code\n";
@@ -155,7 +155,7 @@ if($real)
     print <<EoF ;
 #To install, run:
 
-adb -d install -r $temp_dir/app/build/outputs/apk/app-release.apk
+adb -d install -r $temp_dir/android_install/app/build/outputs/apk/release/app-release.apk
 
 EoF
 

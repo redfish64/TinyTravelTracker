@@ -26,6 +26,10 @@ _Note to users: If you have an issue you would like to see fixed, please click o
 
 Changelog:
 
+V 1.1.34 
+
+Now uses openmaptiles because mapzen.com shut down Feb 1st.
+
 V 1.1.30
 
 Reverted back to V 1.1.28. Mapzen's LOST is too inaccurate even when specifying "high precision"

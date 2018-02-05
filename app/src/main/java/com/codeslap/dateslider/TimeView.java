@@ -37,23 +37,23 @@ import java.util.Calendar;
  */
 public interface TimeView {
 
-    public static final float TEXT_SIZE_DP = 20;
-	public static final float MINI_TEXT_SIZE_DP = 8;
+    float TEXT_SIZE_DP = 20;
+	float MINI_TEXT_SIZE_DP = 8;
 
-	public void setVals(TimeObject to);
+	void setVals(TimeObject to);
 
-    public void setVals(TimeView other);
+    void setVals(TimeView other);
 
-    public String getTimeText();
+    String getTimeText();
 
-    public long getStartTime();
+    long getStartTime();
 
-    public long getEndTime();
+    long getEndTime();
 
     /**
      * This is a simple implementation of a TimeView which realised through a TextView.
      */
-    public static class TimeTextView extends TextView implements TimeView {
+    class TimeTextView extends android.support.v7.widget.AppCompatTextView implements TimeView {
         private long endTime, startTime;
 
         /**
@@ -114,7 +114,7 @@ public interface TimeView {
      * This is a more complex implementation of the TimeView consisting of a LinearLayout with
      * two TimeViews.
      */
-    public static class TimeLayoutView extends LinearLayout implements TimeView {
+    class TimeLayoutView extends LinearLayout implements TimeView {
         long endTime;
         long startTime;
         String text;
@@ -213,7 +213,7 @@ public interface TimeView {
      * More complex implementation of the TimeView which is based on the TimeLayoutView.
      * Sundays are colored red in here.
      */
-    public static class DayTimeLayoutView extends TimeLayoutView {
+    class DayTimeLayoutView extends TimeLayoutView {
 
         boolean isSunday = false;
 

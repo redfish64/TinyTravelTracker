@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.TimeZone;
 
+import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -62,6 +63,7 @@ public class MediaGalleryFragment extends Fragment
 	
 	private int lastGalleryPosition;
 	
+	@SuppressLint("ValidFragment")
 	public MediaGalleryFragment(OsmMapGpsTrailerReviewerMapActivity gtum, ArrayList<MediaLocTime> mlts) {
 		this.gtum = gtum;
 		this.mlts = mlts;
