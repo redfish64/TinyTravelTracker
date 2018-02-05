@@ -51,7 +51,7 @@ import android.widget.TextView;
  * LineBackgroundSpan because we want to make the bubble taller than the text
  * and TextView's clip is too aggressive.
  */
-public class ActionMenuButton extends TextView {
+public class ActionMenuButton extends android.support.v7.widget.AppCompatTextView {
     private static final int CORNER_RADIUS = 8;
     private static final int PADDING_H = 5;
     private static final int PADDING_V = 1;
