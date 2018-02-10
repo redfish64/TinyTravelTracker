@@ -1041,7 +1041,7 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 		/**
 		 * Maximum time to calculate between redraws
 		 */
-		public long maxDrawCalcTime = 200;
+		public long maxDrawCalcTime = 2000;
 
 		/**
 		 * The percentage of screen size the size of smallest viewable AreaPanel should be.
