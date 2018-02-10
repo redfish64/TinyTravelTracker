@@ -6,8 +6,8 @@ android {
         applicationId "com.rareventure.gps2"
         minSdkVersion 19
         targetSdkVersion 26
-        versionCode 78
-        versionName "1.1.35"
+        versionCode 79
+        versionName "1.1.36"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

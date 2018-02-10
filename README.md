@@ -26,6 +26,14 @@ _Note to users: If you have an issue you would like to see fixed, please click o
 
 Changelog:
 
+V 1.1.36 
+
+Attempted fix of issue 76 which causes some ROMS to crash
+
+V 1.1.35 
+
+Small tweak to make drawing faster
+
 V 1.1.34 
 
 Now uses openmaptiles because mapzen.com shut down Feb 1st.
