@@ -28,14 +28,21 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
+import pl.tajchert.nammu.Nammu;
+
 /**
- * WARNING: this  code is duplicated in GTGActivity, GTGFragmentActivity and GTGPreferencesActiity. Be sure to also
+ * WARNING: this  code is duplicated in GTGListActivity, GTGFragmentActivity and GTGPreferencesActiity. Be sure to also
  * change in there what is in here
  */
 public abstract class GTGActivity extends Activity implements IGTGActivity {
 	
 	GTGActivityHelper helper = new GTGActivityHelper(this, this.getRequirements());
-	
+
+	@Override
+	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+		Nammu.onRequestPermissionsResult(requestCode, permissions, grantResults);
+	}
+
 	@Override
 	protected final void onCreate(Bundle bundle) {
 		super.onCreate(bundle);

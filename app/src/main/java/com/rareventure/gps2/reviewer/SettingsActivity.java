@@ -19,6 +19,7 @@
 */
 package com.rareventure.gps2.reviewer;
 
+import android.Manifest;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
@@ -49,6 +50,9 @@ import com.rareventure.gps2.gpx.RestoreGpxBackup;
 import com.rareventure.gps2.reviewer.map.OsmMapGpsTrailerReviewerMapActivity;
 
 import java.util.Arrays;
+
+import pl.tajchert.nammu.Nammu;
+import pl.tajchert.nammu.PermissionCallback;
 
 public class SettingsActivity extends GTGPreferenceActivity implements OnPreferenceChangeListener, OnPreferenceClickListener, OnDismissListener {
 	private final Runnable SAVE_PREFS_AND_RESTART_COLLECTOR = new Runnable() 
@@ -453,13 +457,33 @@ public class SettingsActivity extends GTGPreferenceActivity implements OnPrefere
 		}
 		else if(preference == createBackupFilePref)
 		{
-			startInternalActivity(new Intent(this, CreateGpxBackup.class));
+			Nammu.askForPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE, new PermissionCallback() {
+				@Override
+				public void permissionGranted() {
+					startInternalActivity(new Intent(SettingsActivity.this, CreateGpxBackup.class));
+				}
+
+				@Override
+				public void permissionRefused() {
+
+				}
+			});
 		}
 		else if(preference == restoreBackupFilePref)
 		{
-			//we don't require the backstack, because NOT_IN_RESTORE Requirement is
-			//required by most pages, except that it can't be required for RestoreGpxBackup
-			startInternalActivity(new Intent(this, RestoreGpxBackup.class), false);
+			Nammu.askForPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE, new PermissionCallback() {
+				@Override
+				public void permissionGranted() {
+					//we don't require the backstack, because NOT_IN_RESTORE Requirement is
+					//required by most pages, except that it can't be required for RestoreGpxBackup
+					startInternalActivity(new Intent(SettingsActivity.this, RestoreGpxBackup.class), false);
+				}
+
+				@Override
+				public void permissionRefused() {
+
+				}
+			});
 		}
 		else if(preference == colorblindSettings)
 			startInternalActivity(new Intent(this, ChooseColorsScreen.class));

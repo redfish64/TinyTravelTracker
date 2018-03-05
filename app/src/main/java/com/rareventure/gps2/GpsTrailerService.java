@@ -58,8 +58,10 @@ import com.rareventure.gps2.database.TAssert;
 import com.rareventure.gps2.reviewer.SettingsActivity;
 import com.rareventure.gps2.reviewer.wizard.WelcomePage;
 
+import pl.tajchert.nammu.Nammu;
+
 public class GpsTrailerService extends Service {
-	private static final String TAG = "GpsTrailerService";
+	public static final String TAG = "GpsTrailerService";
 
 	final RemoteCallbackList<IGpsTrailerServiceCallback> mCallbacks = new RemoteCallbackList<IGpsTrailerServiceCallback>();
 
@@ -115,34 +117,53 @@ public class GpsTrailerService extends Service {
 
 		@Override
 		public boolean onGTGEvent(GTGEvent event) {
+//			Log.d(GpsTrailerService.TAG,"onGTGEvent: "+event);
 
+			//note the we return true, in the if statements below, indicating we
+			// handled the error events and
+			//to shut them off, so that when we restart, we will check again.
+			//(we share our process with GpsTrailer, so, even if
+			//we stop self, the event would still be turned on otherwise.)
 			if (event == GTGEvent.ERROR_GPS_DISABLED) {
 				updateNotification(FLAG_GPS_ENABLED, false);
 				stopSelf();
+				return true;
+			}
+			if (event == GTGEvent.ERROR_GPS_NO_PERMISSION) {
+				updateNotification(FLAG_ERROR_NO_GPS_PERMISSION, true);
+				updateNotification(FLAG_GPS_ENABLED, false);
+				stopSelf();
+				return true;
 			}
 			if (event == GTGEvent.ERROR_SDCARD_NOT_MOUNTED) {
 				updateNotification(FLAG_ERROR_SDCARD_NOT_MOUNTED, true);
 				stopSelf();
+				return true;
 			}
 			else if (event == GTGEvent.ERROR_LOW_FREE_SPACE) {
 				updateNotification(FLAG_ERROR_LOW_FREE_SPACE, true);
 				stopSelf();
+				return true;
 			}
 			else if (event == GTGEvent.ERROR_SERVICE_INTERNAL_ERROR) {
 				updateNotification(FLAG_ERROR_INTERNAL, true);
 				stopSelf();
+				return true;
 			}
 			else if (event == GTGEvent.ERROR_LOW_BATTERY) {
 				updateNotification(FLAG_BATTERY_LOW, true);
 				stopSelf();
+				return true;
 			}
 			else if (event == GTGEvent.TRIAL_PERIOD_EXPIRED) {
 				updateNotification(FLAG_TRIAL_EXPIRED, true);
 				stopSelf();
+				return true;
 			}
 			else if (event == GTGEvent.DOING_RESTORE) {
 				updateNotification(FLAG_IN_RESTORE, true);
 				stopSelf();
+				return true;
 			}
 			else if (event == GTGEvent.ERROR_UNLICENSED) {
 				//co: we initially don't want to do anything if the user is unlicensed,
@@ -173,6 +194,7 @@ public class GpsTrailerService extends Service {
 	private static final int FLAG_ERROR_DB_PROBLEM = 128;
 	private static final int FLAG_TRIAL_EXPIRED = 256;
 	private static final int FLAG_IN_RESTORE = 512;
+	private static final int FLAG_ERROR_NO_GPS_PERMISSION= 1024;
 
 
 	private int notificationFlags = 0;
@@ -245,11 +267,15 @@ public class GpsTrailerService extends Service {
 							false),
 
 			new NotificationSetting(R.drawable.red_error,
-					R.string.service_gps_not_enabled, true, 0,
-					FLAG_GPS_ENABLED, new Intent(
-							Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+					R.string.service_gps_must_grant_permission, true, FLAG_ERROR_NO_GPS_PERMISSION,
+					0,null
+					, true),
 
-					, false),
+			new NotificationSetting(R.drawable.red_error,
+					R.string.service_gps_not_enabled, true, 0,
+                                       FLAG_GPS_ENABLED, new Intent(
+                                                       Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+					, true),
 
 			new NotificationSetting(R.drawable.green, R.string.service_active,
 					false, FLAG_GPS_ENABLED | FLAG_FINISHED_STARTUP
@@ -276,7 +302,7 @@ public class GpsTrailerService extends Service {
 			}
 		}
 
-		/* ttt_installer:remove_line */Log.d(GTG.TAG, "Flags is " + notificationFlags + ", current notset is "	+ currentNotificationSetting);
+		/* ttt_installer:remove_line */Log.d(GpsTrailerService.TAG, "Flags is " + notificationFlags + ", current notset is "	+ currentNotificationSetting);
 
 		if (currentNotificationSetting != oldNotSetting) {
 			showCurrentNotification();
@@ -286,13 +312,17 @@ public class GpsTrailerService extends Service {
 	@Override
 	public void onCreate() {
 		Log.d(TAG, "GPS Service Startup");
-		
-		GTG.addGTGEventListener(gtgEventListener);
 
-		//reset all flags 
-		updateNotification(Integer.MAX_VALUE, false);
-		
-		updateNotification(FLAG_GPS_ENABLED, true);
+		//android.os.Debug.waitForDebugger(); //FODO 1 IXME DISABLE!
+
+		Nammu.init(this);
+
+        //reset all flags
+        updateNotification(Integer.MAX_VALUE, false);
+
+        updateNotification(FLAG_GPS_ENABLED, true);
+
+		GTG.addGTGEventListener(gtgEventListener);
 
 		//read isCollectData first from shared prefs and if its false, quit immediately
 		//we don't want to notify the user that we ran for any reason if this is false
@@ -350,8 +380,6 @@ public class GpsTrailerService extends Service {
 					stopSelf();
 					return;
 				}
-
-				int status = GTG.requireDbReady();
 
 				if (GTG.requireDbReady() != GTG.REQUIRE_DB_READY_OK) {
 					updateNotification(FLAG_ERROR_DB_PROBLEM, true);
@@ -446,6 +474,7 @@ public class GpsTrailerService extends Service {
 	 * @param intent 
 	 */
 	private void showCurrentNotification() {
+//		Log.d(TAG, "Showing current notification");
 		NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
 		if (currentNotificationSetting.msgId == -1
@@ -462,7 +491,7 @@ public class GpsTrailerService extends Service {
 		builder.setSmallIcon(currentNotificationSetting.iconId);
 		builder.setOngoing(currentNotificationSetting.isOngoing);
 		builder.setAutoCancel(!currentNotificationSetting.isOngoing);
-		builder.setTicker(text);
+		builder.setContentText(text);
 
 		// The PendingIntent to launch our activity if the user selects this notification
 		// TODO 2.5 make settings lite for notification bar only. Set it's task affinity
@@ -478,7 +507,7 @@ public class GpsTrailerService extends Service {
 
 		builder.setContentIntent(contentIntent);
 
-		Notification notification = builder.getNotification();
+		Notification notification = builder.build();
 
 		nm.notify(GTG.FROG_NOTIFICATION_ID, notification);
 	}

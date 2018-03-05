@@ -6,8 +6,8 @@ android {
         applicationId "com.rareventure.gps2"
         minSdkVersion 19
         targetSdkVersion 26
-        versionCode 79
-        versionName "1.1.36"
+        versionCode 80
+        versionName "1.1.37"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -30,4 +30,5 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
     implementation 'ch.acra:acra:4.9.2'
     implementation 'com.mapzen.tangram:tangram:0.9.0'
+    implementation 'com.github.tajchert:nammu:1.2.0'
 }

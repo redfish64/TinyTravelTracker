@@ -672,7 +672,7 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 	 */
 	private int drawPoints(AreaPanelSpaceTimeBox apStBox)
 	{
-		Log.d(GTG.TAG,"drawPoints!",new Exception());
+		//Log.d(GTG.TAG,"drawPoints!",new Exception());
 
 		//note, technically, this isn't needed, since writing to the view nodes will
 		//never interfere with code at this point to read them. But to make the code

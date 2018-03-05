@@ -23,14 +23,21 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.DataSetObserver;
+import android.location.Criteria;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.Menu;
@@ -72,7 +79,6 @@ import com.rareventure.gps2.GTG.GTGEventListener;
 import com.rareventure.gps2.GTG.Requirement;
 import com.rareventure.gps2.R;
 import com.rareventure.gps2.database.TimeZoneTimeRow;
-import com.rareventure.gps2.database.cache.AreaPanel;
 import com.rareventure.gps2.database.cache.AreaPanelSpaceTimeBox;
 import com.rareventure.gps2.reviewer.EnterFromDateToToDateActivity;
 import com.rareventure.gps2.reviewer.SettingsActivity;
@@ -88,6 +94,30 @@ GTGEventListener
 {
 	private ImageButton menuButton;
 	private GpsLocationOverlay locationOverlay;
+	private LocationManager locationManager;
+	private boolean userDoesntWantGpsOn;
+
+	public void setupLocationUpdates(GpsLocationOverlay gpsLocationOverlay) {
+		//the user may have disabled us from reading location data
+		if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+				== PackageManager.PERMISSION_GRANTED)
+		{
+			Criteria criteria = new Criteria();
+			criteria.setSpeedRequired(false);
+			criteria.setAccuracy(Criteria.ACCURACY_FINE);
+			criteria.setAltitudeRequired(false);
+			criteria.setBearingRequired(false);
+			criteria.setCostAllowed(false);
+
+			String locationProviderName = locationManager.getBestProvider(criteria, true);
+			locationManager.requestLocationUpdates(locationProviderName, 0, 0, gpsLocationOverlay, getMainLooper());
+		}
+	}
+
+	public void removeLocationUpdates(GpsLocationOverlay gpsLocationOverlay) {
+		locationManager.removeUpdates(gpsLocationOverlay);
+	}
+
 
 	private static enum SasPanelState { GONE, TAB, FULL;
 	
@@ -107,6 +137,8 @@ GTGEventListener
 	public void doOnCreate(Bundle savedInstanceState)
     {
         super.doOnCreate(savedInstanceState);
+
+		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
         startService(new Intent(this, GpsTrailerService.class));
 

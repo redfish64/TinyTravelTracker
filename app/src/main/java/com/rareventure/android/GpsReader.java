@@ -25,8 +25,11 @@ import java.io.IOException;
 import com.rareventure.android.AndroidPreferenceSet.AndroidPreferences;
 import com.rareventure.gps2.GTG;
 import com.rareventure.gps2.GTG.GTGEvent;
+import com.rareventure.gps2.GpsTrailerService;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -34,6 +37,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Looper;
 import android.os.SystemClock;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
 public class GpsReader implements DataReader
@@ -64,13 +68,13 @@ public class GpsReader implements DataReader
 
 		@Override
 		public void onProviderDisabled(String provider) {
-//			Log.d(GTG.TAG,"GPS provider disabled: "+provider);
+//			Log.d(GpsTrailerService.TAG,"GPS provider disabled: "+provider);
 			GTG.alert( GTG.GTGEvent.ERROR_GPS_DISABLED);
 		}
 
 		@Override
 		public void onProviderEnabled(String provider) {
-//			Log.d(GTG.TAG,"GPS provider enabled: "+provider);
+//			Log.d(GpsTrailerService.TAG,"GPS provider enabled: "+provider);
 			GTG.alert( GTG.GTGEvent.ERROR_GPS_DISABLED, false);
 		}
 
@@ -86,7 +90,6 @@ public class GpsReader implements DataReader
 	
 	private Looper looper;
 	private String tag;
-	private String providerName;
 	private DataOutputStream os;
 	private Context ctx;
 	
@@ -110,16 +113,6 @@ public class GpsReader implements DataReader
     	//TODO 3.2: handle multile levels of accuracy
     	//basically read from every gps system available
         lm = (LocationManager) ctx.getSystemService(Context.LOCATION_SERVICE);
-        
-        Criteria criteria = new Criteria();
-        criteria.setSpeedRequired(false);
-        criteria.setAccuracy(Criteria.ACCURACY_FINE);
-        criteria.setAltitudeRequired(false);
-        criteria.setBearingRequired(false);
-        criteria.setCostAllowed(false);
-//        criteria.setPowerRequirement(Criteria.POWER_HIGH);
-        
-        providerName =  lm.getBestProvider(criteria, true);
         
     }
     
@@ -177,16 +170,36 @@ public class GpsReader implements DataReader
 	public void turnOn() {
     	synchronized(lock)
     	{
+//    		Log.d(GpsTrailerService.TAG,"Turning on gps");
 			if(!lm.isProviderEnabled( LocationManager.GPS_PROVIDER))
 			{
 				GTG.alert( GTGEvent.ERROR_GPS_DISABLED);
 				return;
 			}
-    		if(gpsOn)
-    			return; //already on
+			if(ActivityCompat.checkSelfPermission(this.ctx, Manifest.permission.ACCESS_FINE_LOCATION)
+					!= PackageManager.PERMISSION_GRANTED)
+			{
+				GTG.alert( GTGEvent.ERROR_GPS_NO_PERMISSION);
+//				Log.d(GpsTrailerService.TAG,"Failed no permission");
+				return;
+			}
+
+    		if(gpsOn) {
+//				Log.d(GpsTrailerService.TAG,"Gps already on");
+				return; //already on
+			}
 			gpsOn = true;
-			
-			lm.requestLocationUpdates(providerName, prefs.gpsRecurringTimeMs, 0, 
+
+//			Log.d(GpsTrailerService.TAG,"Really turning on");
+			Criteria criteria = new Criteria();
+			criteria.setSpeedRequired(false);
+			criteria.setAccuracy(Criteria.ACCURACY_FINE);
+			criteria.setAltitudeRequired(false);
+			criteria.setBearingRequired(false);
+			criteria.setCostAllowed(false);
+
+			String providerName =  lm.getBestProvider(criteria, true);
+			lm.requestLocationUpdates(providerName, prefs.gpsRecurringTimeMs, 0,
 					locationListener, looper);
     	}
 	}
@@ -194,9 +207,11 @@ public class GpsReader implements DataReader
 	public void turnOff() {
     	synchronized(lock)
     	{
+//			Log.d(GpsTrailerService.TAG,"Turning off gps");
     		if(!gpsOn)
     			return; //already off
 			gpsOn = false;
+//			Log.d(GpsTrailerService.TAG,"Really offing gps");
 			lm.removeUpdates(locationListener);
     	}
     	

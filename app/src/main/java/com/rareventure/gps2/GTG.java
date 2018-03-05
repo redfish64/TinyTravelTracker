@@ -895,17 +895,24 @@ public class GTG {
 	
 	public static final int SETTINGS_APP_ID = 3;
 	public static final int GPS_TRAILER_SERVICE_APP_ID = 99;
-	
+
+	/**
+	 * True if we requested the user let us use gps, and they said no
+	 */
+	public static boolean userDoesntWantUsToHaveGpsPerm;
 
 	//TODO 2.01 add instrumentation and automatic error reporting
 	
 	public static enum GTGEvent { 
-								ERROR_LOW_FREE_SPACE,
-							    ERROR_SDCARD_NOT_MOUNTED, 
-								ERROR_LOW_BATTERY, ERROR_GPS_DISABLED, 
-								ERROR_SERVICE_INTERNAL_ERROR, 
-								TRIAL_PERIOD_EXPIRED, TTT_SERVER_DOWN, 
-								 ERROR_UNLICENSED, PROCESSING_GPS_POINTS, LOADING_MEDIA, DOING_RESTORE ; 
+		ERROR_LOW_FREE_SPACE,
+		ERROR_SDCARD_NOT_MOUNTED,
+		ERROR_LOW_BATTERY,
+		ERROR_GPS_DISABLED,
+		ERROR_GPS_NO_PERMISSION,
+
+		ERROR_SERVICE_INTERNAL_ERROR,
+		TRIAL_PERIOD_EXPIRED, TTT_SERVER_DOWN,
+	 	ERROR_UNLICENSED, PROCESSING_GPS_POINTS, LOADING_MEDIA, DOING_RESTORE ;
 								
 		public boolean isOn;
 		public Object obj;
@@ -1025,20 +1032,26 @@ public class GTG {
 	 */
 	public static void alert(final GTGEvent event, final boolean isOn, final Object obj) {
 		int i;
-		
+
+//		Log.d(GTG.TAG,"GTGAlert: event: "+event+", isOn: "+isOn);
+
 		synchronized(eventListeners)
 		{
-			if(event.isOn == isOn && obj == null)
+			if(event.isOn == isOn && obj == null) {
+//				Log.d(GTG.TAG,"GTGAlert: event ignored");
 				return;
-			
+			}
+
 			event.isOn = isOn;
 			event.obj = obj;
 			
 			localEventListeners.clear();
 			localEventListeners.addAll(eventListeners.keySet());
 			i = localEventListeners.size()-1;
+
+//			Log.d(GTG.TAG,"GTGAlert: num listeners "+(i+1));
 		}
-		
+
 		for(; i >= 0; i--)
 		{
 			GTGEventListener el;
@@ -1397,8 +1410,15 @@ public class GTG {
 			GTGEventListener eventListener) {
 		synchronized(eventListeners)
 		{
-			if(!eventListeners.containsKey(eventListener))
-				eventListeners.put(eventListener, Boolean.TRUE);
+			if(eventListeners.containsKey(eventListener))
+				return;
+
+			for(GTGEvent event : GTGEvent.values()) {
+				if(event.isOn)
+					eventListener.onGTGEvent(event);
+			}
+
+			eventListeners.put(eventListener, Boolean.TRUE);
 		}
 	}
 

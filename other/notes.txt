@@ -2057,3 +2057,34 @@ A hack on a hack. So frustrating. This is why I hate working in java.
 Besides this, we also need to make MyTouchInput handle all messages and call TouchInput
 when necessary. This way we can override some other things, sigh too much to explain.
 A monstrous puzzle.
+
+2/10/18
+
+To use ttt_installer within nix:
+
+For some reason when we upgrade nix, perl gets upgraded to version 5.26, and it should be 5.24.
+Do this to fix:
+
+nix-env -f "<nixpkgs>" -iA perl
+
+You need to run the installer within the environment of android-studio. So open a terminal within
+android-studio (an actual window inside the IDE). Then run:
+
+export PATH=$PATH:~/.nix-profile/bin:/run/current-system/sw/bin/
+
+Then you need to get the LD_LIBRARY_PATH from the proc. So find the pid then go to /proc/<pid> and
+run:
+
+cat environ  | perl -pe 's/\0/\n/g'
+
+Then copy the LD_LIBRARY_PATH... line and paste it into the android-studio terminal
+
+Then run:
+
+perl  other/ttt_install.pl -real /t/adt-bundle-linux-x86_64-20140321/sdk /home/tim/StudioProjects/TinyTravelTracker "Tiny Travel Tracker - Free" "Tiny Travel Tracker" com.rareventure.gps2_trial com.rareventure.gps2_premium premium ; mv /tmp/android_install/app/build/outputs/apk/release/app-release.apk ~/premium.apk
+
+for premium and:
+
+perl  other/ttt_install.pl -real /t/adt-bundle-linux-x86_64-20140321/sdk /home/tim/StudioProjects/TinyTravelTracker "Tiny Travel Tracker - Free" "Tiny Travel Tracker" com.rareventure.gps2_trial com.rareventure.gps2_premium trial ; mv /tmp/android_install/app/build/outputs/apk/release/app-release.apk ~/trial.apk
+
+for trial.

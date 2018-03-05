@@ -23,7 +23,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -39,6 +41,8 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Toast;
@@ -57,7 +61,6 @@ import com.rareventure.gps2.database.cache.AreaPanelSpaceTimeBox;
 public class GpsLocationOverlay implements GpsOverlay, LocationListener
 {
 	private OsmMapGpsTrailerReviewerMapActivity activity;
-	private LocationManager lm;
 	private long lastLocationReadingMs = 0;
 	private float lastLocationAccuracy;
 
@@ -75,9 +78,7 @@ public class GpsLocationOverlay implements GpsOverlay, LocationListener
 		//TODO 4: gps reader should start up all location updates, and continue
 		// to run until it gets the best location (from the most accurate provider)
 		// turning off each provider as soon as it gets a location
-		
-		lm = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
-		
+
 //		locationAnim = AnimationUtils.loadAnimation(activity, R.drawable.location_anim);
 	}
 
@@ -185,21 +186,15 @@ public class GpsLocationOverlay implements GpsOverlay, LocationListener
 
 	@Override
 	public void onPause() {
-		lm.removeUpdates(this);
+		activity.removeLocationUpdates(this);
 	}
 
 	@Override
 	public void onResume() {
-		Criteria criteria = new Criteria();
-		criteria.setSpeedRequired(false);
-		criteria.setAccuracy(Criteria.ACCURACY_FINE);
-		criteria.setAltitudeRequired(false);
-		criteria.setBearingRequired(false);
-		criteria.setCostAllowed(false);
 
-		String providerName = lm.getBestProvider(criteria, true);
-		lm.requestLocationUpdates(providerName, 0, 0, this, activity.getMainLooper());
+		activity.setupLocationUpdates(this);
 	}
+
 
 	@Override
 	public void startTask(MapController mapController) {

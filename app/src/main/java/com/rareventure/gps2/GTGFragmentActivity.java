@@ -29,6 +29,8 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 
+import pl.tajchert.nammu.Nammu;
+
 /**
  * WARNING: this  code is duplicated in GTGActivity, GTGFragmentActivity and GTGPreferencesActiity. Be sure to also
  * change in there what is in here
@@ -36,8 +38,12 @@ import android.util.Log;
 public abstract class GTGFragmentActivity extends FragmentActivity implements IGTGActivity
 {
 	GTGActivityHelper helper = new GTGActivityHelper(this, this.getRequirements());
-	
-	
+
+	@Override
+	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+		Nammu.onRequestPermissionsResult(requestCode, permissions, grantResults);
+	}
+
 	@Override
 	protected final void onCreate(Bundle bundle) {
 		super.onCreate(bundle);

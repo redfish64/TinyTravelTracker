@@ -180,4 +180,5 @@
     <string name="write_to_gps_wake_lock_log_summary">Write wake lock calls to \"%s\" for debugging purposes</string>
     <string name="gps_wake_lock_filename">/sdcard/ttt_wake_lock_debug.txt</string>
     <string name="conclusion_help_menu_tip"><![CDATA[If you would like to view the manual, on the following screen, press <img src="1"/> (or <img src="2"/> on older phones) and select "Help"]]></string>
+    <string name="service_gps_must_grant_permission">Permission to use GPS has not been granted.</string>
 </resources>

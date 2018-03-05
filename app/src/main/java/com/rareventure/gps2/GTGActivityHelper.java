@@ -31,9 +31,14 @@ import com.rareventure.gps2.reviewer.password.EnterPasswordActivity;
 import com.rareventure.gps2.reviewer.wizard.EnterNewPasswordPage;
 import com.rareventure.gps2.reviewer.wizard.WelcomePage;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+
+import pl.tajchert.nammu.Nammu;
+import pl.tajchert.nammu.PermissionCallback;
 
 public class GTGActivityHelper {
 	private Activity activity;
@@ -49,8 +54,8 @@ public class GTGActivityHelper {
 	 * it won't then ask for a password)
 	 */
 	private int neededRequirements;
-	
-	
+
+
 	private static enum State {
 		START,
 		IN_DO_ON_CREATE,
@@ -106,7 +111,35 @@ public class GTGActivityHelper {
 
 		neededRequirements = (neededRequirements | i.getIntExtra(INTENT_REQUIREMENTS_BITMAP, 0));
 	}
-	
+
+	/**
+	 * Asks the user to let us use the gps, just like in the old Windows XP days.
+	 * Allow or deny, user? What's it going to be?
+	 */
+	private void getGpsAllowOrDeny() {
+		if(GTG.userDoesntWantUsToHaveGpsPerm)
+			return;
+
+		if(!Nammu.hasPermission(activity,Manifest.permission.ACCESS_FINE_LOCATION)) {
+			Nammu.askForPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION,
+					new PermissionCallback() {
+
+						@Override
+						public void permissionGranted() {
+//							Log.d(GTG.TAG,"Am i being called???? permissionGranted");
+							GTG.alert(GTG.GTGEvent.ERROR_GPS_NO_PERMISSION, false);
+							activity.startService(new Intent(activity,
+									GpsTrailerService.class));
+						}
+
+						@Override
+						public void permissionRefused() {
+							GTG.userDoesntWantUsToHaveGpsPerm = true;
+						}
+					});
+		}
+	}
+
 	public void onCreate(Bundle bundle)
 	{
 		//we always start the service incase the process was killed. If the service shouldn't
@@ -145,7 +178,9 @@ public class GTGActivityHelper {
 	
 
 	public void onResume()
-	{	
+	{
+		getGpsAllowOrDeny();
+
 		if(forwarded)
 			return;
 		

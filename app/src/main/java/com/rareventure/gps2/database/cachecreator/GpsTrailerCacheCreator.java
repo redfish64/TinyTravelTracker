@@ -362,17 +362,24 @@ public class GpsTrailerCacheCreator extends Thread {
 					if(loadNextPoints())
 						nextTimeToLoadPointsMs = System.currentTimeMillis() + prefs.areaPanelUpdateGpsLocSpinLockMs;
 				}
-		
-				//update the media (images and videos) r-tree based on the media
-				// urls 
-				if(this.mediaDirty && gtum != null)
-				{
-					GTG.alert(GTGEvent.PROCESSING_GPS_POINTS,false);
-					//if we finished updating all the images
-					if(GTG.mediaLocTimeMap.updateFromGallery(this, gtum.getContentResolver()))
-						this.mediaDirty = false;
-				}
-		
+
+				//TODO 2.5 Enable media on the map eventually
+				//co: we don't currently support images and videos on the path right now,
+				//and furthermore, we need read_external_storage permission to
+				//do this, and the user may not have granted it.
+				//WARNING:
+				//if you uncomment this, make sure to check for the read_external_storage
+				//permission, or the app will crash for new users!
+//				//update the media (images and videos) r-tree based on the media
+//				// urls
+//				if(this.mediaDirty && gtum != null)
+//				{
+//					GTG.alert(GTGEvent.PROCESSING_GPS_POINTS,false);
+//					//if we finished updating all the images
+//					if(GTG.mediaLocTimeMap.updateFromGallery(this, gtum.getContentResolver()))
+//						this.mediaDirty = false;
+//				}
+
 				//there are two things to wait for. First, for gps service to collect more points,
 				// and second, for the drawer thread to finish calculating its view nodes so they are
 				// no longer dirty (to make it easy we don't update view nodes until they are all clean)

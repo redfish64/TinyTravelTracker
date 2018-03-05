@@ -29,6 +29,8 @@ import com.rareventure.gps2.reviewer.SettingsActivity;
 import android.app.Application;
 import android.content.Intent;
 
+import pl.tajchert.nammu.Nammu;
+
 /**
  * Does stuff that is common to all gps trailer reviewer type things
  */
@@ -55,6 +57,8 @@ public class GpsTrailerReviewerApplication extends Application
     public void onCreate() {
         // The following line triggers the initialization of ACRA
         ACRA.init(this);
+
+        Nammu.init(this);
         
         super.onCreate();
     }
