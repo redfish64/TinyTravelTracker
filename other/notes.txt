@@ -2075,7 +2075,7 @@ export PATH=$PATH:~/.nix-profile/bin:/run/current-system/sw/bin/
 Then you need to get the LD_LIBRARY_PATH from the proc. So find the pid then go to /proc/<pid> and
 run:
 
-cat environ  | perl -pe 's/\0/\n/g'
+cat environ  | perl -pe 's/\0/\n/g' | grep LD_LIBRARY_PATH
 
 Then copy the LD_LIBRARY_PATH... line and paste it into the android-studio terminal
 
