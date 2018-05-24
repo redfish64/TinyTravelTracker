@@ -23,6 +23,7 @@ import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -34,8 +35,8 @@ public class GpsTrailerReceiver extends BroadcastReceiver
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		Log.d("GTG", "GpsTrailerReceiver called");
-		
-        ComponentName name = context.startService(new Intent(context,
+
+        ContextCompat.startForegroundService(context,new Intent(context,
                 GpsTrailerService.class));
 //		Toast.makeText(context, "Good morning! " +intent.getAction(),
 //				Toast.LENGTH_SHORT).show();

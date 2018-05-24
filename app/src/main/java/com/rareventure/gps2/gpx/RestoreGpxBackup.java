@@ -43,6 +43,7 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -141,9 +142,6 @@ public class RestoreGpxBackup extends ProgressDialogActivity {
 
 		/**
 		 * Task and tasknumber are only used if we haven't already loaded the data in memory
-		 * @param validateAndRestoreGpxBackupTask 
-		 * @param t
-		 * @param taskNumber
 		 * @return
 		 * @throws ZipException
 		 * @throws IOException
@@ -677,7 +675,7 @@ public class RestoreGpxBackup extends ProgressDialogActivity {
 			GTG.setIsInRestore(false);
 			
 			//restart the gps service now that we're no longer restoring
-	        startService(new Intent(RestoreGpxBackup.this,
+			ContextCompat.startForegroundService(RestoreGpxBackup.this,new Intent(RestoreGpxBackup.this,
 	                GpsTrailerService.class));
 	        
 			getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);

@@ -33,8 +33,11 @@ import android.util.Log;
  * Testing and debugging utilities
  */
 public class TestUtil {
+	//TODO 3 this is a big hack. It used to write in a binary format, but that's silly because
+	//we turned it off for the most part, so we are converting back to text. So there is a lot
+	// of weird code for binary stuff here that isn't used
 	private static final String NAME_FORMAT = "%8d Mode %2d: %-30s ";
-	private static String tag = "TestUtil(set me!)";
+	private static String tag = "GpsTrailerTestUtil";
 	private static WriteConstants mode;
 	
 	private static int count = 0;
@@ -53,8 +56,7 @@ public class TestUtil {
 	public static void writeMode(DataOutputStream os,
 			WriteConstants writeConstants) throws IOException {
 		if(os != null) {
-			os.write(Type.MODE.ordinal());
-			os.writeByte(writeConstants.ordinal());
+			os.writeChars("Thread "+Thread.currentThread()+" Mode "+writeConstants+"\n");
 		}
 		TestUtil.mode = writeConstants;
 		if(!modesToSuppress.contains(writeConstants))
@@ -62,99 +64,63 @@ public class TestUtil {
 	}
 
 	public static void writeDouble(String name, DataOutputStream os, double value) throws IOException {
-		if(os != null) {
-			os.write(Type.DOUBLE.ordinal());
-			os.writeDouble(value);
-		}
-		log(name, "%20.10f", value);
+		log(os, name, "%20.10f", value);
 	}
 
 	public static void writeFloat(String name, DataOutputStream os, float value) throws IOException {
-		if(os != null) {
-			os.write(Type.FLOAT.ordinal());
-			os.writeFloat(value);
-		}
-		log(name, "%15.7f", value);
+		log(os, name, "%15.7f", value);
 	}
 
 	
-	private static void log(String name, String format, Object ... values) {
+	private static void log(DataOutputStream os, String name, String format, Object ... values) throws IOException {
+		if(os != null)
+			os.writeChars(String.format(NAME_FORMAT, ++count, mode.ordinal(), name) + String.format(format, values)+"\n");
 		if(!modesToSuppress.contains(mode))
 			Log.w(tag, String.format(NAME_FORMAT, ++count, mode.ordinal(), name) + String.format(format, values));
+		if(os != null)
+			os.flush();
 	}
 
 	public static void writeData(String name, DataOutputStream os, byte[] data, int offset, int length) throws IOException {
-		if(os != null) {
-			os.write(Type.DATA.ordinal());
-			os.writeInt(length);
-			os.write(data,offset,length);
-		}
-		
-		log(name, "%10d", length);
+		log(os, name, "%10d", length);
 	}
 	
 	private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 	
 	public static void writeTime(String name, DataOutputStream os, long value) throws IOException {
-		if(os != null) {
-			os.write(Type.TIME.ordinal());
-			os.writeLong(value);
-		}
-		
 		String date;
 		synchronized(sdf)
 		{
 			date = sdf.format(new Date(value));
 		}
 		
-		log(name, "%10d %-40s", value - startTime, date);
+		log(os, name, "%10d %-40s", value - startTime, date);
 	}
 
 	public static void writeByte(String name, DataOutputStream os, byte val) throws IOException {
-		if(os != null) {
-			os.write(Type.BYTE.ordinal());
-			os.writeByte(val);
-		}
-		log(name, "%3d", val);
+		log(os, name, "%3d", val);
 	}
 
 	public static void writeBoolean(String name, DataOutputStream os,
 			boolean val) throws IOException {
-		if(os != null) {
-			os.write(Type.BOOLEAN.ordinal());
-			os.writeByte(val ? 1 : 0);
-		}
-		log(name, val ? "t" : "f");
+		log(os, name, val ? "t" : "f");
 	}
 
 	public static void writeInt(String name, DataOutputStream os, int val) throws IOException {
-		if(os != null) {
-			os.write(Type.INT.ordinal());
-			os.writeInt(val);
-		}
-		log(name, "%10d", val);
+		log(os, name, "%10d", val);
 	}
 
 	public static void writeLong(String name, DataOutputStream os, long val) throws IOException {
-		if(os != null) {
-			os.write(Type.LONG.ordinal());
-			os.writeLong(val);
-		}
-		log(name, "%20d", val);
+		log(os, name, "%20d", val);
 	}
 
 	public static void writeEnum(String name, DataOutputStream os, Enum val) throws IOException {
-		if(os != null) {
-			os.write(Type.ENUM.ordinal());
-			os.writeInt(val.ordinal());
-		}
-		log(name, "%-10s", val);
+		log(os, name, "%-10s", val);
 	}
 
 	public static void writeException(DataOutputStream os,Exception e) throws IOException {
 		synchronized (TestUtil.class)
 		{
-			writeMode(os, WriteConstants.EXCEPTION);
 			writeString("Exception Name", os, e.toString());
 			
 			StringWriter sw = new StringWriter();
@@ -172,12 +138,7 @@ public class TestUtil {
 	}
 
 	public static void writeString(String name, DataOutputStream os, String string) throws IOException {
-		if(os != null) {
-			os.write(Type.STRING.ordinal());
-			os.writeInt(string.length());
-			os.write(string.getBytes());
-		}
-		log(name, "%10d", string.length());
+		log(os, name, "%10d", string.length());
 	}
 
 

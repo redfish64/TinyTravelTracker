@@ -37,6 +37,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.StatFs;
+import android.preference.PreferenceManager;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import com.rareventure.android.AndroidPreferenceSet;
@@ -1003,7 +1005,7 @@ public class GTG {
 	public static void notifyCollectDataServiceOfUpdate(Context context)
 	{
 		if(prefs.isCollectData)
-			context.startService(new Intent(context,
+			ContextCompat.startForegroundService(context,new Intent(context,
                 GpsTrailerService.class));
 		else
 			context.stopService(new Intent(context,
@@ -1556,7 +1558,9 @@ public class GTG {
 	 * Sets whether to enable acra or not. Changes and saves to storedpreferences
 	 */
 	public static void enableAcra(Context context, boolean checked) {
-		SharedPreferences sp = ACRA.getACRASharedPreferences();
+	    //co: for use with ACRA 5+ (If I use it, it causes a problem acquiring wake locks)
+		//SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences sp = ACRA.getACRASharedPreferences();
 
 		Editor editor = sp.edit();
 		
@@ -1569,8 +1573,10 @@ public class GTG {
 
 
 	public static boolean isAcraEnabled(Context context) {
-		SharedPreferences sp = ACRA.getACRASharedPreferences();
-		
+        //co: for use with ACRA 5+ (If I use it, it causes a problem acquiring wake locks)
+		//SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences sp = ACRA.getACRASharedPreferences();
+
 		return !sp.getBoolean(ACRA.PREF_DISABLE_ACRA, false);
 	}
 

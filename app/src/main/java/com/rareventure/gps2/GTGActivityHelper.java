@@ -35,6 +35,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import pl.tajchert.nammu.Nammu;
@@ -128,7 +129,7 @@ public class GTGActivityHelper {
 						public void permissionGranted() {
 //							Log.d(GTG.TAG,"Am i being called???? permissionGranted");
 							GTG.alert(GTG.GTGEvent.ERROR_GPS_NO_PERMISSION, false);
-							activity.startService(new Intent(activity,
+							ContextCompat.startForegroundService(activity,new Intent(activity,
 									GpsTrailerService.class));
 						}
 
@@ -140,13 +141,41 @@ public class GTGActivityHelper {
 		}
 	}
 
+	//co: this was used for appcompat v 27. It didn't work, so I'm downgrading back to
+    //v26. In v27, I can't request wake locks even though I have the permission.
+    //It's not even a dangerous permission, so why this happens, I don't know,
+    //This just causes an infinite loop, which wouldn't be unexpected, since it's
+    //a normal permission. See: https://developer.android.com/guide/topics/permissions/overview?hl=ja
+//	private void wakelockAllowOrDeny() {
+////		if(GTG.userDoesntWantUsToHaveGpsPerm)
+////			return;
+//		Log.d(GTG.TAG,"Am i being called???? gtgwakelock");
+//
+//		if(!Nammu.hasPermission(activity,Manifest.permission.WAKE_LOCK)) {
+//			Log.d(GTG.TAG,"Am i being called???? gtgwakelock asking for permission");
+//			Nammu.askForPermission(activity, Manifest.permission.WAKE_LOCK,
+//					new PermissionCallback() {
+//
+//						@Override
+//						public void permissionGranted() {
+//							Log.d(GTG.TAG,"Am i being called???? gtgwakelock permissionGranted");
+//						}
+//
+//						@Override
+//						public void permissionRefused() {
+//							Log.d(GTG.TAG,"Am i being called???? gtgwakelock permissionDenied");
+//						}
+//					});
+//		}
+//	}
+
 	public void onCreate(Bundle bundle)
 	{
 		//we always start the service incase the process was killed. If the service shouldn't
 		//be running, it will stop itself
 		//PERF maybe a little wasteful to keep restarting the service if it is not supposed to
 		//be running
-        activity.startService(new Intent(activity,
+		ContextCompat.startForegroundService(activity,new Intent(activity,
                 GpsTrailerService.class));
 
         if(state != State.START)
@@ -180,6 +209,8 @@ public class GTGActivityHelper {
 	public void onResume()
 	{
 		getGpsAllowOrDeny();
+		//co: doesn't work
+		//wakelockAllowOrDeny();
 
 		if(forwarded)
 			return;

@@ -359,7 +359,7 @@ public class GpsTrailerGpsStrategy {
 			public void run()
 			{
 				intentTimer.acquireWakeLock();
-				try {	
+				try {
 					boolean wantGps = true;
 					
 					while(!isShutdownRequested)
@@ -480,7 +480,7 @@ public class GpsTrailerGpsStrategy {
 		};
 
 	} // end class GpsBatteryManager
-	
+
 	public static class Preferences implements AndroidPreferences
 	{
 

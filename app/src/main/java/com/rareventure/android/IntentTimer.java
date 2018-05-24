@@ -28,6 +28,7 @@ import java.util.Date;
 import com.rareventure.gps2.GTG;
 import com.rareventure.gps2.R;
 
+import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -38,6 +39,8 @@ import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.os.SystemClock;
 import android.util.Log;
+
+import pl.tajchert.nammu.Nammu;
 
 /**
  * A timer that will continue to work even if the phone sleeps
@@ -123,9 +126,14 @@ public class IntentTimer {
 	public synchronized void acquireWakeLock() {
 		if(!wakeLock.isHeld())
 		{
-			writeDebug("acquiring wake lock");
-			wakeLock.acquire();
-			writeDebug("acquired wake lock");
+			if(Nammu.checkPermission(Manifest.permission.WAKE_LOCK))
+			{
+				writeDebug("acquiring wake lock");
+				wakeLock.acquire();
+				writeDebug("acquired wake lock");
+			}
+			else
+				writeDebug("could not acquire wake lock");
 		}
 //		else
 //			writeDebug("acquireWakeLock() wake lock already held");

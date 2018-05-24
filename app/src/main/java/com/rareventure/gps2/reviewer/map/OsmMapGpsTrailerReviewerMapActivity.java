@@ -140,7 +140,7 @@ GTGEventListener
 
 		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
-        startService(new Intent(this, GpsTrailerService.class));
+		ContextCompat.startForegroundService(this,new Intent(this, GpsTrailerService.class));
 
         timeAndDateSdf = new SimpleDateFormat(getString(R.string.time_and_date_format));
         

@@ -23,6 +23,7 @@ import org.acra.ACRA;
 import org.acra.ErrorReporter;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -33,6 +34,8 @@ import android.content.IntentFilter;
 import android.location.LocationManager;
 import android.os.BatteryManager;
 import android.os.Binder;
+import android.os.Build;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -40,6 +43,7 @@ import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.os.RemoteCallbackList;
 import android.provider.Settings;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.rareventure.gps2.GTG.Requirement;
@@ -57,6 +61,10 @@ import com.rareventure.gps2.database.GpsLocationRow;
 import com.rareventure.gps2.database.TAssert;
 import com.rareventure.gps2.reviewer.SettingsActivity;
 import com.rareventure.gps2.reviewer.wizard.WelcomePage;
+
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import pl.tajchert.nammu.Nammu;
 
@@ -318,7 +326,7 @@ public class GpsTrailerService extends Service {
 		Nammu.init(this);
 
         //reset all flags
-        updateNotification(Integer.MAX_VALUE, false);
+        notificationFlags = 0;
 
         updateNotification(FLAG_GPS_ENABLED, true);
 
@@ -328,6 +336,7 @@ public class GpsTrailerService extends Service {
 		//we don't want to notify the user that we ran for any reason if this is false
 		// (for example the db was corrupted)
 		GTG.prefSet.loadAndroidPreferencesFromSharedPrefs(this);
+
 		//co: we initially don't want to do anything if the user is unlicensed,
 		// just find out how much piracy is a problem
 		if (!GTG.prefs.isCollectData ) //|| GTGEvent.ERROR_UNLICENSED.isOn)
@@ -397,12 +406,12 @@ public class GpsTrailerService extends Service {
 			updateNotification(FLAG_COLLECT_ENABLED, true);
 
 			//co because we don't want gps2data files in the root directory of sdcard. they take up too much space
-			//        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
-			//        File dataFile = new File(root, "gps2data"+sdf.format(new Date())+".txt");
-
-			//			gpsManager = new GpsTrailerManager(dataFile, this, TAG, this.getMainLooper());
-			gpsManager = new GpsTrailerManager(null, this, TAG,
-					this.getMainLooper());
+//			        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+//			        File dataFile = new File(Environment.getExternalStorageDirectory(), "gps2data"+sdf.format(new Date())+".txt");
+			File dataFile = null;
+						gpsManager = new GpsTrailerManager(dataFile, this, TAG, this.getMainLooper());
+//			gpsManager = new GpsTrailerManager(null, this, TAG,
+//					this.getMainLooper());
 
 			//note that there is no way to receive the current status of the battery
 			//However, the battery receiver will get a notification as soon as its registered
@@ -471,27 +480,48 @@ public class GpsTrailerService extends Service {
 
 	/**
 	 * Show a notification while this service is running.
-	 * @param intent 
 	 */
 	private void showCurrentNotification() {
 //		Log.d(TAG, "Showing current notification");
-		NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+		String CHANNEL_ID = "gpstrailer_channel";
+
+		if (Build.VERSION.SDK_INT >= 26) {
+			NotificationChannel channel = new NotificationChannel(CHANNEL_ID,
+					"Tiny Travel Tracker",
+					NotificationManager.IMPORTANCE_DEFAULT);
+
+			((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).createNotificationChannel(channel);
+		}
 
 		if (currentNotificationSetting.msgId == -1
 				&& currentNotificationSetting.iconId == -1) {
-			nm.cancel(GTG.FROG_NOTIFICATION_ID);
+			if (Build.VERSION.SDK_INT >= 26) {
+				//we still need to create an icon, even though we are shutting down
+				//or android will kill our app
+				NotificationChannel channel = new NotificationChannel(CHANNEL_ID,
+						"Tiny Travel Tracker",
+						NotificationManager.IMPORTANCE_DEFAULT);
+
+				((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).createNotificationChannel(channel);
+
+				Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
+						.setContentTitle("")
+						.setContentText("").build();
+
+				startForeground(1, notification);
+			}
 			return;
 		}
 
 		CharSequence text = getText(currentNotificationSetting.msgId);
 
 		// Set the icon, scrolling text and timestamp
-		Notification.Builder builder = new Notification.Builder(this);
-
+		NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID);
 		builder.setSmallIcon(currentNotificationSetting.iconId);
 		builder.setOngoing(currentNotificationSetting.isOngoing);
 		builder.setAutoCancel(!currentNotificationSetting.isOngoing);
 		builder.setContentText(text);
+		builder.setContentTitle("Tiny Travel Tracker");
 
 		// The PendingIntent to launch our activity if the user selects this notification
 		// TODO 2.5 make settings lite for notification bar only. Set it's task affinity
@@ -509,7 +539,8 @@ public class GpsTrailerService extends Service {
 
 		Notification notification = builder.build();
 
-		nm.notify(GTG.FROG_NOTIFICATION_ID, notification);
+		startForeground(1, notification);
+
 	}
 
 	@Override

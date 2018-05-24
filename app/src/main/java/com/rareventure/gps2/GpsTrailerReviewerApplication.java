@@ -19,14 +19,14 @@
 */
 package com.rareventure.gps2;
 
-import org.acra.ACRA;
-import org.acra.ReportingInteractionMode;
-import org.acra.annotation.ReportsCrashes;
+import org.acra.*;
+import org.acra.annotation.*;
 
 import com.rareventure.gps2.R;
 import com.rareventure.gps2.reviewer.SettingsActivity;
 
 import android.app.Application;
+import android.content.Context;
 import android.content.Intent;
 
 import pl.tajchert.nammu.Nammu;
@@ -35,14 +35,14 @@ import pl.tajchert.nammu.Nammu;
  * Does stuff that is common to all gps trailer reviewer type things
  */
 @ReportsCrashes(
-//		formKey="dFp0X2pTTTV1am5kNHczbk1lTE5rYVE6MQ",
-//		formKey="",
-		formUri = "https://collector.tracepot.com/c38489a7",
-//		formUri = "http://10.32.13.200:3127/reportCrash",
+//             formKey="dFp0X2pTTTV1am5kNHczbk1lTE5rYVE6MQ",
+//             formKey="",
+               formUri = "https://collector.tracepot.com/c38489a7",
+//             formUri = "http://10.32.13.200:3127/reportCrash",
 //        mode = ReportingInteractionMode.DIALOG,
-		//we need silent here because of the way we forward from one activity to another in case of an
-		//error. If mode is TOAST or DIALOG, for some reason it ends up in an infinite loop constantly
-		// repeating the exception (when the exception occurs without user input)
+               //we need silent here because of the way we forward from one activity to another in case of an
+               //error. If mode is TOAST or DIALOG, for some reason it ends up in an infinite loop constantly
+               // repeating the exception (when the exception occurs without user input)
         mode = ReportingInteractionMode.SILENT,
         resToastText = R.string.crash_toast_text, // optional, displayed as soon as the crash occurs, before collecting data which can take a few seconds
         resDialogText = R.string.crash_dialog_text,
@@ -50,14 +50,30 @@ import pl.tajchert.nammu.Nammu;
         resDialogTitle = R.string.crash_dialog_title, // optional. default is your application name
         resDialogCommentPrompt = R.string.crash_dialog_comment_prompt, // optional. when defined, adds a user text field input with this text resource as a label
         resDialogOkToast = R.string.crash_dialog_ok_toast // optional. displays a Toast message when the user accepts to send a report.
-        )
+)
+//co: For acra 5+ (causes wakelock bug)
+//@AcraCore(
+//        )
+////note we don't use AcraToast or AcraDialog. By adding nothing, we use silent mode.
+//// We need silent here because of the way we forward from one activity to another in case of an
+////error. If mode is TOAST or DIALOG, for some reason it ends up in an infinite loop constantly
+//// repeating the exception (when the exception occurs without user input)
+//@AcraLimiter()
+//@AcraMailSender(
+//        mailTo="engler@gmail.com"
+//)
 public class GpsTrailerReviewerApplication extends Application
 {
     @Override
-    public void onCreate() {
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+
         // The following line triggers the initialization of ACRA
         ACRA.init(this);
+    }
 
+    @Override
+    public void onCreate() {
         Nammu.init(this);
         
         super.onCreate();

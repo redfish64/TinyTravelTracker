@@ -31,6 +31,7 @@ import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceScreen;
+import android.support.v4.content.ContextCompat;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewTreeObserver;
@@ -64,7 +65,7 @@ public class SettingsActivity extends GTGPreferenceActivity implements OnPrefere
 							public void run() {
 								//we need to restart the service because its preferences changed
 								stopService(new Intent(SettingsActivity.this, GpsTrailerService.class));
-								startService(new Intent(SettingsActivity.this, GpsTrailerService.class));
+								ContextCompat.startForegroundService(SettingsActivity.this,new Intent(SettingsActivity.this, GpsTrailerService.class));
 							}
 						});
 					}
