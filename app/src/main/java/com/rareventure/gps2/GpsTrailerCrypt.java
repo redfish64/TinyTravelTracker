@@ -201,7 +201,9 @@ public class GpsTrailerCrypt {
 	{
 		return decryptPrivateKey(password) != null;
 	}
-	
+
+	private static int HACK = 3;
+
 	private static PrivateKey decryptPrivateKey(String password)
 	{
 		if (prefs.isNoPassword) {
@@ -233,11 +235,19 @@ public class GpsTrailerCrypt {
 			return keyFactory.generatePrivate(keySpec);
 		} catch (Exception e) {
 			//we are assuming all errors are because of a wrong password
-						
+
+
 			//TODO 3: we could alternately store an additional digest of the password, 
 			//and check against that, but it seems that it would be another avenue of attack.
 			//and not worth it
-			return null;
+			Log.d(GTG.TAG,"Password decryption exception",e);
+
+			if(--HACK > 0)
+				return null;
+			else {
+				HACK=3;
+				throw new IllegalStateException("HACK!!! Assuming if the user entered the wrong password 3 times then there is something else that is wrong!!!", e);
+			}
 		}
 	}
 
