@@ -231,7 +231,7 @@ global:
 sources:
     mapzen:
         type: MVT #TopoJSON #GeoJSON, MVT, TopoJSON
-        url: https://maps.tilehosting.com/data/v3/{z}/{x}/{y}.pbf?key=6rAatvyjT2Vv4YQ6LOXT
+        url: https://maps.tilehosting.com/data/v3/{z}/{x}/{y}.pbf?key=Z2Y8FOAUtErA56k7QXDr
         #url: https://free.tilehosting.com/data/v3/{z}/{x}/{y}.pbf.pict?key=F4sTzzXiI7pfgslJxUx
         #url:  https://tile.mapzen.com/mapzen/vector/v1/512/all/{z}/{x}/{y}.topojson
         #url: '//tile.dev.mapzen.com/mapzen/vector/v1/all/{z}/{x}/{y}.topojson'
