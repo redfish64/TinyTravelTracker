@@ -10,7 +10,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="onPrev"
-        android:text="Prev" />
+        android:text="@string/button_prev" />
 
     <Button
         android:id="@+id/next"
@@ -19,6 +19,6 @@
         android:layout_alignParentTop="true"
         android:layout_toRightOf="@+id/prev"
         android:onClick="onNext"
-        android:text="Next" />
+        android:text="@string/button_next" />
 
 </RelativeLayout>

@@ -9,7 +9,7 @@
         android:id="@+id/textView1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="If a problem occurs, Tiny Travel Tracker may optionally send an anonymous report about the issue to the developer. Would you like to enable this?"
+        android:text="@string/report_problem_question"
         android:textAppearance="?android:attr/textAppearanceMedium" />
     
     <include

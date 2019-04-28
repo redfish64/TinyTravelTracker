@@ -10,7 +10,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
-        android:text="Create GPX Backup "
+        android:text="@string/gpx_backup_title"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <TextView
@@ -18,7 +18,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
-        android:text="Backup format is GPX 1.1. File is created in root directory of external storage" />
+        android:text="@string/gpx_backup_format" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -29,7 +29,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
-            android:text="Name"
+            android:text="@string/gpx_backup_name"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <EditText
@@ -50,14 +50,14 @@
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
         android:onClick="onPasswordCheckBox"
-        android:text="Password protect backup file" />
+        android:text="@string/gpx_backup_use_password" />
 
     <TextView
         android:id="@+id/password_file_desc"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
-        android:text="Uses AES 256 bit encryption. Can be opened with WinZip 9.0 (R) or above (Windows), or 7z (Windows, Linux, Mac)"
+        android:text="@string/gpx_backup_encryption"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
     <EditText
@@ -87,7 +87,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
             android:onClick="onCreateButton"
-            android:text="Create" />
+            android:text="@string/gpx_backup_create" />
 
         <Button
             android:id="@+id/cancelButton"
@@ -95,7 +95,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
             android:onClick="onCancelButton"
-            android:text="Cancel" />
+            android:text="@string/cancel" />
     </LinearLayout>
 
 </LinearLayout>

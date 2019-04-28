@@ -38,10 +38,6 @@
 
 package com.rareventure.gps2.reviewer;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -49,10 +45,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.LinearLayout.LayoutParams;
+import android.widget.TextView;
 
-import com.rareventure.gps2.R;
 import com.codeslap.dateslider.DayLabeler;
 import com.codeslap.dateslider.MonthLabeler;
 import com.codeslap.dateslider.ScrollLayout;
@@ -62,7 +57,11 @@ import com.rareventure.android.Util;
 import com.rareventure.gps2.GTG;
 import com.rareventure.gps2.GTG.GTGAction;
 import com.rareventure.gps2.GTGActivity;
+import com.rareventure.gps2.R;
 import com.rareventure.gps2.reviewer.map.OsmMapGpsTrailerReviewerMapActivity;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 public class EnterFromDateToToDateActivity extends GTGActivity {
 
@@ -238,8 +237,10 @@ public class EnterFromDateToToDateActivity extends GTGActivity {
     }
     
     private void updateFromToText() {
-    	this.toDateText.setText("To "+sdf.format(toScrollerData.mTime.getTime()));
-    	this.fromDateText.setText("From "+sdf.format(fromScrollerData.mTime.getTime()));
+    	this.toDateText.setText(getResources().getString(R.string.toText)
+            + sdf.format(toScrollerData.mTime.getTime()));
+    	this.fromDateText.setText(getResources().getString(R.string.fromText)
+            +sdf.format(fromScrollerData.mTime.getTime()));
 	}
 
 

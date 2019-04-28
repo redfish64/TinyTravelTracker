@@ -19,23 +19,6 @@
 */
 package com.rareventure.gps2.gpx;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Date;
-import java.util.TimeZone;
-import java.util.TreeSet;
-import java.util.regex.Pattern;
-import java.util.zip.DataFormatException;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipException;
-import java.util.zip.ZipInputStream;
-
-import org.xml.sax.SAXException;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -55,19 +38,31 @@ import com.lamerman.SelectionMode;
 import com.rareventure.android.DbUtil;
 import com.rareventure.android.ProgressDialogActivity;
 import com.rareventure.android.database.DbDatastoreAccessor;
-import com.rareventure.android.database.timmy.TimmyDatabase;
 import com.rareventure.gps2.GTG;
 import com.rareventure.gps2.GpsTrailerDb;
 import com.rareventure.gps2.GpsTrailerDbProvider;
 import com.rareventure.gps2.GpsTrailerService;
 import com.rareventure.gps2.R;
-import com.rareventure.gps2.GTG.Requirement;
 import com.rareventure.gps2.database.GpsLocationRow;
 import com.rareventure.gps2.database.TimeZoneTimeRow;
 import com.rareventure.gps2.gpx.RestoreGpxBackup.ValidateAndRestoreGpxBackupTask.TaskList;
 import com.rareventure.gps2.reviewer.PasswordDialogFragment;
-import com.rareventure.gps2.reviewer.SettingsActivity;
 import com.rareventure.util.ByteCounterInputStream;
+
+import org.xml.sax.SAXException;
+
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.TimeZone;
+import java.util.regex.Pattern;
+import java.util.zip.DataFormatException;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
+import java.util.zip.ZipInputStream;
 
 import de.idyl.winzipaes.AesZipFileDecrypter;
 import de.idyl.winzipaes.CrcIgnoringZipInputStream;
@@ -290,7 +285,7 @@ public class RestoreGpxBackup extends ProgressDialogActivity {
 		if(fileInfo.needsPassword())
 		{
 			new PasswordDialogFragment.Builder(this)
-				.setTitle("Enter Password")
+				.setTitle(getString(R.string.enter_password))
 				.setMessage(String.format(getString(R.string.restore_dialog_enter_password_for_filename_fmt),
 						fileInfo.entry.getName()))
 				.setOnOk(new PasswordDialogFragment.OnOkListener() {
