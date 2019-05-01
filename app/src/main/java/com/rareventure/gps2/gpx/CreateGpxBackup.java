@@ -172,8 +172,9 @@ public class CreateGpxBackup extends ProgressDialogActivity {
 			};
 			
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setMessage(R.string.backup_file_already_exists_overwrite).setPositiveButton("Yes", dialogClickListener)
-			    .setNegativeButton("No", dialogClickListener).show();
+			builder.setMessage(R.string.backup_file_already_exists_overwrite)
+				.setPositiveButton(R.string.yes, dialogClickListener)
+			    .setNegativeButton(R.string.no, dialogClickListener).show();
 
 			return;
 		}

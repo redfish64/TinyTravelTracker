@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--<string name="app_name">File dialog</string>-->
+    <string name="location">Percorso</string>
+    <string name="cant_read_folder">La cartella non può essere letta!</string>
+    <string name="nnew">Nuovo</string>
+    <string name="select">Seleziona</string>
+    <string name="file_name">Nome file:</string>
+<!-- <string name="cancel">Cancel</string> -->    
+    <string name="create">Salva</string>
+    <string name="no_data">Nessun dato</string>
+    <color name="gray">#ffff0000</color>
+    <string name="err">Errore</string>
+</resources>
