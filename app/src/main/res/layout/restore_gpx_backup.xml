@@ -10,7 +10,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
-        android:text="Restore from GPX Backup "
+        android:text="@string/gpx_restore_title"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <TextView
@@ -18,7 +18,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
-        android:text="WARNING: This will replace ALL current GPS points!" />
+        android:text="@string/gpx_restore_warning" />
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -30,7 +30,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginRight="5dp"
-            android:hint="Filename (*.gpx, *.zip)" >
+            android:hint="@string/gpx_restore_filename" >
 
             <requestFocus />
         </EditText>
@@ -51,7 +51,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
-        android:text="File must be GPX 1.0 or 1.1. It may be zipped and optionally AES 256 password protected. " />
+        android:text="@string/gpx_restore_format" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -63,7 +63,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
             android:onClick="onRestoreButton"
-            android:text="Restore" />
+            android:text="@string/gpx_restore_action" />
 
         <Button
             android:id="@+id/cancelButton"
@@ -71,7 +71,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
             android:onClick="onCancelButton"
-            android:text="Cancel" />
+            android:text="@string/cancel" />
     </LinearLayout>
 
 </LinearLayout>

@@ -21,6 +21,7 @@ package com.rareventure.gps2.reviewer;
 
 import android.Manifest;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
@@ -56,7 +57,7 @@ import pl.tajchert.nammu.Nammu;
 import pl.tajchert.nammu.PermissionCallback;
 
 public class SettingsActivity extends GTGPreferenceActivity implements OnPreferenceChangeListener, OnPreferenceClickListener, OnDismissListener {
-	private final Runnable SAVE_PREFS_AND_RESTART_COLLECTOR = new Runnable() 
+	private final Runnable SAVE_PREFS_AND_RESTART_COLLECTOR = new Runnable()
 				{	
 					public void run() {
 						GTG.savePreferences(SettingsActivity.this);
@@ -69,7 +70,6 @@ public class SettingsActivity extends GTGPreferenceActivity implements OnPrefere
 							}
 						});
 					}
-					
 				};
 				
 	private CheckBoxPreference isCollectData;
@@ -95,6 +95,7 @@ public class SettingsActivity extends GTGPreferenceActivity implements OnPrefere
 
 	private SeekBarDialogPreference mapFontSize;
 
+	/*
 	private static final String[] passwordTimeoutStrs =
 			{ "Off" ,
 			"30 seconds",
@@ -105,6 +106,8 @@ public class SettingsActivity extends GTGPreferenceActivity implements OnPrefere
 					"15 minutes",
 					"30 minutes",
 					"1 hour"};
+	*/
+
 	private static final long[] passwordTimeoutValues =
 			{ 0 ,
 					30*1000,
@@ -128,7 +131,9 @@ public class SettingsActivity extends GTGPreferenceActivity implements OnPrefere
     }
 
     private void createPreferenceHierarchy() {
-        PreferenceScreen root = getPreferenceManager().createPreferenceScreen(this);
+		String[] passwordTimeoutStrs = SettingsActivity.this.getResources().getStringArray(R.array.passwordTimeoutStrings);
+
+		PreferenceScreen root = getPreferenceManager().createPreferenceScreen(this);
         this.setPreferenceScreen(root);
 
         isCollectData = new CheckBoxPreference(this);
@@ -248,7 +253,7 @@ public class SettingsActivity extends GTGPreferenceActivity implements OnPrefere
         root.addPreference(aboutPref);
 
 		PreferenceCategory advancedCategory = new PreferenceCategory(this);
-		advancedCategory.setTitle("Advanced");
+		advancedCategory.setTitle(getString(R.string.advanced));
 		root.addPreference(advancedCategory);
 
 		writeGpsWakeLockDebugFile = new CheckBoxPreference(this);
@@ -501,6 +506,6 @@ public class SettingsActivity extends GTGPreferenceActivity implements OnPrefere
 		return GTG.REQUIREMENTS_FULL_PASSWORD_PROTECTED_UI;
 	}
 
-	
+
 
 }

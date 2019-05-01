@@ -19,17 +19,14 @@
 */
 package com.rareventure.gps2.reviewer.timeview;
 
-import java.util.Calendar;
-import java.util.TimeZone;
-
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Region.Op;
 import android.graphics.Paint.FontMetricsInt;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.Region.Op;
 import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -37,8 +34,12 @@ import android.view.View;
 
 import com.rareventure.android.Util;
 import com.rareventure.gps2.GTG;
+import com.rareventure.gps2.R;
 import com.rareventure.gps2.database.TimeZoneTimeRow;
 import com.rareventure.gps2.reviewer.map.OsmMapGpsTrailerReviewerMapActivity;
+
+import java.util.Calendar;
+import java.util.TimeZone;
 
 public class TimeView extends View {
 	private static final String[] MONTHS = new String[] { "Jan", "Feb", "Mar",
@@ -46,6 +47,14 @@ public class TimeView extends View {
 
 	private static final String[] DAYS_OF_WEEK = new String[] { "Sun", "Mon",
 			"Tue", "Wed", "Thu", "Fri", "Sat" };
+
+	private static String nowText;
+	private static String startText;
+	private static String endText;
+	private static String startToText;
+	private static String toText;
+	private static String noDataText;
+	private static String allDataText;
 
 	private static final float Y_TO_SCREEN = 2f;
 
@@ -260,16 +269,22 @@ public class TimeView extends View {
 	public TimeView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 		init();
+
+		initStrings(context);
 	}
 
 	public TimeView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		init();
+
+		initStrings(context);
 	}
 
 	public TimeView(Context context) {
 		super(context);
 		init();
+
+		initStrings(context);
 	}
 
 	public void setActivity(OsmMapGpsTrailerReviewerMapActivity gtum) {
@@ -579,21 +594,21 @@ public class TimeView extends View {
 		
 		if(atStart && !atEnd && !endSameAsSb)
 		{
-			sb.append(" (start) to ").append(end);
+			sb.append(startToText).append(end);
 		}
 		else {
 			if(!endSameAsSb)
-				sb.append(" to ").append(end);
+				sb.append(toText).append(end);
 			if(minTimeSec == maxTimeSec)
-				sb.append(" (no data)");
+				sb.append(noDataText);
 			else if (atEnd && atStart) {
-				sb.append(" (all data)");
+				sb.append(allDataText);
 			} else if (atEnd) {
-				sb.append(" (end)");
+				sb.append(endText);
 			} else if (atStart) //in this case endSameAsSb is true (because we check above), so
 				//we just add start to the end
 			{
-				sb.append(" (start)");
+				sb.append(startText);
 			}
 		}
 	}
@@ -671,7 +686,7 @@ public class TimeView extends View {
 		if (hours == 1) {
 			out.append("0 minutes ago");
 		} else
-			out.append("now");
+			out.append(nowText);
 		return out;
 	}
 
@@ -1237,4 +1252,13 @@ public class TimeView extends View {
 		}
 	}
 
+	private void initStrings(Context context){
+		nowText = context.getResources().getString(R.string.now);
+		startText = context.getResources().getString(R.string.start);
+		endText = context.getResources().getString(R.string.end);
+		startToText = context.getResources().getString(R.string.start_to);
+		toText = context.getResources().getString(R.string.to_text);
+		noDataText = context.getResources().getString(R.string.nodata);
+		allDataText = context.getResources().getString(R.string.alldata);
+	}
 }
