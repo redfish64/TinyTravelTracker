@@ -383,6 +383,8 @@ public class MediaLocTimeMap {
 							
 						} catch (IOException e1) {
 							Log.d(GTG.TAG,"No exif data for image "+data);
+						} catch (NegativeArraySizeException e2) {
+							Log.d(GTG.TAG,"Exif init error for image "+data);
 						}
 						
 					}
