@@ -984,8 +984,6 @@ public class GTG {
 
 	public static DbDatastoreAccessor<GpsLocationRow> gpsLocDbAccessor;
 
-	public static SuperThreadManager superThreadManager = new SuperThreadManager();
-
 	/**
 	 * A background process for loading data into the areapanel and timetree
 	 * caches. We make it this way because it takes too long to commit 

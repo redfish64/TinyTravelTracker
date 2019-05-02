@@ -60,6 +60,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ZoomControls;
 
+import com.mapzen.tangram.CameraPosition;
 import com.mapzen.tangram.LngLat;
 import com.rareventure.android.AndroidPreferenceSet.AndroidPreferences;
 import com.rareventure.android.DbUtil;
@@ -1216,12 +1217,11 @@ GTGEventListener
 
 			//sometimes on pause gets called when we're not fully started up
 			if(osmMapView.getMapController() != null) {
-				LngLat lp = osmMapView.getMapController().getPosition();
-				float lastZoom = osmMapView.getMapController().getZoom();
+				CameraPosition cp = osmMapView.getMapController().getCameraPosition();
 
-				prefs.lastLat = lp.latitude;
-				prefs.lastLon = lp.longitude;
-				prefs.lastZoom = lastZoom;
+				prefs.lastLat = cp.latitude;
+				prefs.lastLon = cp.longitude;
+				prefs.lastZoom = cp.zoom;
 
 				GTG.runBackgroundTask(new Runnable() {
 
