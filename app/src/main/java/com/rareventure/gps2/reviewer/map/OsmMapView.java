@@ -421,6 +421,7 @@ public class OsmMapView extends MapView implements MapView.MapReadyCallback {
 	protected void	onMapInitOnUIThread(MapController controller, HttpHandler handler, GLViewHolderFactory viewHolderFactory, MapView.MapReadyCallback callback) {
 		super.onMapInitOnUIThread(controller,handler,viewHolderFactory,callback);
 		mapController.setMapChangeListener(mapChangeListener);
+		((MyMapController)mapController).setupTouchListener();
 
 		File cacheDir = new File(GTG.getExternalStorageDirectory().toString()+"/tile_cache2");
 
@@ -497,45 +498,12 @@ public class OsmMapView extends MapView implements MapView.MapReadyCallback {
 			}
 		});
 
-		touchInput.setPanResponder(new TouchInput.PanResponder() {
-			TouchInput.PanResponder orig = mapController.getPanResponder();
 
-			@Override
-			public boolean onPanBegin() {
-
-				Log.d(GTG.TAG, "onPanBegin");
-				return orig.onPanBegin();
-			}
-
-			@Override
-			public boolean onPan(float startX, float startY, float endX, float endY) {
-				Log.d(GTG.TAG, "onPan");
-				return orig.onPan(startX,startY,endX,endY);
-			}
-
-			@Override
-			public boolean onPanEnd() {
-				Log.d(GTG.TAG, "onPanEnd");
-				return orig.onPanEnd();
-			}
-
-			@Override
-			public boolean onFling(float posX, float posY, float velocityX, float velocityY) {
-				return orig.onFling(posX, posY, velocityX, velocityY);
-			}
-
-			@Override
-			public boolean onCancelFling() {
-				return orig.onCancelFling();
-			}
-		});
-
-		touchInput.setLongPressResponder(new TouchInput.LongPressResponder() {
+		((MyMapController)mapController).setLongPressResponderExt(new MyTouchInput.LongPressResponder() {
 			public float startX;
 			public float startY;
 
 			public void onLongPress(float x, float y) {
-				Log.d(GTG.TAG, "onLongPress");
 				// Get instance of Vibrator from current Context
 				Vibrator v = (Vibrator) activity.getSystemService(Context.VIBRATOR_SERVICE);
 
@@ -546,56 +514,23 @@ public class OsmMapView extends MapView implements MapView.MapReadyCallback {
 				startY = y;
 			}
 
-//			@Override
-//			public void onLongPressUp(float x, float y) {
-//				for(GpsOverlay overlay : overlays)
-//				{
-//					overlay.onLongPressEnd(startX, startY, x,y);
-//				}
-//			}
-//
-//			@Override
-//			public boolean onLongPressPan(float movementStartX, float movementStartY, float endX, float endY) {
-//				for(GpsOverlay overlay : overlays)
-//				{
-//					overlay.onLongPressMove(startX, startY, endX,endY);
-//				}
-//				return false;
-//			}
+			@Override
+			public void onLongPressUp(float x, float y) {
+				for(GpsOverlay overlay : overlays)
+				{
+					overlay.onLongPressEnd(startX, startY, x,y);
+				}
+			}
+
+			@Override
+			public boolean onLongPressPan(float movementStartX, float movementStartY, float endX, float endY) {
+				for(GpsOverlay overlay : overlays)
+				{
+					overlay.onLongPressMove(startX, startY, endX,endY);
+				}
+				return false;
+			}
 		});
-		//TODO FIXME figure out how to implement this
-//				((MyMapController)mapController).setLongPressResponderExt(new MyTouchInput.LongPressResponder() {
-//					public float startX;
-//					public float startY;
-//
-//					public void onLongPress(float x, float y) {
-//						// Get instance of Vibrator from current Context
-//						Vibrator v = (Vibrator) activity.getSystemService(Context.VIBRATOR_SERVICE);
-//
-//						// Vibrate for a short time
-//						v.vibrate(50);
-//
-//						startX = x;
-//						startY = y;
-//					}
-//
-//					@Override
-//					public void onLongPressUp(float x, float y) {
-//						for(GpsOverlay overlay : overlays)
-//						{
-//							overlay.onLongPressEnd(startX, startY, x,y);
-//						}
-//					}
-//
-//					@Override
-//					public boolean onLongPressPan(float movementStartX, float movementStartY, float endX, float endY) {
-//						for(GpsOverlay overlay : overlays)
-//						{
-//							overlay.onLongPressMove(startX, startY, endX,endY);
-//						}
-//						return false;
-//					}
-//				});
 
 		for(GpsOverlay o : overlays)
 			o.startTask(mapController);
@@ -606,5 +541,11 @@ public class OsmMapView extends MapView implements MapView.MapReadyCallback {
 
 	}
 
+	@Override
+	protected MapController getMapInstance() {
+		//We do this because we want to use our own TouchInput (MyTouchInput) which can handle long
+		// press pans correctly
+		return new MyMapController(this.getContext());
+	}
 
 }
