@@ -25,6 +25,17 @@ It also is useful in situations where you don't have internet access. All map ti
 _Note to users: If you have an issue you would like to see fixed, please click on the smiley on the right on the issue screen, and select thumbs up (or thumbs down). I'll use this information to decide what to work on next. Thanks_
 
 Changelog:
+
+V 1.1.43 - 5/1/2019
+
+Found nextzen.org which has the original mapzen maps. This allows me to retire my poorly custom made map that ran against tilehosting.
+
+Added the ability to choose from some different map styles.
+
+Upgraded to Tangram 10.1 which fixes some chinese fonts not showing up.
+
+Itegrated igor-cali's italian language translation.
+
 V 1.1.38
 
 Now compatible with Android Oreo.
