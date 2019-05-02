@@ -26,8 +26,7 @@ _Note to users: If you have an issue you would like to see fixed, please click o
 
 Changelog: (you can monitor the latest build here: https://f-droid.org/wiki/index.php?title=com.rareventure.gps2/lastbuild&redirect=no)
 
-V 1.1.43 (build 86) - 5/1/2019
-
+V 1.1.43 (build 86) - 2019 May 2
 Found nextzen.org which has the original mapzen maps. This allows me to retire my poorly custom made map that ran against tilehosting.
 
 Added the ability to choose from some different map styles.
