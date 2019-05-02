@@ -1,0 +1,32 @@
+layers:
+    earth:
+        data: { source: mapzen }
+        draw:
+            polygons:
+                order: global.order
+                color: [0.267,0.365,0.502]
+        early:
+            filter: { $zoom: { max: 7 } }
+            draw:
+                polygons:
+                    style: earth-early
+        later:
+            filter: { $zoom: { min: 7 } }
+            draw:
+                polygons:
+                    style: polygons
+                    color: [[7,[0.242,0.332,0.456]],[8,[0.212,0.302,0.431]]]
+
+styles:
+    earth-early:
+        base: polygons
+        mix: [functions-zoom, polygons-diagonal-opaque-stripes]
+        shaders:
+            defines:
+                ZOOM_START: 0.
+                ZOOM_END: 6.5
+                ZOOM_MAX: 6.
+
+                STRIPES_ALPHA: 1.
+                STRIPES_SCALE: mix(25.,50.,smoothstep(0.,1.,1.-zoom()))
+                STRIPES_WIDTH: 1.-zoom()-.2

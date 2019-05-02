@@ -1,0 +1,34 @@
+import:
+    - ../polygons/diagonal-dash.yaml
+
+styles:
+    elevation-dash:
+        doc:
+            author: 
+                name: Patricio Gonzalez Vivo
+                twitter: patriciogv
+            version: 0.0.1
+            tangram-version: 0.0.7
+            licence: MIT
+            description: |
+                Perfect for the `landuse` layer on your elevation maps, the `elevation-dash` modules use the color of the layer to draw a dash pattern that changes width based on the surface of the terrain.
+        base: polygons
+        mix: [polygons-diagonal-dash]
+        raster: custom
+        shaders:
+            defines:
+                DASH_COLOR: color.rgb*.5
+                DASH_BACKGROUND_COLOR: color.rgb
+                DASH_SCALE: 10.
+                DASH_SIZE: 0.9
+                DASH_TYPE: fill
+                DASH_TILE_STYLE: tile
+                DASH_DIR: vec3(-0.600,-0.420,0.560)
+                NORMAL_TEXTURE_INDEX: 0
+                DASH_MIN_SIZE: .8
+                DASH_MAX_SIZE: 1.
+                DASH_SIZE: shade
+            blocks:
+                normal: |
+                    float shade = dot((sampleRaster(int(NORMAL_TEXTURE_INDEX)).rgb-.5)*2., DASH_DIR);
+                    shade = mix(DASH_MIN_SIZE, DASH_MAX_SIZE, (shade*shade*shade)*4.);

@@ -1,0 +1,47 @@
+layers:
+    boundaries:
+        country:
+            country-labels:
+                filter: { name: true, $zoom: { min: 9 }, not: { maritime_boundary: true } }
+                draw:
+                    text:
+                        priority: 2
+                        visible: global.text_visible_admin
+                        text_source: global.ux_language_text_source_boundary_lines_left_right
+                        offset: [0, 6px]
+                        text_wrap: 100px
+                        font:
+                            family: Aldrich
+                            size: 9px
+                            fill: [0.369,0.624,1.000]
+                            transform: uppercase
+                no-left-right:
+                    filter: { "name:left": false, "name:right": false }
+                    draw:
+                        text:
+                            text_source: global.ux_language_text_source_boundary_lines
+                            offset: 0px
+
+        region:
+            region-labels:
+                filter: { name: true, $zoom: { min: 9 }, not: { maritime_boundary: true } }
+                draw:
+                    text:
+                        priority: 3
+                        visible: global.text_visible_admin
+                        text_source: global.ux_language_text_source_boundary_lines_left_right
+                        offset: [0, 5px]
+                        text_wrap: 100px
+                        # offset: 10px
+                        # anchor: top
+                        font:
+                            family: Aldrich
+                            size: 9px
+                            fill: [0.369,0.624,1.000]
+                            transform: uppercase
+                no-left-right:
+                    filter: { "name:left": false, "name:right": false }
+                    draw:
+                        text:
+                            text_source: global.ux_language_text_source_boundary_lines
+                            offset: 0px

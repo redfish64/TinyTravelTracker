@@ -1,0 +1,434 @@
+layers:
+    roads:
+
+        path:
+            paths:
+                paths-overlay:
+                    filter:
+                        function() { return global.sdk_path_overlay; }
+                    draw:
+                        lines:
+                            color: [[14, [0.400,0.740,0.672]],[15,[1.00,1.00,1.00]]]
+                            width: [[14, 0.3px], [15, 1px], [17, 2.5m]]
+                            outline:
+                                color: [[14, [0.400,0.740,0.672]], [16, [0.118,0.600,0.518]]]
+                                width: [[13, 0px], [14, 0.5px], [15, 1px], [16, 1px], [17, 1px], [18, 2px]]
+
+                    networked:
+                        filter: { walking_network: true }
+                        draw:
+                            lines:
+                                outline:
+                                    width: [[13, 0.5px], [14, 0.6px], [15, 1px], [16, 1px], [17, 1px], [18, 2px]]
+                            highlight:
+                                order: function() { return feature.sort_rank - 5; }
+                                color: [[12, [0.937,0.973,0.447]], [14, [1.000,1.000,0.000]]]
+                                width: [[12, 2.5px], [14, 4px], [15, 6px], [16, 7px], [18, 16px], [20, 26px]]
+
+                    in_zoo_golf_course-early:
+                        filter: { landuse_kind: [zoo, golf_course, garden, university, cemetery, allotments], $zoom: { max: 15 } }
+                        draw:
+                            lines:
+                                visible: false
+                                outline:
+                                    visible: false
+
+                    labels-path:
+                        draw:
+                            text-blend-order:
+                                font:
+                                    fill: green
+
+
+
+            footway:
+                footway-overlay:
+                    filter:
+                        function() { return global.sdk_path_overlay; }
+                    draw:
+                        lines:
+                            # widths are narrower for footway, so does not follow default widths
+                            color: [[14, [0.147,0.640,0.541]], [15, [1.000,1.000,1.000]]]
+                            width: [[14, 0.35px], [15, 0.5px], [16, 1px], [17, 2.5m]]
+                            outline:
+                                style: dashed_footway
+                                color: [[15, [0.147,0.640,0.541]], [18, [0.118,0.600,0.518]]]
+                                width: [[15, 0px], [16, 1px], [17, 1.25px], [18, 2px]]
+
+                    z15-transition:
+                        filter:
+                            $zoom: 15
+                        draw:
+                            lines:
+                                style: dots_footway
+                                color: [0.135,0.595,0.500]
+                                width: 3px
+                                outline:
+                                    color: [0.765,0.900,0.824]
+                                    width: 0.1px
+
+                    networked:
+                        filter: { walking_network: true }
+                        draw:
+                            lines:
+                                outline:
+                                    width: [[13, 0.5px], [14, 0.6px], [15, 1px], [16, 1px], [17, 1px], [18, 2px]]
+                            highlight:
+                                order: function() { return feature.sort_rank - 5; }
+                                color: [[12, [0.937,0.973,0.447]], [14, [1.000,1.000,0.000]]]
+                                width: [[12, 2.5px], [14, 4px], [15, 6px], [16, 7px], [18, 16px], [20, 26px]]
+
+                    in_zoo_golf_course-early:
+                        filter: { landuse_kind: [zoo, golf_course, garden, university, cemetery, allotments], $zoom: { max: 15 } }
+                        draw:
+                            lines:
+                                visible: false
+                                outline:
+                                    visible: false
+
+                    labels-footpaths:
+                        draw:
+                            text-blend-order:
+                                font:
+                                    fill: green
+
+
+            pedestrian:
+                pedestrian-overlay:
+                    filter:
+                        function() { return global.sdk_path_overlay; }
+                    draw:
+                        lines:
+                            color: [[14, [0.400,0.740,0.672]],[15,[1.00,1.00,1.00]]]
+                            width: [[14, 0.3px], [15, 1px], [17, 2.5m]]
+                            outline:
+                                color: [[14, [0.400,0.740,0.672]], [16, [0.118,0.600,0.518]]]
+                                width: [[13, 0px], [14, 0.5px], [15, 1px], [16, 1px], [17, 1px], [18, 2px]]
+
+                    networked:
+                        filter: { walking_network: true }
+                        draw:
+                            lines:
+                                outline:
+                                    width: [[13, 0.5px], [14, 0.6px], [15, 1px], [16, 1px], [17, 1px], [18, 2px]]
+                            highlight:
+                                order: function() { return feature.sort_rank - 5; }
+                                color: [[12, [0.937,0.973,0.447]], [14, [1.000,1.000,0.000]]]
+                                width: [[12, 2.5px], [14, 4px], [15, 6px], [16, 7px], [18, 16px], [20, 26px]]
+
+                    in_zoo_golf_course-early:
+                        filter: { landuse_kind: [zoo, golf_course, garden, university, cemetery, allotments], $zoom: { max: 15 } }
+                        draw:
+                            lines:
+                                visible: false
+                                outline:
+                                    visible: false
+
+                    labels-pedestrian:
+                        draw:
+                            text-blend-order:
+                                font:
+                                    fill: green
+
+
+        track:
+            tracks-overlay:
+                filter:
+                    function() { return global.sdk_path_overlay; }
+                draw:
+                    lines:
+                        color: [[14, [0.400,0.740,0.672]],[15,[1.00,1.00,1.00]]]
+                        width: [[14, 0.3px], [15, 1px], [17, 2.5m]]
+                        outline:
+                            color: [[14, [0.682,0.690,0.616]], [16, [0.710,0.553,0.522]]]
+                            width: [[13, 0px], [14, 0.5px], [15, 1px], [16, 1px], [17, 1px], [18, 2px]]
+
+                networked:
+                    filter: { walking_network: true }
+                    draw:
+                        lines:
+                            outline:
+                                width: [[13, 0.5px], [14, 0.6px], [15, 1px], [16, 1px], [17, 1px], [18, 2px]]
+                        highlight:
+                            order: function() { return feature.sort_rank - 5; }
+                            color: [[12, [0.937,0.973,0.447]], [14, [1.000,1.000,0.000]]]
+                            width: [[12, 2.5px], [14, 4px], [15, 6px], [16, 7px], [18, 16px], [20, 26px]]
+
+                    in_zoo_golf_course-early:
+                        filter: { landuse_kind: [zoo, golf_course, garden, university, cemetery, allotments], $zoom: { max: 15 } }
+                        draw:
+                            lines:
+                                visible: false
+                                outline:
+                                    visible: false
+
+                labels-track:
+                    draw:
+                        text-blend-order:
+                            font:
+                                fill: green
+
+
+
+        other-roads-no-motorvehicle-overlay:
+            path-other-roads-no-motorvehicle-overlay:
+                filter:
+                    function() { return global.sdk_path_overlay; }
+                draw:
+                    lines:
+                        color: [[14, [0.682,0.690,0.616]],[15,[1.00,1.00,1.00]]]
+                        width: [[14, 0.3px], [15, 1px], [17, 2.5m]]
+                        outline:
+                            color: [[14, [0.682,0.690,0.616]], [16, [0.710,0.553,0.522]]]
+                            width: [[13, 0px], [14, 0.5px], [15, 1px], [16, 1px], [17, 1px], [18, 2px]]
+
+                networked:
+                    filter: { walking_network: true }
+                    draw:
+                        lines:
+                            outline:
+                                width: [[13, 0.5px], [14, 0.6px], [15, 1px], [16, 1px], [17, 1px], [18, 2px]]
+                        highlight:
+                            order: function() { return feature.sort_rank - 5; }
+                            color: [[12, [0.937,0.973,0.447]], [14, [1.000,1.000,0.000]]]
+                            width: [[12, 2.5px], [14, 4px], [15, 6px], [16, 7px], [18, 16px], [20, 26px]]
+
+                in_zoo_golf_course-early:
+                    filter: { landuse_kind: [zoo, golf_course, garden, university, cemetery, allotments], $zoom: { max: 15 } }
+                    draw:
+                        lines:
+                            visible: false
+                            outline:
+                                visible: false
+
+                labels-track:
+                    draw:
+                        text-blend-order:
+                            font:
+                                fill: green
+
+        other-roads-walking-network-only:
+            path-other-roads-walking-network-only:
+                filter:
+                    function() { return global.sdk_path_overlay; }
+                draw:
+                    lines:
+                        color: [[14, [0.400,0.740,0.672]],[15,[1.00,1.00,1.00]]]
+                        width: [[14, 0.3px], [15, 1px], [17, 2.5m]]
+                        outline:
+                            color: [[14, [0.400,0.740,0.672]], [16, [0.118,0.600,0.518]]]
+                            width: [[13, 0px], [14, 0.5px], [15, 1px], [16, 1px], [17, 1px], [18, 2px]]
+
+                networked:
+                    filter: { walking_network: [lwn,rwn] }
+                    draw:
+                        lines:
+                            outline:
+                                width: [[13, 0.5px], [14, 0.6px], [15, 1px], [16, 1px], [17, 1px], [18, 2px]]
+                        highlight:
+                            order: function() { return feature.sort_rank - 50; }
+                            color: [[12, [0.937,0.973,0.447]], [14, [1.000,1.000,0.000]]]
+                            width: [[12, 2.5px], [14, 4px], [15, 6px], [16, 7px], [18, 16px], [20, 26px]]
+
+                in_zoo_golf_course-early:
+                    filter: { landuse_kind: [zoo, golf_course, garden, university, cemetery, allotments], $zoom: { max: 15 } }
+                    draw:
+                        lines:
+                            visible: false
+                            outline:
+                                visible: false
+
+        # steps:
+        #     steps-overlay:
+        #         draw:
+        #             lines:
+        #                 outline:
+        #                     color: [[14, [0.400,0.740,0.672]], [16, [0.118,0.600,0.518]]]
+            # dashed_steps_path_overlay:
+            #     #order: function() { return feature.sort_rank; }
+            #     order: 1005
+            #     color: red #[0.118,0.600,0.518]
+            #     width: [[15, 0.6px], [16, 1px], [17, 2.5m]]
+        steps:
+            steps-overlay:
+                filter:
+                    function() { return global.sdk_path_overlay; }
+                # bike_tier1_off_road:
+                    # filter: global.bike_tier1_off_road_steps_filter
+                draw:
+                    lines:
+                        outline:
+                            color: [[14, [0.400,0.740,0.672]], [16, [0.118,0.600,0.518]]]
+                    dashed_steps:
+                        color: white #[0.633,0.988,0.633] #global.bike_tier1_off_road_path_color_lite
+                        width: [[15, 0.6px], [16, 1px], [17, 2.5m]]
+
+                networked:
+                    filter: { walking_network: true }
+                    draw:
+                        lines:
+                            outline:
+                                width: [[13, 0.5px], [14, 0.6px], [15, 1px], [16, 1px], [17, 1px], [18, 2px]]
+                        highlight:
+                            order: function() { return feature.sort_rank - 5; }
+                            color: [[12, [0.937,0.973,0.447]], [14, [1.000,1.000,0.000]]]
+                            width: [[12, 2.5px], [14, 4px], [15, 6px], [16, 7px], [18, 16px], [20, 26px]]
+
+
+        walking_route_shields:
+            #enabled: function() { return global.sdk_path_overlay; }
+            filter:
+                all:
+                    - walking_shield_text: true
+                    - function() { return global.sdk_road_shields; }
+                    - function() { return global.sdk_path_overlay; }
+            # default
+            draw:
+                mapzen_icon_library:
+                    # you need to match any custom shield to the vector tile `network` values
+                    sprite: |
+                        function() {
+                            return ('sdk_shield-' + feature.walking_shield_text.length + 'char');
+                        }
+                    color: green
+                    sprite_default: sdk_shield_5char
+                    priority: 58
+                    repeat_group: shields
+                    repeat_distance: [[8,90px],[10,40px],[13,30px]]
+                    placement: midpoint
+                    placement_min_length_ratio:
+                        - [8, 0.1]
+                        - [9, 0.25]
+                        - [10, 0.25]
+                        - [11, 0.15]
+                        - [12, 0.25]
+                        - [13, 0.4]
+                        - [14, 0.9]
+                        - [15, 1.5]
+                    cull_from_tile: true
+                    visible: global.sdk_path_shields
+                    # for 256px tiles a larger buffer is useful, may or may not be true for 512px tiles
+                    buffer: 16px
+                    text:
+                        offset: [0px, -0.5px]
+                        repeat_distance: 200px
+                        anchor: center
+                        text_source: walking_shield_text
+                        font:
+                            family: Montserrat
+                            #fill: [0.308,0.308,0.308]
+                            weight: 500
+                            fill: white #[0.320,0.320,0.320]
+                            size: [[7,7px],[12,8px],[16,11px]]
+                            stroke: { width: 0px }
+            width_1char:
+                filter: |
+                    function() {
+                        return (feature.walking_shield_text.length === 1)
+                    }
+                draw:
+                    mapzen_icon_library:
+                        size: [[6,[14px,14px]],[13,[16px,16px]],[16,[18px,18px]]]
+            width_2char:
+                filter: |
+                    function() {
+                        return (feature.walking_shield_text.length === 2)
+                    }
+                draw:
+                    mapzen_icon_library:
+                        size: [[6,[18px,14px]],[13,[20px,15px]],[16,[24px,18px]]]
+            width_3char:
+                filter: |
+                    function() {
+                        return (feature.walking_shield_text.length === 3)
+                    }
+                draw:
+                    mapzen_icon_library:
+                        size: [[6,[25px,14px]],[13,[27px,15px]],[16,[33px,18px]]]
+            width_4char:
+                filter: |
+                    function() {
+                        return (feature.walking_shield_text.length === 4)
+                    }
+                draw:
+                    mapzen_icon_library:
+                        size: [[6,[29px,14px]],[13,[31px,15px]],[16,[38px,18px]]]
+            width_5char:
+                filter: |
+                    function() {
+                        return (feature.walking_shield_text.length === 5)
+                    }
+                draw:
+                    mapzen_icon_library:
+                        size: [[6,[34px,14px]],[13,[37px,15px]],[16,[45px,18px]]]
+            width_other:
+                filter: |
+                    function() {
+                        return (feature.walking_shield_text.length > 5)
+                    }
+                draw:
+                    mapzen_icon_library:
+                        visible: false
+            network_iwn:
+                filter: { walking_network: iwn }
+                draw:
+                    mapzen_icon_library:
+                        priority: 56
+                        visible: global.sdk_path_shields
+            network_nwn:
+                filter: { walking_network: nwn }
+                draw:
+                    mapzen_icon_library:
+                        priority: 57
+                        visible: global.sdk_path_shields
+            network_rwn:
+                filter: { walking_network: rwn }
+                draw:
+                    mapzen_icon_library:
+                        priority: 58
+                        visible: global.sdk_path_shields
+                early:
+                    filter: { $zoom: { max: 9 } }
+                    draw:
+                        mapzen_icon_library:
+                            visible: false
+            network_lwn:
+                filter: { walking_network: lwn }
+                draw:
+                    mapzen_icon_library:
+                        priority: 59
+                        visible: global.sdk_path_shields
+                early:
+                    filter: { $zoom: { max: 15 } }
+                    draw:
+                        mapzen_icon_library:
+                            visible: false
+
+
+global:
+    sdk_path_overlay: true          # should be true for default walkabout
+    sdk_path_shields: true          # should be true, except false for no-labels
+
+
+styles:
+    dashed_steps_path_overlay:
+        base: lines
+        dash: [0.5, 0.25]
+        dash_background_color: red #[0.760,0.785,0.805]
+    dashed_footway:
+        base: lines
+        dash: [0.5, 0.3]
+        dash_background_color: [0.690,0.875,0.824]
+    dots_footway:
+        base: lines
+        lighting: false
+        texcoords: true
+        blend: overlay
+        shaders:
+            defines:
+                dotSize: .1
+            blocks:
+                color: |
+                    vec2 st = fract(v_texcoord.xy);
+                    st -= .5;
+                    color.a = 1.- step(dotSize, dot(st,st)*2.);

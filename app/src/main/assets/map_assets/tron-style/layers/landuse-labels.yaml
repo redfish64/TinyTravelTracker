@@ -1,0 +1,34 @@
+layers:
+    # tuck this into existing landuse layer
+    landuse:
+        landuse-labels:
+            filter:
+                all:
+                    - label_placement: true
+                    - name: true
+            draw:
+                text:
+                    text_source: global.ux_language_text_source
+                    move_into_tile: true
+                    priority: 100
+                    visible: global.text_visible_landuse_generic
+                    interactive: global.sdk_interactive
+                    font:
+                        family: Cairo
+                        fill: [0.149,0.871,0.992]
+                        style: italic
+                        size: 11px
+            pier:
+                filter: { kind: [pier] }
+                draw:
+                    mapzen_icon_library:
+                        size: 18px
+                        sprite: function() { return feature.kind; }
+                        priority: 65
+                        visible: global.icon_visible_poi_landuse
+                        interactive: global.sdk_interactive
+                        text:
+                            font:
+                                family: Cairo
+                                fill: [0.345,0.953,0.769]
+                                size: 11px

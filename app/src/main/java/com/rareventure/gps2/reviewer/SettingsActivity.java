@@ -27,6 +27,7 @@ import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
+import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
@@ -50,6 +51,7 @@ import com.rareventure.gps2.R;
 import com.rareventure.gps2.gpx.CreateGpxBackup;
 import com.rareventure.gps2.gpx.RestoreGpxBackup;
 import com.rareventure.gps2.reviewer.map.OsmMapGpsTrailerReviewerMapActivity;
+import com.rareventure.gps2.reviewer.map.OsmMapView;
 
 import java.util.Arrays;
 
@@ -93,7 +95,8 @@ public class SettingsActivity extends GTGPreferenceActivity implements OnPrefere
 
 	private CheckBoxPreference allowErrorReporting;
 
-	private SeekBarDialogPreference mapFontSize;
+	//	private SeekBarDialogPreference mapFontSize;
+	private ListPreference mapStyle;
 
 	/*
 	private static final String[] passwordTimeoutStrs =
@@ -188,19 +191,27 @@ public class SettingsActivity extends GTGPreferenceActivity implements OnPrefere
         colorblindSettings.setOnPreferenceClickListener(this);
         
         root.addPreference(colorblindSettings);
-        
-        mapFontSize = new SeekBarDialogPreference(this,
-        		getText(R.string.title_map_font_size), 
-        		getText(R.string.desc_map_font_size),
-    			getResources().getInteger(R.dimen.map_font_size_min_value), 
-    			getResources().getInteger(R.dimen.map_font_size_max_value), 
-    			getResources().getInteger(R.dimen.map_font_size_steps), 
-    			getResources().getInteger(R.dimen.map_font_size_log_scale),
-    			"%1.0f",
-				null);
-        mapFontSize.setOnPreferenceChangeListener(this);
-        root.addPreference(mapFontSize);
-        
+
+//		mapFontSize = new SeekBarDialogPreference(this,
+//				getText(R.string.title_map_font_size),
+//				getText(R.string.desc_map_font_size),
+//				getResources().getInteger(R.dimen.map_font_size_min_value),
+//				getResources().getInteger(R.dimen.map_font_size_max_value),
+//				getResources().getInteger(R.dimen.map_font_size_steps),
+//				getResources().getInteger(R.dimen.map_font_size_log_scale),
+//				"%1.0f",
+//				null);
+//		mapFontSize.setOnPreferenceChangeListener(this);
+//		root.addPreference(mapFontSize);
+		mapStyle= new ListPreference(this);
+
+		mapStyle.setTitle(R.string.title_map_style);
+		mapStyle.setSummary(R.string.desc_map_style);
+		mapStyle.setEntries(OsmMapView.Preferences.MapStyle.entryNames(this));
+		mapStyle.setEntryValues(OsmMapView.Preferences.MapStyle.entryValues(this));
+		mapStyle.setOnPreferenceChangeListener(this);
+		root.addPreference(mapStyle);
+
 
         enablePassword = new CheckBoxPreference(this);
         enablePassword.setTitle(R.string.enable_password);
@@ -304,7 +315,7 @@ public class SettingsActivity extends GTGPreferenceActivity implements OnPrefere
         percTimeGpsOn.setValue(GpsTrailerGpsStrategy.prefs.batteryGpsOnTimePercentage * 100);
         minBatteryLife.setValue(GTG.prefs.minBatteryPerc*100);
         enableToolTips.setChecked(OsmMapGpsTrailerReviewerMapActivity.prefs.enableToolTips);
-		mapFontSize.setValue(OsmMapGpsTrailerReviewerMapActivity.prefs.panelScale);
+		mapStyle.setValue(OsmMapView.prefs.mapStyle.toString());
 		passwordTimeout.setValue(getPasswordTimeoutFromMS(GTG.prefs.passwordTimeoutMS));
 
 		passwordTimeout.setEnabled(enablePassword.isChecked());
@@ -401,9 +412,9 @@ public class SettingsActivity extends GTGPreferenceActivity implements OnPrefere
 			GpsTrailerGpsStrategy.prefs.batteryGpsOnTimePercentage = percTimeGpsOn.getValue()/100;
 			GTG.runBackgroundTask(SAVE_PREFS_AND_RESTART_COLLECTOR);
 		}
-		else if(preference == mapFontSize)
+		else if(preference == mapStyle)
 		{
-			OsmMapGpsTrailerReviewerMapActivity.prefs.panelScale = (int)(mapFontSize.getValue()+.5);
+			OsmMapView.prefs.mapStyle= OsmMapView.Preferences.MapStyle.valueOf(newValue.toString());
 			GTG.savePreferences(SettingsActivity.this);
 		}
 		else if(preference == passwordTimeout)

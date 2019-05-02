@@ -1,0 +1,160 @@
+layers:
+    # tuck this into existing water layer
+    water:
+        water-area-labels:
+            visible: global.text_visible_water_labels
+            filter:
+                all:
+                    - name: true
+                    - $geometry: point
+                    - not: { kind: [riverbank, dock, playa] }
+                    - area: true
+                any:
+                    # show labels for smaller landuse areas at higher zooms
+                    - { $zoom: { min: 5 },  area: { min: 10000000000 } }
+                    - { $zoom: { min: 6 },  area: { min: 5000000000 } }
+                    - { $zoom: { min: 7 },  area: { min: 400000000 } }
+                    - { $zoom: { min: 8 },  area: { min: 200000000 } }
+                    - { $zoom: { min: 9 },  area: { min: 100000000 } }
+                    - { $zoom: { min: 10 }, area: { min: 100000000 } }
+                    - { $zoom: { min: 11 }, area: { min: 10000000 } }
+                    - { $zoom: { min: 12 }, area: { min: 2000000 } }
+                    - { $zoom: { min: 13 }, area: { min: 1000000 } }
+                    - { $zoom: { min: 14 }, area: { min: 500000 } }
+                    - { $zoom: { min: 15 }, area: { min: 100000 } }
+                    - { $zoom: { min: 15 }, area: { min: 50000 } }
+                    - { $zoom: { min: 16 }, area: { min: 20000 } }
+                    - { $zoom: { min: 17 } }
+            default-label-text:
+                draw:
+                    text:
+                        text_source: global.ux_language_text_source
+                        font:
+                            fill: [0.370,0.622,1.000]
+                            family: Aldrich
+                            size: 12px
+
+            lakes-labels:
+                filter:
+                    $zoom: { min: 4 }
+                draw:
+                    text:
+                        font:
+                            size: [[5,9px],[8,12px]]
+
+        ocean-sea-labels:
+            visible: global.text_visible_water_labels
+            filter: { name: true, kind: [sea, ocean] }
+            draw:
+                text:
+                    text_source: global.ux_language_text_source
+                    font:
+                        fill: [0.370,0.622,1.000]
+                        family: Aldrich
+                        size: 12px
+                        transform: uppercase
+
+            ocean-spacer:
+                filter: { kind: ocean }
+                ocean-spacer-z1-z4:
+                    filter: { $zoom: { min: 1, max: 4 } }
+                    draw:
+                        text:
+                            text_source: global.ux_language_text_source_sea
+                            text_wrap: false
+                ocean-spacer-z4-up:
+                    filter: { $zoom: { min: 4 } }
+                    draw:
+                        text:
+                            text_source: global.ux_language_text_source_ocean
+                            text_wrap: false
+            ocean-labels-z1-z2:
+                filter: { $zoom: [0,1,2] }
+                draw:
+                    text: { visible: false }
+            ocean-labels-z3-z4:
+                filter: { $zoom: [3] }
+                draw:
+                    text:
+                        font:
+                            size: [[3,12px],[6,17px]]
+
+
+            sea-early:
+                filter: { $zoom: [3], kind: sea }
+                draw: { text: { visible: false } }
+            sea-spacer:
+                filter: { not: { kind: [ocean] }, $zoom: { min: 5 } }
+                draw:
+                    text:
+                        text_source: global.ux_language_text_source_sea
+                        text_wrap: false
+
+            sea-labels:
+                filter: { not: { kind: [ocean] } }
+                draw:
+                    text:
+                        font:
+                            size: [[4,9px],[8,14px]]
+
+        playa-labels:
+            visible: global.text_visible_water_labels
+            filter:
+                all:
+                    - name: true
+                    - $geometry: point
+                    - kind: playa
+                    - area: true
+                any:
+                    # show labels for smaller landuse areas at higher zooms
+                    - { $zoom: { min: 7 },  area: { min: 1500000000 } }
+                    - { $zoom: { min: 8 },  area: { min: 200000000 } }
+                    - { $zoom: { min: 9 },  area: { min: 100000000 } }
+                    - { $zoom: { min: 10 }, area: { min: 100000000 } }
+                    - { $zoom: { min: 11 }, area: { min: 10000000 } }
+                    - { $zoom: { min: 12 }, area: { min: 2000000 } }
+                    - { $zoom: { min: 13 }, area: { min: 1000000 } }
+                    - { $zoom: { min: 14 }, area: { min: 500000 } }
+                    - { $zoom: { min: 15 }, area: { min: 100000 } }
+                    - { $zoom: { min: 15 }, area: { min: 50000 } }
+                    - { $zoom: { min: 16 }, area: { min: 20000 } }
+                    - { $zoom: { min: 17 } }
+            draw:
+                text:
+                    text_source: global.ux_language_text_source
+                    font:
+                        fill: [0.351,0.770,0.950]
+                        family: Aldrich
+                        size: 10px
+
+        water-line-labels:
+            visible: global.text_visible_water_labels
+            filter:
+                all:
+                    - name: true
+                    - $geometry: line
+                    - kind: [river,canal,stream,dam,ditch,drain]
+                    - $zoom: { min: 14 }
+            draw:
+                text:
+                    text_source: global.ux_language_text_source
+                    font:
+                        fill: [0.370,0.622,1.000]
+                        family: Aldrich
+                        size: 12px
+            water-line-labels:
+                filter: { $zoom: [14] }
+                draw:
+                    text:
+                        font:
+                            size: [[14,10px],[17,14px]]
+            not-river-not-stream:
+                filter: { kind: [canal,dam,ditch,drain], $zoom: { max: 16 } }
+                draw:
+                    text:
+                        visible: false
+            stream:
+                filter: { kind: [stream], $zoom: { max: 17 } }
+                draw:
+                    text:
+                        visible: false

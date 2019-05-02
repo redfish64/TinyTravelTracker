@@ -1,0 +1,25 @@
+import: 
+    - ../functions/map.yaml
+
+styles:
+    geometry-dynamic-height:
+        doc:
+            author: 
+                name: Patricio Gonzalez Vivo
+                twitter: patriciogv
+            version: 0.0.1
+            tangram-version: 0.0.7
+            licence: MIT
+            description: |  
+                Scale geometries in `z` acording to the zoom level
+        mix: [functions-zoom]
+        shaders:
+            defines:
+                ZOOM_START: 15.0
+                ZOOM_END: 20.0
+                HEIGHT: zoom()
+                HEIGHT_MIN: 1.0
+                HEIGHT_MAX: 2.5
+            blocks:
+                position: |
+                    position.z *= max(HEIGHT_MIN,HEIGHT_MAX*HEIGHT);

@@ -213,15 +213,15 @@ GTGEventListener
 	public boolean onPrepareOptionsMenu(Menu menu) {
     	menu.clear();
     	menu.add(R.string.settings);
-    	if(prefs.showPhotos)
-    	{
-    		menu.add(R.string.turn_off_photos);
-    	}
-    	else
-    	{
-    		menu.add(R.string.turn_on_photos);
-    	}
-    	menu.add(R.string.help);
+//    	if(prefs.showPhotos)
+//    	{
+//    		menu.add(R.string.turn_off_photos);
+//    	}
+//    	else
+//    	{
+//    		menu.add(R.string.turn_on_photos);
+//    	}
+//    	menu.add(R.string.help);
     	
 		return super.onPrepareOptionsMenu(menu);
 	}
@@ -784,7 +784,8 @@ GTGEventListener
         }
 		else if(v == menuButton)
 		{
-			openOptionsMenu();
+			startInternalActivity(new Intent(this, SettingsActivity.class));
+			//openOptionsMenu();
 		}
 		else if(v == sasPanelButton)
 		{

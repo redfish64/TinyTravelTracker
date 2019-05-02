@@ -1,0 +1,691 @@
+layers:
+    roads:
+        data: { source: mapzen }
+        filter: { not: { kind: rail } }
+        draw:
+            lines:
+                width: 1px
+                order: global.order
+                outline:
+                    order: 352
+
+        early:
+            filter: { $zoom: { max: 15} }
+            draw:
+                lines:
+                    outline:
+                        order: global.order
+        bridges_and_tunnels:
+            filter: { any: [is_bridge: true, is_tunnel: true] }
+            draw:
+                lines:
+                    outline:
+                        order: global.order
+        natural_earth_roads:
+            filter:
+                - $zoom: { min: 5, max: 8 }
+            draw:
+                lines:
+                    style: roads-glow
+                    # color: [[5,[0.463,0.800,0.824]],[6,[0.541,0.969,0.949]]]
+                    # width: [[5,0.5px],[6,10px]]
+                    # color: [0.463,0.800,0.824]
+                    color: [0.000,0.535,0.630]
+                    width: [[5,1.5px],[7,5px]]
+
+                    # outline:
+                    #     color: [0.541,0.969,0.949]
+                    #     width: [[5,0px],[6,0px]]
+
+            # TODO: bug at zoom 7 prevents most major_road features from drawing?!
+            major_road:
+                filter: { kind: major_road }
+                draw:
+                    lines:
+                        color: [[5,[0.463,0.800,0.824]],[6,[0.541,0.969,0.949]]]
+                        width: [[5,0.5px],[6,0.75px]]
+                        # outline:
+                        #     width: 1px
+
+            minor_road:
+                filter: { kind: minor_road }
+                draw:
+                    lines:
+                        color: [0.333,0.518,0.612]
+                        width: 0.5px
+            ferry:
+                filter: { kind: ferry }
+                draw:
+                    lines:
+                        visible: false
+
+        highway:
+            filter:
+                kind: highway
+                $zoom: { min: 8 }
+            highway-z8:
+                filter:
+                    $zoom: { min: 8, max: 11 }
+                draw:
+                    lines:
+                        style: roads-glow
+                        # color: [0.463,0.800,0.824]
+                        # color: [0.000,0.535,0.630]
+                        color: [0.000,0.312,0.367]
+                        width: [[8,4px],[11,9px]]
+
+            highway-z11:
+                filter:
+                    $zoom: { min: 11 }
+                draw:
+                    lines:
+                        style: lines-traffic-animation
+                        order: global.order
+                        color: [0.086,0.135,0.260]
+                        width: [[8,0px],[9,0.25px],[10,1px],[12,1px],[13,2px],[14,3px],[15,5px],[16,5px],[17,9px],[18,16px],[19,12px]]
+                        outline:
+                            # color: [0.541,0.969,0.949]
+                            color: [0.689,0.970,0.956]
+                            width: [[8,0.5px],[9,1px],[12,1.25px],[15,1.5px],[16,1.5px],[17,0px]]
+                    highway-dashed:
+                        order: global.order_sub_1
+                        # color: [0.557,0.909,0.887]
+                        # color: [0.306,0.361,0.949]
+                        color: [0.035,0.976,1.000]
+                        width: [[8,0px],[16,8px],[17,13px],[18,20px],[19,20px]]
+                    highway-glow:
+                        order: global.order_sub_6
+                        # color: [0.800,1.000,0.987]
+                        color: [0.000,0.535,0.630]
+                        width: [[11,8px],[13,12px],[16,30px],[17,40px],[18,50px],[19,80px]]
+                    highway-casing:
+                        order: global.order
+
+                highway-link:
+                    filter: { is_link: true } # on- and off-ramps, etc
+                    draw:
+                        lines:
+                            order: global.order_add_1
+                            width: [[8,0px],[9,0px],[11,0.25px],[12,0.25px],[13,1px],[14,1.5px],[15,2px],[17,3px],[18,9px],[19,12px],[20,20px]]
+                            outline:
+                                color: [[8,[0.481,0.842,0.890]],[16,[0.481,0.842,0.890]],[18,[0.035,0.976,1.000]]]
+                                width: [[8,0px],[9,0.5px],[15,1px],[18,1.5px]]
+                        highway-dashed:
+                            visible: false
+                        highway-casing:
+                            visible: false
+                        highway-glow:
+                            visible: false
+
+                    highway-link-early:
+                        filter: { $zoom: { min: 13, max: 15 } }
+                        draw:
+                            lines:
+                                order: 352
+                            highway-dashed:
+                                visible: false
+                        highway-link-early-z17-18:
+                            filter: { $zoom: [17, 18]}
+                            draw:
+                                lines:
+                                    visible: false
+
+                highway-tunnel:
+                    filter: { is_tunnel: true, $zoom: { min: 13 } }
+                    draw:
+                        lines:
+                            color: [0.201,0.286,0.409]
+                            outline:
+                                # color: [0.373,0.673,0.657]
+                                color: [[13,[0.276,0.568,0.950]],[18,[0.073,0.435,0.908]]]
+                        highway-dashed:
+                            visible: true
+                            color: [0.073,0.435,0.908]
+                        highway-glow:
+                            visible: true
+                            color: [0.059,0.000,0.953]
+                        highway-casing:
+                            color: [0.073,0.435,0.908]
+                            visible: true
+                    highway-tunnel-link:
+                        filter:
+                            is_link: true
+                        draw:
+                            highway-dashed:
+                                visible: false
+                            highway-casing:
+                                visible: false
+                            highway-glow:
+                                visible: false
+
+            # Show 0 width roads one zoom before they have width, so they can scale up instead of popping in
+            highway-z17:
+                filter:
+                    $zoom: { min: 16 }
+                draw:
+                    highway-casing:
+                        visible: true
+                        order: global.order_sub_2
+                        color: [0.541,0.969,0.949]
+                        width: [[8,0px],[16,10px],[17,18px],[18,34px],[19,45px]]
+
+        major_road:
+            filter:
+                kind: major_road
+                $zoom: { min: 8 }
+            draw:
+                lines:
+                    # color: [0.086,0.135,0.260]
+                    color: [0.255,0.455,0.627]
+                    width: 0.75px
+                    outline:
+                        width: 0px
+
+            traffic:
+                filter:
+                    $zoom: { min: 14 }
+                draw:
+                    lines:
+                        style: fast-traffic-animation-twoways
+
+                oneway:
+                    filter: { oneway: yes } # should be `true` for 1.0 tiles
+                    draw:
+                        lines:
+                            style: fast-traffic-animation
+
+            trunk_primary:
+                filter: { kind_detail: [trunk, primary] }
+                draw:
+                    lines:
+                        color: [[8,[0.418,0.754,0.736]],[12,[0.278,0.651,0.749]],[13,[0.086,0.135,0.260]]]
+                        width: [[8,0.25px],[9,0.3px],[11,0.3px],[12,0.75px],[13,0.1px],[14,3px],[15,5px],[16,6px],[17,12px],[18,22px],[19,38px],[20,65px]]
+                        outline:
+                            color: [[13,[0.196,0.494,0.647]],[14,[0.000,0.466,0.650]]]
+                            width: [[8,0px],[12,0px],[13,0.6px],[14,0.6px],[15,1px],[17,2px],[18,2px],[19,2px]]
+                trunk-primary-z17:
+                    filter:
+                        $zoom: { min: 17 }
+                    draw:
+                        center-line:
+                            style: center-glow
+                            order: global.order_add_1
+                            color: [0.034,0.105,0.569]
+                            width: 6px
+                routes:
+                    filter: { ref: true }
+                    draw:
+                        lines:
+                            color: [[8,[0.337,0.788,0.878]],[11,[0.301,0.704,0.785]],[12,[0.086,0.135,0.260]],[13,[0.086,0.135,0.260]]]
+                            width: [[8,0.15px],[11,0.4px],[12,0.1px],[13,0.1px],[14,2px],[15,5px],[16,7px],[17,12px],[18,22px],[19,38px],[20,65px]]
+                            outline:
+                                # color: [[8,[0.329,0.588,0.784]],[11,[0.418,0.754,0.736]],[14,[0.510,0.920,0.897]]]
+                                color: [0.301,0.704,0.785]
+                                width: [[8,0px],[11,0px],[12,0.30px],[13,0.5px],[15,1.5px]]
+                    primary-routes-z17:
+                        filter:
+                            $zoom: { min: 17 }
+                        draw:
+                            center-line:
+                                style: center-glow
+                                order: global.order_add_1
+                                color: [0.034,0.105,0.569]
+                                width: 6px
+                    tunnel:
+                        filter: { is_tunnel: true, $zoom: { min: 13 } }
+                        draw:
+                            lines:
+                                color: [0.201,0.286,0.409]
+                                outline:
+                                    color: [0.276,0.568,0.950]
+            link:
+                filter: { is_link: true }
+                draw:
+                    lines:
+                        color: [0.086,0.135,0.260]
+                        width: [[8,0px],[12,0.0px],[13,0.25px],[14,1.5px],[15,2px],[17,3px],[18,9px],[19,12px],[20,20px]]
+                        outline:
+                            color: [0.039,0.980,1.000]
+                            width: [[10,0px],[13,0.3px],[16,1px],[17,1.5px]]
+            tunnel:
+                filter: { is_tunnel: true, $zoom: { min: 13 } }
+                draw:
+                    lines:
+                        color: [0.201,0.286,0.409]
+                        outline:
+                            color: [0.276,0.568,0.950]
+            secondary:
+                filter: { kind_detail: secondary }
+                draw:
+                    lines:
+                        color: [[8,[0.418,0.754,0.736]],[12,[0.278,0.651,0.725]],[13,[0.086,0.135,0.260]]]
+                        width: [[8,0.25px],[9,0.3px],[11,0.5px],[12,0.75px],[13,0.1px],[14,2.25px],[15,5px],[16,6px],[17,9px],[18,14px],[19,32px],[20,60px]]
+                        outline:
+                            color: [[13,[0.196,0.494,0.647]],[14,[0.000,0.466,0.650]]]
+                            width: [[8,0px],[12,0px],[13,0.5px],[14,0.5px],[15,1px],[17,2px],[18,2px]]
+                secondary-z17:
+                    filter:
+                        $zoom: { min: 17 }
+                    draw:
+                        center-line:
+                            style: center-glow
+                            order: global.order_add_1
+                            color: [0.034,0.105,0.569]
+                            width: 6px
+                routes:
+                    filter: { ref: true, $zoom: { min: 12 } }
+                    draw:
+                        lines:
+                            color: [[12,[0.278,0.651,0.725]],[13,[0.086,0.135,0.260]]]
+                            width: [[12,0.75px],[13,0.1px],[14,1.5px],[15,5px],[16,6px],[17,9px],[18,14px],[19,30px],[20,60px]]
+                            outline:
+                                color: [[13,[0.196,0.494,0.647]],[14,[0.000,0.466,0.650]]]
+                                width: [[12,0px],[13,0.5px],[14,0.75px],[15,1px],[17,1.25px],[18,1.5px]]
+                    tunnel:
+                        filter: { is_tunnel: true, $zoom: { min: 13 } }
+                        draw:
+                            lines:
+                                color: [0.201,0.286,0.409]
+                                outline:
+                                    color: [0.276,0.568,0.950]
+
+            tertiary:
+                filter: { kind_detail: [tertiary, tertiary_link] }
+                draw:
+                    lines:
+                        color: [[12,[0.248,0.397,0.439]],[13,[0.248,0.397,0.439]],[14,[0.082,0.133,0.259]]]
+                        width: [[12,0.5px],[13,0.1px],[14,1.0px],[15,3.2px],[16,6px],[17,8px],[18,14px],[19,30px],[20,60px]]
+                        outline:
+                            # color: [[15,[0.248,0.397,0.439]],[16,[0.285,0.457,0.506]]]
+                            color: [[12,[0.082,0.133,0.259]],[14,[0.082,0.133,0.259]],[15,[0.212,0.302,0.427]],[17,[0.212,0.302,0.427]]]
+                            width: [[12,0px],[13,0.2px],[14,0.4px],[15,1px],[17,2px],[18,2px]]
+                routes:
+                    filter: { ref: true, $zoom: { min: 12 } }
+                    draw:
+                        lines:
+                            width: [[12,0.5px],[13,0.5px],[14,0.1px],[15,2px],[16,4px],[17,8px],[18,14px],[19,30px],[20,60px]]
+                            outline:
+                                width: [[12,0px],[14,0.4px],[15,1px],[17,2px],[18,2px]]
+                    tunnel:
+                        filter: { is_tunnel: true, $zoom: { min: 13 } }
+                        draw:
+                            lines:
+                                color: [0.201,0.286,0.409]
+                                outline:
+                                    color: [0.276,0.568,0.950]
+                link:
+                    filter: { is_link: true }
+                    draw:
+                        lines:
+                            width: [[13,0px],[15,1px],[16,2px],[17,4px],[18,7px],[19,10px],[20,20px]]
+                            outline:
+                                width: [[12,0px],[14,0.4px],[15,1px],[17,2px],[18,2px]]
+                in-hospital:
+                    filter: { landuse_kind: hospital }
+                    draw:
+                        lines:
+                            color: [0.208,0.106,0.271]
+
+        minor_road:
+            filter:
+                kind: minor_road
+                not: { kind_detail: service }
+                $zoom: { min: 8 }
+            draw:
+                lines:
+                    color: [[12,[0.196,0.267,0.373]],[13,[0.173,0.224,0.318]],[14,[0.082,0.133,0.259]]]
+                    width: [[12,0.5px],[13,0.5px],[14,0.15px],[15,1.5px],[16,4px],[17,8px],[18,14px],[19,30px],[20,60px]]
+                    outline:
+                        # color: [[12,[0.248,0.397,0.439]],[15,[0.248,0.397,0.439]],[16,[0.285,0.457,0.506]]]
+                        color: [[12,[0.082,0.133,0.259]],[14,[0.082,0.133,0.259]],[15,[0.212,0.302,0.427]],[17,[0.212,0.302,0.427]]]
+                        width: [[12,0px],[13,0px],[14,0.4px],[15,0.5px],[17,2px],[18,2px]]
+
+            traffic:
+                filter:
+                    $zoom: { min: 18 }
+                    not:
+                        - kind_detail: [parking_aisle, service]
+                draw:
+                    lines:
+                        style: slow-traffic-animation-twoways
+
+                oneway:
+                    filter: { oneway: yes } # should be `true` for 1.0 tiles
+                    draw:
+                        lines:
+                            style: slow-traffic-animation
+
+            tunnel:
+                filter: { is_tunnel: true, $zoom: { min: 13 } }
+                draw:
+                    lines:
+                        color: [0.184,0.263,0.373]
+                        # outline:
+                        #     color: [0.276,0.568,0.950]
+            minor_road_bridge:
+                filter: { is_bridge: true }
+                draw:
+                    lines:
+                        cap: round
+                        outline:
+                            cap: butt
+            in-hospital:
+                filter: { landuse_kind: hospital }
+                draw:
+                    lines:
+                        color: [0.208,0.106,0.271]
+
+        service_road:
+            filter: { kind: minor_road, kind_detail: service }
+            draw:
+                lines:
+                    color: [[12,[0.248,0.397,0.439]],[13,[0.248,0.397,0.439]],[14,[0.082,0.133,0.259]]]
+                    width: [[12,0px],[13,0px],[14,0.10px],[15,1px],[16,2px],[18,5px],[19,10px],[20,25px]]
+                    outline:
+                        color: [[12,[0.082,0.133,0.259]],[14,[0.082,0.133,0.259]],[15,[0.212,0.302,0.427]],[17,[0.212,0.302,0.427]]]
+                        width: [[12,0px],[13,0px],[14,0.2px],[15,0.5px],[17,1.25px],[18,1.5px]]
+            in-hospital:
+                filter: { landuse_kind: hospital }
+                draw:
+                    lines:
+                        color: [0.208,0.106,0.271]
+                        outline:
+                            width: 0px
+
+        path:
+            filter:
+                all:
+                    - kind: [path,portage_way]
+                not:
+                    - kind_detail: [steps,track,pier]
+            draw:
+                lines:
+                    color: [0.175,0.175,0.283]
+                    width: [[13,0px],[14,0.35px],[15,1px],[16,1.25px],[17,1.5px],[19,4px],[20,5px]]
+                    outline:
+                        color: [0.236,0.337,0.477]
+                        width: [[14,0px],[15,0.35px],[16,1px],[17,2px],[19,3px]]
+            pedestrian:
+                filter: { kind_detail: pedestrian }
+                draw:
+                    lines:
+                        color: [0.175,0.175,0.283]
+                        width: [[13,0px],[14,0.35px],[15,1px],[16,1.25px],[17,1.5px],[19,4px],[20,5px]]
+                        outline:
+                            color: [0.236,0.337,0.477]
+                            width: [[14,0px],[15,0.35px],[16,1px],[17,2px],[19,3px]]
+
+            corridor:
+                filter: { kind_detail: corridor }
+                draw:
+                    lines:
+                        order: 1000
+                early:
+                    filter: { $zoom: { max: 17 } }
+                    draw:
+                        lines:
+                            visible: false
+            bridge:
+                filter: { is_bridge: true }
+                draw:
+                    lines:
+                        color: [0.175,0.175,0.283]
+                        width: [[13,0px],[14,0.35px],[15,1px],[16,1.25px],[17,1.5px],[19,4px],[20,5px]]
+                        cap: round
+                        outline:
+                            color: [0.236,0.337,0.477]
+                            width: [[14,0px],[15,0.35px],[16,1px],[17,2px],[19,3px]]
+                            cap: butt
+            in-hospital:
+                filter: { landuse_kind: hospital }
+                draw:
+                    lines:
+                        color: [0.208,0.106,0.271]
+            in-park-pitch:
+                filter: { landuse_kind: [park,pitch,parking,golf_course] }
+                draw:
+                    lines:
+                        color: [0.175,0.175,0.283]
+                        outline:
+                            width: [[14,0px],[15,0.35px],[16,1px],[17,2px],[19,3px]]
+            in-pedestrian:
+                filter: { landuse_kind: [pedestrian,common] }
+                draw:
+                    lines:
+                        color: [0.192,0.159,0.351]
+            tunnel:
+                filter: { is_tunnel: true }
+                draw:
+                    lines:
+                        color: [0.184,0.263,0.373]
+                        outline:
+                            width: 0px
+
+        track:
+            filter: { kind: path, kind_detail: track }
+            draw:
+                lines:
+                    color: [0.175,0.175,0.283]
+                    width: [[13,0px],[14,0.35px],[15,1px],[16,1.25px],[17,1.5px],[19,4px],[20,5px]]
+                    outline:
+                        color: [0.236,0.337,0.477]
+                        width: [[14,0px],[15,0.35px],[16,1px],[17,2px],[19,3px]]
+            in-park-pitch:
+                filter: { landuse_kind: [park,pitch,parking,golf_course] }
+                draw:
+                    lines:
+                        color: [0.192,0.159,0.351]
+            bridge:
+                filter: { is_bridge: true }
+                draw:
+                    lines:
+                        color: [0.175,0.175,0.283]
+                        width: [[13,0px],[14,0.35px],[15,1px],[16,1.25px],[17,1.5px],[19,4px],[20,5px]]
+                        cap: round
+                        outline:
+                            color: [0.236,0.337,0.477]
+                            width: [[14,0px],[15,0.35px],[16,1px],[17,2px],[19,3px]]
+                            cap: butt
+
+        steps:
+            filter:
+                all:
+                    - kind: path
+                    - kind_detail: steps
+            draw:
+                lines:
+                    style: steps-dashed
+                    color: [0.175,0.175,0.283]
+                    width: [[13,0px],[14,0.35px],[15,1px],[16,1.25px],[17,1.5px],[19,4px],[20,5px]]
+                    outline:
+                        color: [0.236,0.337,0.477]
+                        width: [[14,0px],[15,0.35px],[16,1px],[17,2px],[19,3px]]
+            in-hospital:
+                filter: { landuse_kind: hospital }
+                draw:
+                    lines:
+                        color: [0.208,0.106,0.271]
+
+        pier:
+            filter: { kind: path, kind_detail: pier }
+            draw:
+                lines:
+                    order: global.order
+                    style: pier-overlay
+                    color: [0.267,0.498,0.843,0.5]
+                    width: [[13, 0px], [14, 0.5px],[15, 1.5px], [16, 2.5px],[17, 3px],[18, 3m]]
+
+        # ferry:
+        #     filter: { kind: ferry }
+        #     draw:
+        #         lines:
+        #             style: ferry-overlay
+        #             color: [0.259,0.878,0.980,0.75]
+        #             width: [[12, 0.5px], [14, 1.0px], [15, 1.0px], [16, 1.25px]]
+        #             outline:
+        #                 width: 0px
+
+        airport-lines:
+            filter: { kind: aeroway, kind_detail: [runway,taxiway] }
+            draw:
+                lines:
+                    order: global.order
+                    color: [0.000,0.902,0.839]
+                    width: 2px
+            taxiway:
+                filter: { kind_detail: taxiway }
+                draw:
+                    lines:
+                        color: [[9,[0.215,1.000,1.000]],[11,[0.215,1.000,1.000]],[13,[0.078,0.129,0.259]]]
+                        width: [[12,0px],[13,1px],[15,1.5px],[17,6px],[20,20px]]
+                        outline:
+                            width: 0px
+            runway:
+                filter: { kind_detail: runway }
+                draw:
+                    lines:
+                        color: [[9,[0.215,1.000,1.000]],[11,[0.215,1.000,1.000]],[13,[0.078,0.129,0.259]]]
+                        width: [[9,0px],[11,1px],[13,5px],[15,30px],[20,100m]]
+                        outline:
+                            style: runway-glow
+                            color: [[9,[0.215,1.000,1.000]],[15,[0.078,0.129,0.259]]]
+                            width: [[9,2px],[11,3px],[12,2px],[20,12px]]
+                runway-detail:
+                    filter: { $zoom: { min: 12 } }
+                    draw:
+                        runway-dots:
+                            color: [0.215,1.000,1.000]
+                            width: [[12,2px],[15,15px],[20,100px]]
+
+styles:
+    fast-traffic-animation:
+        mix: [lines-traffic-animation]
+        shaders:
+            defines:
+                ZOOM_START: 13.
+                DATASTREAM_SPEED: 15.
+    fast-traffic-animation-twoways:
+        mix: [lines-traffic-animation]
+        shaders:
+            defines:
+                ZOOM_START: 13.
+                DATASTREAM_SPEED: 15.
+                DATASTREAM_TWOWAYS: true
+    slow-traffic-animation:
+        mix: [lines-traffic-animation]
+        shaders:
+            defines:
+                ZOOM_START: 18.
+                ZOOM_END: 20.
+                DATASTREAM_SPEED: 7.
+    slow-traffic-animation-twoways:
+        mix: [lines-traffic-animation]
+        shaders:
+            defines:
+                ZOOM_START: 17.
+                ZOOM_END: 20.
+                DATASTREAM_SPEED: 7.
+                DATASTREAM_TWOWAYS: true
+
+
+    roads-glow:
+        base: lines
+        mix: [functions-zoom, lines-glow]
+        shaders:
+            defines:
+                ZOOM_START: 5.
+                ZOOM_END: 6.
+                GLOW_WIDTH: mix(1.,.45,zoom())
+                GLOW_BRIGHTNESS: zoom()*.22
+
+    highway-dashed:
+        base: lines
+        dash: [1,1]
+        dash_background_color: [0.086,0.149,0.290]
+        shaders:
+            blocks:
+                position: |
+                    v_texcoord.y *= 11.;
+
+    highway-casing:
+        base: lines
+        mix: [functions-aastep, functions-pulse, functions-zoom]
+        texcoords: true
+        shaders:
+            defines:
+                ZOOM_START: 16.
+                ZOOM_END: 19.
+
+                BACKGROUND_COLOR: vec3(0.086,0.135,0.260)
+                # CAST_A_COLOR: vec3(0.541,0.969,0.949)
+                CAST_A_COLOR: v_color.rgb
+                CAST_A_WIDTH: 0.03
+                CAST_A_DIST: mix(0.47,0.34,zoom())
+                # CAST_B_COLOR: vec3(0.800,1.000,0.987)
+                CAST_B_COLOR: v_color.rgb+vec3(0.259,0.031,0.038)
+                CAST_B_WIDTH: 0.07
+                CAST_B_DIST: 0.47
+            blocks:
+                color: |
+                    float x = abs(v_texcoord.x-.5);
+                    color = mix(vec4(BACKGROUND_COLOR,1), color, aastep(CAST_B_DIST+CAST_B_WIDTH*.5, x));
+                    color.rgb = mix(color.rgb, CAST_A_COLOR, aastep(.5, pulse(x, CAST_A_DIST, CAST_A_WIDTH)));
+                    color.rgb = mix(color.rgb, CAST_B_COLOR, aastep(.5, pulse(x, CAST_B_DIST, CAST_B_WIDTH)));
+
+    highway-glow:
+        base: lines
+        mix: [lines-glow]
+        shaders:
+            defines:
+                GLOW_WIDTH: 0.45
+                GLOW_BRIGHTNESS: .25
+
+    center-glow:
+        base: lines
+        mix: [lines-glow]
+        shaders:
+            defines:
+                GLOW_WIDTH: 0.45
+                GLOW_BRIGHTNESS: .25
+
+    runway-glow:
+        base: lines
+        mix: [lines-glow]
+        shaders:
+            defines:
+                GLOW_WIDTH: 0.40
+                GLOW_BRIGHTNESS: .25
+
+    taxiway-glow:
+        base: lines
+        mix: [lines-glow]
+        shaders:
+            defines:
+                GLOW_WIDTH: 0.10
+                GLOW_BRIGHTNESS: .3
+
+    runway-dots:
+        base: lines
+        mix: [lines-dots-glow]
+        animated: true
+        shaders:
+            defines:
+                DOTS_ANIMATE: color.a *=abs(sin(v_texcoord.y+u_time))*1.0
+            blocks:
+                filter: |
+                    #ifdef DOTS_ANIMATE
+                    DOTS_ANIMATE;
+                    #endif
+
+    steps-dashed:
+        base: lines
+        dash: [1,1]
+        dash_background_color: [0.212,0.302,0.427]
+
+    pier-overlay:
+        base: lines
+        blend: overlay
+
+    ferry-overlay:
+        base: lines
+        blend: overlay

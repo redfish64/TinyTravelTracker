@@ -21,13 +21,12 @@ package com.rareventure.gps2.reviewer.map;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Map;
 
 import android.content.Context;
 import android.graphics.Paint;
 import android.graphics.PointF;
-import android.opengl.GLSurfaceView;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Vibrator;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
@@ -36,14 +35,13 @@ import android.util.Log;
 import com.mapzen.tangram.CameraPosition;
 import com.mapzen.tangram.MapChangeListener;
 import com.mapzen.tangram.networking.HttpHandler;
-import com.mapzen.tangram.viewholder.ConfigChooser;
 import com.mapzen.tangram.LngLat;
 import com.mapzen.tangram.MapController;
 import com.mapzen.tangram.MapView;
 
-import com.mapzen.tangram.SceneError;
 import com.mapzen.tangram.TouchInput;
 import com.mapzen.tangram.viewholder.GLViewHolderFactory;
+import com.rareventure.android.AndroidPreferenceSet;
 import com.rareventure.gps2.R;
 import com.rareventure.android.SuperThread;
 import com.rareventure.android.Util;
@@ -175,6 +173,7 @@ public class OsmMapView extends MapView implements MapView.MapReadyCallback {
 //	};
 
 	private int windowHeight;
+	private Preferences.MapStyle lastLoadedSceneFile;
 
 //	private MultiTouchController<OsmMapView> multiTouchController = new MultiTouchController<OsmMapView>(this);
 
@@ -278,11 +277,59 @@ public class OsmMapView extends MapView implements MapView.MapReadyCallback {
 
 	@Override
 	public void onMapReady(@Nullable MapController mapController) {
-		mapController.loadSceneFile("map_style.yaml");
+		loadSceneFileIfNecessary();
+	}
+
+	private void loadSceneFileIfNecessary() {
+		if(lastLoadedSceneFile != prefs.mapStyle) {
+			mapController.loadSceneFile(prefs.mapStyle.fn);
+			lastLoadedSceneFile = prefs.mapStyle;
+		}
 	}
 
 	public static class Preferences implements AndroidPreferences
 	{
+		public static enum MapStyle {
+			BUBBLE_WRAP (R.string.BUBBLE_WRAP_MAP_STYLE_DESC, "bubble_wrap_style.yaml"),
+			CINNABAR (R.string.CINNABAR_MAP_STYLE_DESC, "cinnabar_style.yaml"),
+			REFILL (R.string.REFILL_MAP_STYLE_DESC, "refill_style.yaml"),
+			//SDK_DEFAULT (R.string.SDK_DEFAULT_MAP_STYLE_DESC, "sdk_default_style.yaml"),
+			TRON (R.string.TRON_MAP_STYLE_DESC, "tron_style.yaml"),
+			WALKABOUT (R.string.WALKABOUT_MAP_STYLE_DESC, "walkabout_style.yaml");
+
+			private final int r;
+			public String fn;
+
+			private MapStyle(int r, String fn)
+			{
+				this.r = r;
+				this.fn = fn;
+			}
+
+			public static String [] entryNames(Context c) {
+				MapStyle [] ms = MapStyle.values();
+				String[] res = new String[ms.length];
+				for(int i = 0; i < ms.length; i++)
+				{
+					res[i] = c.getResources().getString(ms[i].r);
+				}
+
+				return res;
+			}
+
+			public static String [] entryValues(Context c) {
+				MapStyle [] ms = MapStyle.values();
+				String[] entryNames = new String[ms.length];
+				for(int i = 0; i < ms.length; i++)
+				{
+					entryNames[i] = ms[i].toString();
+				}
+
+				return entryNames;
+			}
+		}
+
+		public MapStyle mapStyle = MapStyle.CINNABAR;
 	}
 
 	public void setScaleWidget(MapScaleWidget scaleWidget) {
@@ -393,6 +440,11 @@ public class OsmMapView extends MapView implements MapView.MapReadyCallback {
 
 	public void onResume() {
 		super.onResume();
+
+		//if the user changed the map style in settings, we want to reflect it right away
+		//even if the osmmapview wasn't destroyed
+		if(mapController != null)
+			loadSceneFileIfNecessary();
 		for(GpsOverlay o : overlays)
 			o.onResume();
 	}
@@ -547,5 +599,6 @@ public class OsmMapView extends MapView implements MapView.MapReadyCallback {
 		// press pans correctly
 		return new MyMapController(this.getContext());
 	}
+
 
 }

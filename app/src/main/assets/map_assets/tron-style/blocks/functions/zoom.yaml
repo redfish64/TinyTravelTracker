@@ -1,0 +1,40 @@
+import:
+    - ./easing.yaml
+
+styles:
+    functions-zoom:
+        doc:
+            author: 
+                name: Patricio Gonzalez Vivo
+                twitter: patriciogv
+            version: 0.0.1
+            tangram-version: 0.0.7
+            licence: MIT
+            description: |
+                when you mix this block to another block you can use the functions `zoom()` or `zoomEase()`. Both will help you to interpolate any values between the zooms `ZOOM_START` and `ZOOM_END`.
+                By default `zoom()` and `zoomEase()` will return a `float `number between 0 and 1. But you can change it to interpolate any thing! Like `floats`, `vec2`, `vec3`, `vec4` and even other functions! For that you just need to change de `defines`: `ZOOM_IN`, and `ZOOM_OUT` to what ever you want to interpolate.
+                `zoom()` use the cuadratic interpolation of `smoothstep()` but you can use `zoomEase()` to specify what type of **easing interpolation** you prefere. Just change the default `linear` function for any [easing functions describe here](#functions-easing) in the `ZOOM_FNC` define. Ex: `ZOOM_FNC: quadraticInOut`
+        mix: [functions-easing]
+        shaders:
+            defines:
+                ZOOM_START: 14.
+                ZOOM_END: 20.
+                ZOOM_MAX: max(ZOOM_START, ZOOM_END)
+                ZOOM_FNC: linear
+                ZOOM_IN: 0.0
+                ZOOM_OUT: 1.0
+            blocks:
+                global: |
+                    float zoom() {
+                        return mix( ZOOM_IN, 
+                                    ZOOM_OUT, 
+                                    clamp( smoothstep(  ZOOM_START/ZOOM_MAX, 
+                                                        ZOOM_END/ZOOM_MAX, 
+                                                        max(u_map_position.z/ZOOM_MAX, 0.)), 0., 1.) );
+                    }
+
+                    float zoomEase() {
+                        return mix( ZOOM_IN, 
+                                    ZOOM_OUT, 
+                                    ZOOM_FNC( (u_map_position.z-ZOOM_START)/(ZOOM_END-ZOOM_START) ) );
+                    }

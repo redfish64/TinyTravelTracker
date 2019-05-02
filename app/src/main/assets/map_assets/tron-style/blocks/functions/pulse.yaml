@@ -1,0 +1,19 @@
+styles:
+    functions-pulse:
+        doc:
+            author: 
+                name: Inigo Quiles
+                twitter: iquilezles
+            version: 0.0.1
+            tangram-version: 0.0.7
+            description: |
+                This one dimensional shaping function made by Inigo Quiles in [this article](http://www.iquilezles.org/www/articles/functions/functions.htm).
+        shaders:
+            blocks:
+                global: |
+                    float pulse (float x, float peak, float width) {
+                        x = abs(x - peak);
+                        if (x>width) return 0.0;
+                        x /= width;
+                        return 1.0 - x*x*(3.0-2.0*x);
+                    }

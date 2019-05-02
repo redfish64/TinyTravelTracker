@@ -219,6 +219,14 @@
     <string name="password_timeout_1hour">1 hour</string>
     <string name="fromText">From&#160;</string>
     <string name="toText">To&#160;</string>
+    <string name="WALKABOUT_MAP_STYLE_DESC">Walkabout</string>
+    <string name="TRON_MAP_STYLE_DESC">Tron</string>
+    <string name="SDK_DEFAULT_MAP_STYLE_DESC">SDK Default</string>
+    <string name="REFILL_MAP_STYLE_DESC">Refill</string>
+    <string name="CINNABAR_MAP_STYLE_DESC">Cinnabar</string>
+    <string name="BUBBLE_WRAP_MAP_STYLE_DESC">Bubble Wrap</string>
+    <string name="title_map_style">Map Style</string>
+    <string name="desc_map_style">Choose a display style of the map</string>
     <string-array name="passwordTimeoutStrings">
         <item>@string/password_timeout_off</item>
         <item>@string/password_timeout_30sec</item>

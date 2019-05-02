@@ -1,0 +1,27 @@
+global:
+  sdk_api_key: '0FGtx0j8R3C0XOoqgEIWrw'
+
+layers:
+  #GPS Trailer points
+  gt_point:
+    data: { source: gt_point }
+    draw:
+      points:
+        collide: false
+        size: function() { return feature.size; }
+        #size: 10px
+        order: 1000
+        #        color: function() { return feature.color; }
+        color: function() { return feature.color; }
+        #color: '#000000'
+
+  # used for user to create a rectangular area to select multiple points
+  gt_selected_area_rect:
+    data: { source: gt_selected_area_rect }
+    draw:
+      sdk-line-overlay:
+        #dashedline:
+        color: '#000000'
+        order: 1001
+        width: 3px
+

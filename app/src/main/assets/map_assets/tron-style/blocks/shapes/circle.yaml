@@ -1,0 +1,49 @@
+import: 
+    - type.yaml
+
+styles:
+    shapes-circle:
+        doc:
+            author: 
+                name: Patricio Gonzalez Vivo
+                twitter: patriciogv
+            version: 0.0.1
+            tangram-version: 0.0.7
+            licence: MIT
+            description: |  
+                Collection of functions to draw circles. To learn more about how to make shapes on shaders go to From check [this chapter about shapes from the Book of Shaders](https://thebookofshaders.com/07/)
+            examples:
+                lego:
+                    url: https://tangrams.github.io/tangram-sandbox/styles/lego.yaml
+                    img: https://tangrams.github.io/tangram-sandbox/styles/lego.png
+                    lines: 109-110
+                patterns:
+                    url: https://tangrams.github.io/tangram-sandbox/styles/patterns.yaml
+                    img: https://tangrams.github.io/tangram-sandbox/styles/patterns.png
+                    lines: 146
+                nursery:
+                    url: https://tangrams.github.io/tangram-sandbox/styles/nursery.yaml
+                    img: https://tangrams.github.io/tangram-sandbox/styles/nursery.png
+                    lines: 146
+        mix: [shapes-type]
+        shaders:
+            blocks:
+                global: |
+                    // get distance field of a Circle
+                    // ================================
+                    float circleDF (vec2 st) {
+                        return dot(st,st)*3.03;
+                    }
+                    //
+                    // Draw a circle in the middle of the ST space
+                    // ================================
+                    float circle (vec2 st, float radius) {
+                        return fill(radius, circleDF(st-vec2(0.5)));
+                    }
+
+                    //
+                    // Draw a circle in the middle of the ST space
+                    // ================================
+                    float circleBorder (vec2 st, float radius) {
+                        return stroke(radius, circleDF(st-vec2(0.5)));
+                    }

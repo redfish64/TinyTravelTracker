@@ -1,0 +1,65 @@
+import: 
+    - ../functions/aastep.yaml
+    - ../geometry/matrices.yaml
+
+styles:
+    patterns-stripes:
+        doc:
+            author: 
+                name: Patricio Gonzalez Vivo
+                twitter: patriciogv
+            version: 0.0.1
+            tangram-version: 0.0.7
+            licence: MIT
+            description: |  
+                Collection of functions to draw stripes. To learn more about patterns check [this chapter from the Book of Shaders](https://thebookofshaders.com/09/)    
+            examples:
+                grain-area:
+                    url: https://tangrams.github.io/tangram-sandbox/styles/grain-area.yaml
+                    img: https://tangrams.github.io/tangram-sandbox/styles/grain-area.png
+                    lines: 26
+                press:
+                    url: https://tangrams.github.io/tangram-sandbox/styles/press.yaml
+                    img: https://tangrams.github.io/tangram-sandbox/styles/press.png
+                    lines: 150
+                radar:
+                    url: https://tangrams.github.io/tangram-sandbox/styles/radar.yaml
+                    img: https://tangrams.github.io/tangram-sandbox/styles/radar.png
+        mix: [functions-aastep, geometry-matrices]
+        shaders:
+            defines:
+                PI: 3.14159265358979323846
+            blocks:
+                global: |
+                    // Return a distance function of stripes
+                    float stripesDF (vec2 st) {
+                        return abs(sin(st.y*PI));
+                    }
+                    
+                    // Adjustable width stripes
+                    float stripes (vec2 st, float width) {
+                        return aastep(width, stripesDF(st));
+                    }
+
+                    // Adjustable Angle
+                    float stripes (vec2 st, float width, float angle) {
+                        st = rotate2D(angle) * st;
+                        return stripes(st, width);
+                    }
+                    
+                    // Faster optimisation of diagonal stripes
+                    float diagonalStripes (vec2 st) {
+                        vec2 i_st = floor(st);
+                        vec2 f_st = fract(st);
+                        if (mod(i_st.y,2.) - mod(i_st.x,2.) == 0.) {
+                            return 1.0 - aastep(f_st.x,f_st.y);
+                        } else {
+                            return aastep(f_st.x,f_st.y);
+                        }
+                    }
+
+                    // Faster optimisation of diagonal stripes with controlable width
+                    float diagonalStripes (vec2 st, float width) {
+                        st.y -= st.x;
+                        return stripes(st, width);
+                    }

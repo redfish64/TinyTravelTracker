@@ -61,6 +61,7 @@ import com.rareventure.gps2.database.cache.TimeTreeCache;
 import com.rareventure.gps2.database.cachecreator.GpsTrailerCacheCreator;
 import com.rareventure.gps2.reviewer.map.MediaLocTimeMap;
 import com.rareventure.gps2.reviewer.map.OsmMapGpsTrailerReviewerMapActivity;
+import com.rareventure.gps2.reviewer.map.OsmMapView;
 import com.rareventure.util.BackgroundRunner;
 import com.rareventure.util.ReadWriteThreadManager;
 
@@ -766,6 +767,9 @@ public class GTG {
 			res.put(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.reviewer.map.OsmMapGpsTrailerReviewerMapActivity.Preferences.panelScale",
 					OsmMapGpsTrailerReviewerMapActivity.prefs.panelScale);
 
+			res.put(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.reviewer.map.OsmMapView.Preferences.mapStyle",
+					OsmMapView.prefs.mapStyle);
+
 			res.put(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.GpsTrailerGpsStrategy.Preferences.batteryGpsOnTimePercentage", 
 					GpsTrailerGpsStrategy.prefs.batteryGpsOnTimePercentage);
 			
@@ -823,6 +827,10 @@ public class GTG {
 
 			else if(name.equals(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.GpsTrailerGpsStrategy.Preferences.batteryGpsOnTimePercentage"))
 				GpsTrailerGpsStrategy.prefs.batteryGpsOnTimePercentage = Float.parseFloat(value);
+
+			else if(name.equals(/* ttt_installer:obfuscate_str */"com.rareventure.gps2.reviewer.map.OsmMapView.Preferences.mapStyle"))
+				OsmMapView.prefs.mapStyle = Enum.valueOf(OsmMapView.Preferences.MapStyle.class, value);
+
 			else
 				Log.e(GTG.TAG,"ignoring pref: "+name);
 		}};

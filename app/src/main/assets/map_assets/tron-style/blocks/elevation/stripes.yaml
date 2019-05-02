@@ -1,0 +1,32 @@
+import:
+    - ../polygons/diagonal-stripes.yaml
+
+styles:
+    elevation-stripes:
+        doc:
+            author: 
+                name: Patricio Gonzalez Vivo
+                twitter: patriciogv
+            version: 0.0.1
+            tangram-version: 0.0.7
+            licence: MIT
+            description: |
+                Perfect for the `landuse` layer on your elevation maps, the `elevation-stripe` modules use the color of the layer to draw a stripe pattern that changes width based on the surface of the terrain.
+            examples:
+                stripes:
+                    url: https://tangrams.github.io/tangram-sandbox/styles/elevation-stripes.yaml
+                    img: https://tangrams.github.io/tangram-sandbox/styles/elevation-stripes.png
+        base: polygons
+        mix: [polygons-diagonal-stripes]
+        blend: inlay
+        lighting: false
+        raster: custom
+        shaders: 
+            defines:
+                STRIPES_ALPHA: .5
+                STRIPES_SCALE: 20.
+                STRIPES_PCT: 1.8
+                NORMAL_TEXTURE_INDEX: 0
+                STRIPES_DIR: vec3(-0.600,-0.420,0.600)
+                STRIPES_WIDTH: dot((sampleRaster(int(NORMAL_TEXTURE_INDEX)).rgb-.5)*2.,
+                                    STRIPES_DIR)*STRIPES_PCT

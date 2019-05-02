@@ -1,0 +1,678 @@
+layers:
+    pois:
+        data: { source: mapzen, layer: pois }
+        filter:
+            all:
+                - not: { kind: [building,address,farm,tree,apron,residential,commercial,industrial] }
+                # White list a few kinds to "always" show per the tile zoom inclusion, else test feature's min_zoom
+                #- function() { return feature.min_zoom <= $zoom }
+                - function() { if( feature.kind == 'restaurant' || feature.kind == 'landmark' || feature.kind == 'cafe' ) { return true } else { return feature.min_zoom <= $zoom } }
+        draw:
+            mapzen_icon_library:
+                visible: global.icon_visible_poi_landuse
+                size: 18px
+                sprite: function() { return feature.kind; }
+                sprite_default: generic
+                interactive: global.sdk_interactive
+                priority: 65
+                repeat_group: abc
+                buffer: 20px
+                text:
+                    visible: global.text_visible_poi_landuse
+                    text_source: global.ux_language_text_source
+                    buffer: 7px
+                    text_wrap: 18
+                    max_lines: 3
+                    font:
+                        family: Cairo
+                        fill: [0.149,0.871,0.992]
+                        size: 10px
+
+        poi-scale-z18:
+            filter: { $zoom: { min: 18 } }
+            draw:
+                mapzen_icon_library:
+                    text:
+                        max_lines: 5
+        poi-scale-z20:
+            filter: { $zoom: [20] }
+            draw:
+                mapzen_icon_library:
+                    size: 20px
+
+        # source icon sprite from something other than kind
+        sports-pitch:
+            filter: { kind: [grass] }
+            draw:
+                mapzen_icon_library:
+                    sprite: function() { return feature.kind_detail; }
+                    text:
+                        font:
+                            fill: [1.000,0.766,0.460]
+                    # needs a better recreation icon, so just use generic (default) for now
+                    #sprite_default: sports
+        place_of_worship:
+            filter:
+                kind: [place_of_worship, wayside_chapel]
+            draw:
+                mapzen_icon_library:
+                    sprite: function() { return feature.religion; }
+                    sprite_default: place_of_worship
+        # TODO: some or all of this may be unnecessary for the sprite, but is necessary for the early filter
+        building-icon:
+            filter:
+                kind: [apartments, auditorium, building, hangar, manor, recreation_center, retirement_home, terminal]
+            draw:
+                mapzen_icon_library:
+                    sprite: building
+            early:
+                filter:
+                    any:
+                        # show labels for smaller landuse areas at higher zooms
+                        - { $zoom: [14], area: { max: 200000 } }
+                        - { $zoom: [15], area: { max: 20000 } }
+                        - { $zoom: [16], area: { max: 5000 } }
+                        - { $zoom: [17], area: { max: 1000 } }
+                draw:
+                    mapzen_icon_library:
+                        visible: false
+        #end different icon sprites
+
+        #most POI icons without name should be hidden, except these
+        no-name:
+            filter: { name: false }
+            draw:
+                mapzen_icon_library:
+                    visible: false
+            # eg park polygons in SF that have area but no name, sigh
+            no-name-no-area:
+                filter:
+                    kind: true
+                    name: false
+                draw:
+                    mapzen_icon_library:
+                        visible: false
+            sports-pitch:
+                filter:
+                    $zoom: { min: 17 }
+                    kind: [grass, pitch]
+                    kind_detail: [baseball, basketball, football, hockey, soccer, tennis]
+                draw:
+                    mapzen_icon_library:
+                        visible: global.icon_visible_poi_landuse_e
+                        priority: 69
+            z17:
+                filter:
+                    $zoom: { min: 17 }
+                    kind: [parking]
+                draw: { mapzen_icon_library: { visible: global.icon_visible_poi_landuse_e } }
+            z18:
+                # for different styles, different sets
+                # since [picnic_site] doesn't have bubble-wrap icon, it's omitted here
+                filter:
+                    $zoom: { min: 18 }
+                    kind: [drinking_water, information, playground, toilets, traffic_signals]
+                draw: { mapzen_icon_library: { visible: global.icon_visible_poi_landuse_e } }
+            z19:
+                filter:
+                    $zoom: { min: 19 }
+                    kind: [bicycle_parking]
+                draw: { mapzen_icon_library: { visible: global.icon_visible_poi_landuse_e } }
+
+        # NOTE: all natural_* should only be in landuse layer
+        suppress-icon-always:
+            filter:
+                kind: [natural_forest, natural_park, natural_wood]
+            draw:
+                mapzen_icon_library:
+                    size: 0px
+                    priority: 100
+                    text:
+                        font:
+                            fill: [0.356,0.990,0.789]
+                            size: 11px
+        suppress-icon-z17:
+            filter:
+                $zoom: { min: 17 }
+                kind: [common, grass, houseboat, pedestrian, railway, ship, wetland]
+            draw:
+                mapzen_icon_library:
+                    size: 0px
+
+        # the server should be setting better values here
+        z-server-friend:
+            hide-until-z12-any:
+                filter:
+                    kind: [landmark, museum, prison]
+                    $zoom: { max: 12 }
+                draw:
+                    mapzen_icon_library:
+                        visible: false
+            hide-until-z14-any:
+                filter:
+                    kind: [natural_forest, natural_park, natural_wood, post_office]
+                    $zoom: { max: 14 }
+                draw:
+                    mapzen_icon_library:
+                        visible: false
+            hide-until-z15-any:
+                filter:
+                    $zoom: { max: 15 }
+                    kind: [cafe, restaurant]
+                draw:
+                    mapzen_icon_library:
+                        visible: false
+            hide-until-z15-no-area:
+                filter:
+                    area: false
+                    $zoom: { max: 15 }
+                    kind: [park]
+                draw:
+                    mapzen_icon_library:
+                        visible: false
+            hide-until-z15-with-area:
+                filter:
+                    area: true
+                    $zoom: { max: 15 }
+                    kind: [nursing_home]
+                draw:
+                    mapzen_icon_library:
+                        visible: false
+            hide-until-z16-any:
+                filter:
+                    kind: [fire_station, grass, peak, police, tram_stop]
+                    $zoom: { max: 16 }
+                draw:
+                    mapzen_icon_library:
+                        visible: false
+            hide-until-z16-no-area:
+                filter:
+                    area: false
+                    kind: [allotments, college, garden, university]
+                    $zoom: { max: 16 }
+                draw:
+                    mapzen_icon_library:
+                        visible: false
+            # no POIs for commercial, residential
+            hide-until-z17-any:
+                filter:
+                    $zoom: { max: 17 }
+                    kind: [bank, bus_stop, car_sharing, wood]
+                draw:
+                    mapzen_icon_library:
+                        visible: false
+            hide-until-z17-with-area:
+                filter:
+                    area: true
+                    $zoom: { max: 17 }
+                    kind: [common, grass, houseboat, pedestrian, pitch, railway, ship, wetland]
+                draw:
+                    mapzen_icon_library:
+                        visible: false
+            hide-until-z17-no-area:
+                filter:
+                    area: false
+                    $zoom: { max: 17 }
+                    # note: atm and drinking_water appear hear and in area versions
+                    kind: [accountant, administrative, advertising_agency, animal, architect, association, atm, bakery, bed_and_breakfast, bicycle, bicycle_parking, bicycle_rental_station, books, butcher, car, car_repair, chalet, clothes, company, computer, consulting, convenience, doityourself, drinking_water, dry_cleaning, educational_institution, emergency_phone, employment_agency, estate_agent, fashion, financial, florist, foundation, gift, government, greengrocer, guest_house, hairdresser, hostel, hotel, insurance, it, jewelry, lawyer, mast, memorial, mobile_phone, motel, newspaper, ngo, notary, optician, parking, pet, physician, playground, political_party, post_box, religion, research, subway_entrance, tax_advisor, telecommunication, telephone, theatre, therapist, toilets, traffic_signals, travel_agent, water_tower]
+                draw:
+                    mapzen_icon_library:
+                        visible: false
+            hide-until-z18-any:
+                filter:
+                    kind: [atm, bus_stop, drinking_water]
+                    $zoom: { max: 18 }
+                draw:
+                    mapzen_icon_library:
+                        visible: false
+            hide-until-z18-no-area:
+                filter:
+                    $zoom: { max: 18 }
+                    area: false
+                    kind: [bench, parking, waste_basket]
+                draw:
+                    mapzen_icon_library:
+                        visible: false
+            hide-until-z19-any:
+                filter:
+                    $zoom: { max: 19 }
+                    kind: [bicycle_parking, burial_vault, car_sharing]
+                draw:
+                    mapzen_icon_library:
+                        visible: false
+
+            # hide based on kind and area filters
+            military-early:
+                filter:
+                    kind: [military]
+                    any:
+                        # show labels for smaller landuse areas at higher zooms
+                        - { $zoom: [8], area: { max: 50000000 } }
+                draw:
+                    mapzen_icon_library:
+                        visible: false
+            university-early:
+                filter:
+                    kind: [university, college]
+                    any:
+                        # show labels for smaller landuse areas at higher zooms
+                        - { $zoom: [11], area: { max: 2000000 } }
+                        - { $zoom: [12], area: { max: 500000 } }
+                draw:
+                    mapzen_icon_library:
+                        visible: false
+            school-early:
+                filter:
+                    kind: [school, kindergarten]
+                    any:
+                        # show labels for smaller landuse areas at higher zooms
+                        - { $zoom: [13], area: { max: 100000 } }
+                        - { $zoom: [14], area: { max: 50000 } }
+                        - { $zoom: [15], area: { max: 10000 } }
+                        - { $zoom: [16], area: { max: 5000 } }
+                        - { $zoom: [17], area: { max: 2000 } }
+                draw:
+                    mapzen_icon_library:
+                        visible: false
+            garden-area-early:
+                filter:
+                    kind: [garden, allotments]
+                    any:
+                        # limit show smaller landuse areas to higher zooms
+                        - { $zoom: [12], area: { max: 500000 } }
+                        - { $zoom: [13], area: { max: 100000 } }
+                        - { $zoom: [14], area: { max: 10000 } }
+                        - { $zoom: [15], area: { max: 5000 } }
+                draw:
+                    mapzen_icon_library:
+                        visible: false
+            cemetery-early:
+                filter:
+                    kind: [cemetery]
+                    # limit show smaller landuse areas to higher zooms
+                    any:
+                        - { $zoom: [12], area: { max: 3000000 } }
+                draw:
+                    mapzen_icon_library:
+                        visible: false
+            golf_course-early:
+                filter:
+                    kind: golf_course
+                    any:
+                        - { $zoom: [12], area: { max: 2500000 } }
+                draw:
+                    mapzen_icon_library:
+                        visible: false
+            office-early:
+                filter:
+                    - { kind: [insurance, office, company], $zoom: [15], area: { max: 10000 } }
+                    - { kind: [insurance, office, company], $zoom: [16], area: { max: 5000 } }
+                draw:
+                    mapzen_icon_library:
+                        visible: false
+            landuse-labels-green-areas-not-national-park:
+                filter:
+                    kind: [park, conservation, protected_area, nature_reserve, forest, grass]
+                    any:
+                    # show labels for smaller landuse areas at higher zooms
+                    - { $zoom: { max: 6 }, area: true }
+                    - { $zoom: [6],    area: { max: 5000000000 } }
+                    - { $zoom: [7],    area: { max: 5000000000 } }
+                    - { $zoom: [8],    area: { max: 1000000000 } }
+                    - { $zoom: [9],    area: { max: 100000000 } }
+                    - { $zoom: [10],   area: { max: 50000000 } }
+                    - { $zoom: [11],   area: { max: 25000000 } }
+                    - { $zoom: [12],   area: { max: 5000000 } }
+                    - { $zoom: [13],   area: { max: 200000 } }
+                    - { $zoom: [14],   area: { max: 50000 } }
+                    - { $zoom: [15],   area: { max: 10000 } }
+                    - { $zoom: [16],   area: { max: 1000 } }
+                draw:
+                    mapzen_icon_library:
+                        visible: false
+                wilderness-areas-early:
+                    filter: function() { return $zoom < 9 && feature.name && (feature.name.indexOf("Wilderness") > -1 || feature.name.indexOf("BLM") > -1 || feature.protect_class == '1' || feature.protect_class == '1a' || feature.protect_class == '1b' ); }
+                    draw:
+                        mapzen_icon_library:
+                            visible: false
+                not-national-park:
+                    filter: function() { return feature.name && !((feature.name.indexOf("National Park") > -1) || feature.name.indexOf("National Monument") > -1); }
+                    early:
+                        filter: { $zoom: { max: 8 } }
+                        draw:
+                            mapzen_icon_library:
+                                visible: false
+            landuse-labels-not-any-above:
+                filter:
+                    $zoom: { max: 6 }
+                    not: { kind: [aerodrome, airport, allotments, aquarium, attraction, battlefield, beach, cemetery, college, conservation, forest, garden, glacier, golf_course, grass, kindergarten, landmark, maze, national_park, nature_reserve, park, playground, protected_area, resort, school, stadium, station, theme_park, university, winery, winter_sports, zoo] }
+                draw:
+                    mapzen_icon_library:
+                        visible: false
+            glacier:
+                filter: { $zoom: { max: 14 }, kind: glacier, area: false }
+                draw:
+                    mapzen_icon_library:
+                        visible: false
+
+        # set special priority, sprite, and text styles per kind
+        has-area:
+            filter: { area: true }
+            draw:
+                mapzen_icon_library:
+                    priority: 41
+
+        national-park-protected-areas:
+            filter:
+                kind: [national_park, battlefield]
+            draw:
+                mapzen_icon_library:
+                    visible: global.icon_visible_landuse_green
+                    size: global.icon_size_green_nationl_park
+                    sprite: park
+                    text:
+                        visible: global.text_visible_landuse_green
+                        text_wrap: 12
+                        font:
+                            fill: [0.356,0.990,0.789]
+            z10-parks:
+                filter: { $zoom: { min: 13 } }
+                draw:
+                    mapzen_icon_library:
+                        sprite: park-l
+        parks:
+            filter:
+                - kind: [park, conservation, grass]
+                - { kind: protected_area, not: { protect_class: [6, '6'] } }
+            draw:
+                mapzen_icon_library:
+                    visible: global.icon_visible_landuse_green
+                    size: global.icon_size_green
+                    sprite: park
+                    text:
+                        visible: global.text_visible_landuse_green
+                        font:
+                            fill: [0.356,0.990,0.789]
+            only-text-later:
+                filter: { kind: [grass], $zoom: { min: 16 } }
+                draw:
+                    mapzen_icon_library:
+                        size: 0px
+
+        forest:
+            filter:
+                - kind: forest
+                - { kind: protected_area, protect_class: [6, '6'] }
+            draw:
+                mapzen_icon_library:
+                    visible: global.icon_visible_landuse_green
+                    size: global.icon_size_green
+                    sprite: forest
+                    text:
+                        visible: global.text_visible_landuse_green
+                        font:
+                            fill: [0.356,0.990,0.789]
+        beach:
+            filter:
+                kind: [beach]
+            draw:
+                mapzen_icon_library:
+                    visible: global.icon_visible_landuse_green
+                    size: global.icon_size_green
+                    text:
+                        visible: global.text_visible_landuse_green
+                        font:
+                            fill: [0.290,0.902,0.910]
+        airport:
+            filter:
+                kind: [airport, aerodrome]
+            draw:
+                mapzen_icon_library:
+                    priority: 42
+                    visible: global.icon_visible_landuse_green
+                    size: global.icon_size_green_airport
+                    text:
+                        visible: global.text_visible_landuse_green
+                        text_source: global.ux_language_text_source_iata
+                        font:
+                            family: Orbitron
+                            size: [[9,14px],[14,16px]]
+            early:
+                filter: { $zoom: { min: 9, max: 15 } }
+                draw: { mapzen_icon_library: { text: { text_source: iata } } }
+            early2:
+                filter: { $zoom: { min: 15, max: 18 } }
+                draw:
+                    mapzen_icon_library:
+                        text:
+                            font:
+                                family: Cairo
+                                size: 11px
+            z12-airport:
+                filter: { $zoom: { min: 12 } }
+                draw:
+                    mapzen_icon_library:
+                        sprite: airport-l
+        enclosure-related:
+            filter:
+                kind: [enclosure, animal]
+            draw:
+                mapzen_icon_library:
+                    priority: 43
+                    size: 0px
+                    text:
+                        text_wrap: 10
+        glacier:
+            filter:
+                kind: glacier
+            draw:
+                mapzen_icon_library:
+                    size: 0px
+                    #visible: false
+                    text:
+                        visible: true
+                        priority: 44
+                        text_wrap: 10
+                        font:
+                            fill: [0.290,0.902,0.910]
+
+
+        landuse-labels-not-any-above:
+            filter:
+                not: { kind: [aerodrome, airport, allotments, aquarium, attraction, battlefield, beach, cemetery, college, conservation, forest, garden, glacier, golf_course, grass, kindergarten, landmark, maze, national_park, nature_reserve, park, playground, protected_area, resort, school, stadium, station, theme_park, university, winery, winter_sports, zoo] }
+            draw:
+                mapzen_icon_library:
+                    priority: 43
+
+        building-like:
+            filter: { kind: [commercial,residential,warehouse,public,dormitory], osm_relation: false }
+            draw:
+                mapzen_icon_library:
+                    sprite: building
+
+        station-train-subway:
+            filter: { kind: [station, train_station] }
+            draw:
+                mapzen_icon_library:
+                    visible: global.icon_visible_station
+                    size: [[13,12px],[14,12px],[17,18px],[19,36px]]
+                    priority: 42
+                    text:
+                        text_wrap: 12
+                        visible: global.text_visible_station
+                        font:
+                            fill: [0.965,0.929,0.341]
+                            size: 10px
+            high-priority-early:
+                filter: { kind_tile_rank: { max: 4 }, $zoom: { min: 0, max: 13 } }
+                draw:
+                    mapzen_icon_library:
+                        text: { visible: false }
+            low-priority-early:
+                filter: { kind_tile_rank: { min: 4 }, $zoom: { min: 0, max: 13 } }
+                draw:
+                    mapzen_icon_library:
+                        visible: false
+                        text: { visible: false }
+            high-priority-early-z13:
+                filter: { kind_tile_rank: { min: 2 }, $zoom: [13] }
+                draw:
+                    mapzen_icon_library:
+                        text: { visible: false }
+            low-priority-early-z13:
+                filter: { kind_tile_rank: { min: 4 }, $zoom: [13] }
+                draw:
+                    mapzen_icon_library:
+                        visible: false
+                        text: { visible: false }
+            low-priority-early-z14:
+                filter: { kind_tile_rank: { min: 4 }, $zoom: [14] }
+                draw:
+                    mapzen_icon_library:
+                        text: { visible: false }
+            z18-stations:
+                    filter: { $zoom: { min: 18 } }
+                    draw:
+                        mapzen_icon_library:
+                            sprite: train_station-l
+
+        garden-no-area-early:
+            filter: { kind: [garden, allotments], $zoom: [16], area: false }
+            draw:
+                mapzen_icon_library:
+                    priority: 45
+                    size: 14px
+                    text:  { font: { size: 10px } }
+        garden-no-area-later:
+            filter: { kind: [garden, allotments], $zoom: { min: 17 }, area: false }
+            draw:
+                mapzen_icon_library:
+                    priority: 45
+                    size: 16px
+                    text:  { font: { size: 11px } }
+        gate:
+            filter: { kind: gate, name: true  }
+            draw: { mapzen_icon_library: { sprite: generic } }
+
+        parking-labels:
+            filter:
+                kind: [parking]
+                $zoom: { min: 18 }
+            draw:
+                mapzen_icon_library:
+                    text:
+                        visible: global.text_visible_poi_landuse
+                        font:
+                            size: 10px
+        tower:
+            filter: { kind: [tower], label_placement: true }
+            draw:
+                mapzen_icon_library:
+                    size: 0px
+
+        bus_stop:
+            filter:
+                kind: [bus_stop]
+            draw:
+                mapzen_icon_library:
+                    size: [[18,12px],[20,18px]]
+                    text:
+                        optional: true
+                        font:
+                            size: 11px
+                            weight: normal
+            early:
+                filter: { $zoom: { max: 19 } }
+                draw:
+                    mapzen_icon_library:
+                        text:
+                            visible: false
+
+        airport-gate:
+            filter: { kind: aeroway_gate }
+            draw:
+                mapzen_icon_library:
+                    visible: false
+                text:
+                    visible: global.text_visible_airport_gate
+                    text_source: ref
+                    priority: 63
+                    font:
+                        family: Aldrich
+                        fill: [0.149,0.871,0.992]
+                        size: [[16,8px],[20,14px]]
+
+        highway-exit:
+            filter: { kind: motorway_junction, $zoom: { min: 14 } }
+            draw:
+                mapzen_icon_library:
+                    visible: false
+                text:
+                    visible: global.text_visible_exits
+                    text_source: ref
+                    priority: 63
+                    font:
+                        family: Aldrich
+                        fill: white
+                        size: [[12,8px],[17,14px]]
+
+        text_colors:
+            landuse-labels-green-areas-not-national-park:
+                filter: { kind: [park, national_park, protected_area, nature_reserve, forest, grass] }
+                not-national-park:
+                    filter: function() { return feature.name && !((feature.name.indexOf("National Park") > -1) || feature.name.indexOf("National Monument") > -1); }
+                    draw: { mapzen_icon_library: { text: { font: { fill: [0.356,0.990,0.789] } } } }
+            restaurant:
+                filter: { kind: [restaurant,cafe,fast_food,bakery,pub,bar,ice_cream,wine,biergarten,brewery] }
+                draw: { mapzen_icon_library: { text: { font: { fill: [0.212,1.000,0.882] } } } }
+            hotel:
+                filter: { kind: [hotel,hostel,motel,company,office,substation,plant,generator,wastewater_plant,works,bench,slipway,insurance,archaeological_site,water_works] }
+                draw: { mapzen_icon_library: { text: { font: { fill: [0.900,0.750,1.000] } } } }
+            pharmacy:
+                filter: { kind: pharmacy }
+                draw: { mapzen_icon_library: { text: { font: { fill: [0.382,0.830,0.501] } } } }
+            hospital:
+                filter: { kind: hospital }
+                draw: { mapzen_icon_library: { text: { font: { fill: [0.932,0.737,0.932] } } } }
+            # courthouse:
+            #     filter: { kind: [courthouse,library,museum,post_office,police,embassy,bank,observatory,recycling,information,bicycle_rental_station,fire_station,townhall,assisted_living,group_home,community_centre,attraction,artwork,sports_centre,historical,fitness_station,drinking_water,ngo,plumber,lawyer,it,doctors,guest_house,clinic,shelter,social_facility,government,post_box,research,aquarium,telecommunication,dentist,gate,telephone,shoemaker,childcare,atm,association,platform,foundation,stop,bicycle_parking,nursing_home,animal,level_crossing,motorcycle,swimming_area] }
+            #     draw: { mapzen_icon_library: { text: { font: { fill: [0.149,0.871,0.992] } } } }
+            school:
+                filter: { kind: [school,university,kindergarten,college] }
+                draw: { mapzen_icon_library: { text: { font: { fill: [0.461,0.885,0.980] } } } }
+            retail:
+                filter: { kind: [books,computer,supermarket,department_store,electronics,mall,clothes,toys,fashion,jewelry,convenience,gift,music,bicycle,alcohol,sports,florist,mobile_phone,tailor,bicycle_rental,hardware,retail,confectionery,greengrocer,doityourself,butcher,bicycle_rental_station] }
+                draw: { mapzen_icon_library: { text: { font: { fill: [1.000,0.714,0.976] } } } }
+            place-of-worship:
+                filter: { kind: [place_of_worship,cemetery,grave_yard] }
+                draw: { mapzen_icon_library: { text: { font: { fill: [0.719,0.806,0.839] } } } }
+            ferry:
+                filter: { kind: [ferry_terminal,tram_stop,subway_entrance,bus_station] }
+                draw: { mapzen_icon_library: { text: { font: { fill: [0.965,0.929,0.341] } } } }
+            theatre:
+                filter: { kind: [theatre,performing-arts,cinema] }
+                draw: { mapzen_icon_library: { text: { font: { fill: [1.000,0.800,0.710] } } } }
+            parking:
+                filter: { kind: [parking] }
+                draw: { mapzen_icon_library: { text: { font: { fill: [1.000,0.714,0.976] } } } }
+            stadium:
+                filter: { kind: [stadium,fitness,golf_course,winter_sports,recreation_ground,pitch,sports_centre,fitness_station] }
+                draw: { mapzen_icon_library: { text: { font: { fill: [1.000,0.766,0.460] } } } }
+            memorial:
+                filter: { kind: [memorial,monument] }
+                draw: { mapzen_icon_library: { text: { font: { fill: [0.817,0.752,0.857] } } } }
+            bridge:
+                filter: { kind: [bridge,toilets,fuel,optician,car,car_repair,viewpoint,car_sharing,landmark,quarry,lighthouse] }
+                draw: { mapzen_icon_library: { text: { font: { fill: [0.851,0.796,0.851] } } } }
+            garden:
+                filter: { kind: [garden,playground,zoo,camp_site,marina,peak,volcano,theme_park,water_park,caravan_site,pier,fort,castle,spring,beach] }
+                draw: { mapzen_icon_library: { text: { font: { fill: [0.345,0.953,0.769] } } } }
+            vet:
+                filter: { kind: [veterinary,pet,pet_store] }
+                draw: { mapzen_icon_library: { text: { font: { fill: [0.838,0.815,0.970] } } } }
+            hairdresser:
+                filter: { kind: [hairdresser,laundry,dry_cleaning] }
+                draw: { mapzen_icon_library: { text: { font: { fill: [0.988,0.851,0.820] } } } }
+            airport:
+                filter: { kind: [aerodrome] }
+                draw: { mapzen_icon_library: { text: { font: { fill: [0.977,0.830,1.000] } } } }

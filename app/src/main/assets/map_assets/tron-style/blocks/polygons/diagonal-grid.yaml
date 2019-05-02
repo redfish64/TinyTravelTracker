@@ -1,0 +1,53 @@
+import:
+    - ../space/tile.yaml
+    - ../patterns/grid.yaml
+
+styles:
+    polygons-diagonal-grid:
+        doc:
+            author: 
+                name: Patricio Gonzalez Vivo
+                twitter: patriciogv
+            version: 0.0.1
+            tangram-version: 0.0.7
+            licence: MIT
+            description: |  
+                Apply a diagonal grid pattern to the polygon style. To learn more about patterns check [this chapter from the Book of Shaders](https://thebookofshaders.com/09/)
+        ui:
+            shaders:
+                defines:
+                    GRID_SCALE:
+                        type: number
+                        label: Scale
+                        range: 
+                            min: 1.
+                            max: 1000.
+                            step: 1.
+                    GRID_WIDTH:
+                        type: number
+                        label: Width
+                        range: 
+                            min: 0.
+                            max: 1.
+                            step: 0.01
+                    GRID_COLOR: 
+                        type: color
+                        label: Color
+                    GRID_BACKGROUND_COLOR: 
+                        type: color
+                        label: 'Background color'
+
+        base: polygons
+        mix: [space-tile, patterns-grid]
+        shaders:
+            defines:
+                GRID_SCALE: 20.
+                GRID_WIDTH: .05
+                GRID_COLOR: color.rgb
+                GRID_BACKGROUND_COLOR: color.rgb*.5
+            blocks:
+                color: |
+                    color.rgb = mix(GRID_COLOR, 
+                                    GRID_BACKGROUND_COLOR, 
+                                    diagonalGrid(   fract(getTileCoords()*GRID_SCALE),
+                                                    GRID_WIDTH));
