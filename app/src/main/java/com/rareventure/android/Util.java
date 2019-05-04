@@ -19,40 +19,6 @@
 */
 package com.rareventure.android;
 
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.RandomAccessFile;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Locale;
-import java.util.TimeZone;
-import java.util.Map.Entry;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
-
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.ShortBufferException;
-import javax.crypto.spec.SecretKeySpec;
-
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -82,8 +48,35 @@ import android.widget.DatePicker;
 
 import com.mapzen.tangram.LngLat;
 import com.rareventure.gps2.GTG;
+import com.rareventure.gps2.R;
 import com.rareventure.gps2.database.TAssert;
-import com.rareventure.gps2.database.cache.AreaPanel;
+
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.RandomAccessFile;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map.Entry;
+import java.util.TimeZone;
+import java.util.UUID;
+import java.util.regex.Pattern;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.ShortBufferException;
+import javax.crypto.spec.SecretKeySpec;
 
 //import com.google.android.maps.MapView;
 
@@ -1487,7 +1480,8 @@ public class Util {
 		
 		
 	}
-	
+
+	/*
 	private static TimeLabel[] timeLabels =
 	{
 		new TimeLabel(MILLIS_IN_YEAR, "year", "years"),
@@ -1498,8 +1492,20 @@ public class Util {
 		new TimeLabel(MILLIS_IN_MINUTE, "minute", "minutes"),
 		new TimeLabel(1000, "second", "seconds")
 	};
-	
-	public static String convertMsToText(long l) {
+	*/
+
+	public static String convertMsToText(Context context, long l) {
+		TimeLabel[] timeLabels =
+		{
+			new TimeLabel(MILLIS_IN_YEAR, context.getString(R.string.year), context.getString(R.string.year_plural)),
+			new TimeLabel(MILLIS_IN_MONTH, context.getString(R.string.month), context.getString(R.string.month_plural)),
+			new TimeLabel(MILLIS_IN_DAY * 7, context.getString(R.string.week), context.getString(R.string.week_plural)),
+			new TimeLabel(MILLIS_IN_DAY, context.getString(R.string.day), context.getString(R.string.day_plural)),
+			new TimeLabel(MILLIS_IN_HOUR, context.getString(R.string.hour), context.getString(R.string.hour_plural)),
+			new TimeLabel(MILLIS_IN_MINUTE, context.getString(R.string.minute), context.getString(R.string.minute_plural)),
+			new TimeLabel(1000, context.getString(R.string.second), context.getString(R.string.second_plural)),
+		};
+
 		int mentionedItems = 0;
 		
 		StringBuffer res = new StringBuffer();
