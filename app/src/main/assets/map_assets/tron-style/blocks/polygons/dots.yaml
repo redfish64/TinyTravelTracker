@@ -1,0 +1,72 @@
+import:
+    - ../tiling/brick.yaml
+    - ../tiling/tile.yaml
+    - ../space/tile.yaml
+    - ../shapes/circle.yaml
+
+styles:
+    polygons-dots:
+        doc:
+            author: 
+                name: Patricio Gonzalez Vivo
+                twitter: patriciogv
+            version: 0.0.1
+            tangram-version: 0.0.7
+            licence: MIT
+            description: |  
+                Apply dot patterns to a polygon. To learn more about patterns check [this chapter from the Book of Shaders](https://thebookofshaders.com/09/)
+        ui:
+            shaders:
+                defines:
+                    DOTS_SCALE:
+                        type: number
+                        label: Scale
+                        range: 
+                            min: 1.
+                            max: 1000.
+                            step: 1.
+                    DOTS_SIZE:
+                        type: number
+                        label: Size
+                        range: 
+                            min: 0.
+                            max: 1.
+                            step: 0.01
+                    STROKE:
+                        type: number
+                        label: Stroke
+                        default_value: 0.15
+                        range: 
+                            min: 0.
+                            max: 1.
+                            step: 0.01
+                    DOTS_TYPE: 
+                        type: dropdownArray
+                        label: Type
+                        values: ['fill', 'stroke']
+                    DOTS_TILE_STYLE: 
+                        type: dropdownArray
+                        label: 'Tile type'
+                        values: ['tile', 'brick']
+                    DOTS_COLOR: 
+                        type: color
+                        label: Color
+                    DOTS_BACKGROUND_COLOR: 
+                        type: color
+                        label: 'Background color'
+
+        base: polygons
+        mix: [space-tile, tiling-brick, tiling-tile, shapes-circle]
+        shaders:
+            defines:
+                DOTS_COLOR: color.rgb*.5
+                DOTS_BACKGROUND_COLOR: color.rgb
+                DOTS_SCALE: 10.
+                DOTS_SIZE: 0.41
+                DOTS_TYPE: fill
+                DOTS_TILE_STYLE: brick
+            blocks:
+                color: |
+                    color.rgb = mix(DOTS_BACKGROUND_COLOR, 
+                                    DOTS_COLOR, 
+                                    DOTS_TYPE( DOTS_SIZE, circleDF(vec2(0.5)-DOTS_TILE_STYLE(getTileCoords()*DOTS_SCALE,2.))) );

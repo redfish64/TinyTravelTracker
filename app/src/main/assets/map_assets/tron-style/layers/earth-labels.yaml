@@ -1,0 +1,15 @@
+layers:
+    # tuck this into existing earth layer
+    earth:
+        earth-labels:
+            filter: { name: true }
+            island:
+                filter: { kind: [archipelago, island, islet] }
+                draw:
+                    text:
+                        visible: global.text_visible_island
+                        text_wrap: 10
+                        font:
+                            family: Orbitron
+                            size: [[10,12px],[16,16px]]
+                            fill: [0.594,0.990,0.944]

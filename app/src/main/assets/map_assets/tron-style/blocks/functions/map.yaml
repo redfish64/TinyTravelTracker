@@ -1,0 +1,38 @@
+styles:
+    functions-map:
+        doc:
+            author: 
+                name: Patricio Gonzalez Vivo
+                twitter: patriciogv
+            version: 0.0.1
+            tangram-version: 0.0.7
+            licence: MIT
+            description: |
+                This function helps you to interpolate a `value` between an IN range (`inputMin` to `inputMax`) to a OUT range (`outputMin` to `outputMax`). 
+        shaders:
+            defines:
+                EPSILON: 0.0000001
+            blocks:
+                global: |
+                    float map (in float value, in float inputMin, in float inputMax, in float outputMin, in float outputMax, bool clamp) {
+                        if (abs(inputMin - inputMax) < EPSILON){
+                            return outputMin;
+                        } else {
+                            float outVal = ((value - inputMin) / (inputMax - inputMin) * (outputMax - outputMin) + outputMin);
+                        
+                            if( clamp ){
+                                if(outputMax < outputMin){
+                                    if( outVal < outputMax ) outVal = outputMax;
+                                    else if( outVal > outputMin ) outVal = outputMin;
+                                }else{
+                                    if( outVal > outputMax ) outVal = outputMax;
+                                    else if( outVal < outputMin ) outVal = outputMin;
+                                }
+                            }
+                            return outVal;
+                        }
+                    }
+                    
+                    float map (in float value, in float inputMin, in float inputMax, in float outputMin, in float outputMax) {
+                        return map(value, inputMin, inputMax, outputMin, outputMax, true); 
+                    }

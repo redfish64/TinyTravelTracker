@@ -1,0 +1,162 @@
+import: 
+    - random.yaml
+
+styles:
+    generative-noise:
+        doc:
+            author: 
+                name: Patricio Gonzalez Vivo
+                twitter: patriciogv
+            version: 0.0.1
+            tangram-version: 0.0.7
+            licence: MIT
+            description: |
+                Set of Noise functions.
+                For more information on this theme read [this chapter of The Book of Shaders about Noise](http://thebookofshaders.com/11/).
+        mix: generative-random
+        shaders:
+            blocks:
+                global: |
+                    // 1D Value Noise for 1, 2 and 3 dimentions
+                    // ================================
+                    float noise (in float x) {
+                        float i = floor(x);
+                        float f = fract(x);
+                        float u = f * f * (3.0 - 2.0 * f);
+                        return mix(random(i), random(i + 1.0), u);
+                    }
+                    
+                    float noise (vec2 xy) {
+                        vec2 i = floor(xy);
+                        vec2 f = fract(xy);
+                        float a = random(i);
+                        float b = random(i + vec2(1.0, 0.0));
+                        float c = random(i + vec2(0.0, 1.0));
+                        float d = random(i + vec2(1.0, 1.0));
+                        vec2 u = f * f * (3.0 - 2.0 * f);
+                        return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
+                    }
+
+                    float noise (vec3 xyz) {
+                        const vec3 step = vec3(110.0, 241.0, 171.0);
+                        vec3 i = floor(xyz);
+                        vec3 f = fract(xyz);
+                        float n = dot(i, step);
+                        vec3 u = f * f * (3.0 - 2.0 * f);
+                        return mix( mix(mix(random(n + dot(step, vec3(0,0,0))),
+                                            random(n + dot(step, vec3(1,0,0))),
+                                            u.x),
+                                        mix(random(n + dot(step, vec3(0,1,0))),
+                                            random(n + dot(step, vec3(1,1,0))),
+                                            u.x),
+                                        u.y),
+                                    mix(mix(random(n + dot(step, vec3(0,0,1))),
+                                        random(n + dot(step, vec3(1,0,1))),
+                                        u.x),
+                                        mix(random(n + dot(step, vec3(0,1,1))),
+                                            random(n + dot(step, vec3(1,1,1))),
+                                            u.x),
+                                    u.y),
+                                u.z);
+                    }
+
+                    // Description : GLSL 2D simplex noise function
+                    //      Author : Ian McEwan, Ashima Arts
+                    //  Maintainer : ijm
+                    //     Lastmod : 20110822 (ijm)
+                    //     License : 
+                    //  Copyright (C) 2011 Ashima Arts. All rights reserved.
+                    //  Distributed under the MIT License. See LICENSE file.
+                    //  https://github.com/ashima/webgl-noise
+                    vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+                    vec2 mod289(vec2 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+                    vec3 permute(vec3 x) { return mod289(((x*34.0)+1.0)*x); }
+                    float snoise(vec2 v) {
+
+                        // Precompute values for skewed triangular grid
+                        const vec4 C = vec4(0.211324865405187,
+                                            // (3.0-sqrt(3.0))/6.0
+                                            0.366025403784439,  
+                                            // 0.5*(sqrt(3.0)-1.0)
+                                            -0.577350269189626,  
+                                            // -1.0 + 2.0 * C.x
+                                            0.024390243902439); 
+                                            // 1.0 / 41.0
+
+                        // First corner (x0)
+                        vec2 i  = floor(v + dot(v, C.yy));
+                        vec2 x0 = v - i + dot(i, C.xx);
+
+                        // Other two corners (x1, x2)
+                        vec2 i1 = vec2(0.0);
+                        i1 = (x0.x > x0.y)? vec2(1.0, 0.0):vec2(0.0, 1.0);
+                        vec2 x1 = x0.xy + C.xx - i1;
+                        vec2 x2 = x0.xy + C.zz;
+
+                        // Do some permutations to avoid
+                        // truncation effects in permutation
+                        i = mod289(i);
+                        vec3 p = permute(
+                                permute( i.y + vec3(0.0, i1.y, 1.0))
+                                    + i.x + vec3(0.0, i1.x, 1.0 ));
+
+                        vec3 m = max(0.5 - vec3(
+                                            dot(x0,x0), 
+                                            dot(x1,x1), 
+                                            dot(x2,x2)
+                                            ), 0.0);
+
+                        m = m*m ;
+                        m = m*m ;
+
+                        // Gradients: 
+                        //  41 pts uniformly over a line, mapped onto a diamond
+                        //  The ring size 17*17 = 289 is close to a multiple 
+                        //      of 41 (41*7 = 287)
+
+                        vec3 x = 2.0 * fract(p * C.www) - 1.0;
+                        vec3 h = abs(x) - 0.5;
+                        vec3 ox = floor(x + 0.5);
+                        vec3 a0 = x - ox;
+
+                        // Normalise gradients implicitly by scaling m
+                        // Approximation of: m *= inversesqrt(a0*a0 + h*h);
+                        m *= 1.79284291400159 - 0.85373472095314 * (a0*a0+h*h);
+
+                        // Compute final noise value at P
+                        vec3 g = vec3(0.0);
+                        g.x  = a0.x  * x0.x  + h.x  * x0.y;
+                        g.yz = a0.yz * vec2(x1.x,x2.x) + h.yz * vec2(x1.y,x2.y);
+                        return 130.0 * dot(m, g);
+                    }
+
+
+                    //
+                    // Simplex Noise
+                    //
+                    const float F3 =  0.3333333;
+                    const float G3 =  0.1666667;
+                    float snoise (vec3 p) {
+                        vec3 s = floor(p + dot(p, vec3(F3)));
+                        vec3 x = p - s + dot(s, vec3(G3));
+                        vec3 e = step(vec3(0.0), x - x.yzx);
+                        vec3 i1 = e*(1.0 - e.zxy);
+                        vec3 i2 = 1.0 - e.zxy*(1.0 - e);
+                        vec3 x1 = x - i1 + G3;
+                        vec3 x2 = x - i2 + 2.0*G3;
+                        vec3 x3 = x - 1.0 + 3.0*G3;
+                        vec4 w, d;
+                        w.x = dot(x, x);
+                        w.y = dot(x1, x1);
+                        w.z = dot(x2, x2);
+                        w.w = dot(x3, x3);
+                        w = max(0.6 - w, 0.0);
+                        d.x = dot(random3(s), x);
+                        d.y = dot(random3(s + i1), x1);
+                        d.z = dot(random3(s + i2), x2);
+                        d.w = dot(random3(s + 1.0), x3);
+                        w *= w;
+                        w *= w;
+                        d *= w;
+                        return dot(d, vec4(52.0));
+                    }

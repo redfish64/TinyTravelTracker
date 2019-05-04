@@ -1,0 +1,59 @@
+import:
+    - ../space/tile.yaml
+    - ../patterns/stripes.yaml
+
+styles:
+    polygons-stripes:
+        doc:
+            author: 
+                name: Patricio Gonzalez Vivo
+                twitter: patriciogv
+            version: 0.0.1
+            tangram-version: 0.0.7
+            licence: MIT
+            description: |  
+                Apply stripe pattern to the polygon style. To learn more about patterns check [this chapter from the Book of Shaders](https://thebookofshaders.com/09/)
+        ui:
+            shaders:
+                defines:
+                    STRIPES_SCALE:
+                        type: number
+                        label: Scale
+                        range: 
+                            min: 1.
+                            max: 1000.
+                            step: 1.
+                    STRIPES_WIDTH:
+                        type: number
+                        label: Width
+                        range: 
+                            min: 0.
+                            max: 1.
+                            step: 0.01
+                    STRIPES_ALPHA:
+                        type: number
+                        label: Amount
+                        range: 
+                            min: 0.
+                            max: 1.
+                            step: 0.01
+                    STRIPES_ANGLE:
+                        type: number
+                        label: Angle (radiants)
+                        range: 
+                            min: 0.
+                            max: 3.1415
+                            step: 0.1
+        base: polygons
+        mix: [patterns-stripes, space-tile]
+        shaders:
+            defines:
+                STRIPES_WIDTH: .5
+                STRIPES_ALPHA: .5
+                STRIPES_SCALE: 2.
+                STRIPES_ANGLE: PI*0.25
+            blocks:
+                color: |
+                    color.a = stripes(  getTileCoords()*STRIPES_SCALE, 
+                                        STRIPES_WIDTH, 
+                                        STRIPES_ANGLE)*STRIPES_ALPHA;

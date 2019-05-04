@@ -1,0 +1,89 @@
+layers:
+    transit:
+        data: { source: mapzen, layer: transit }
+        transit-lines:
+            filter: { not: { kind: [platform] } }
+            draw:
+                lines:
+                    order: global.order
+            railway:
+                filter: { kind: [railway,train] }
+                draw:
+                    lines:
+                        style: railway-dashed
+                        color: [0.267,0.000,0.427]
+                        width: [[9,0.5px],[14,0.5px],[16,0.5px],[18,0.75px],[19,2px]]
+            subway:
+                filter: { kind: [subway,tram,light_rail] }
+                draw:
+                    lines:
+                        style: transit-glow
+                        color: [1.00,0.000,0.250]
+                        width: [[9,0.5px],[13,2px],[16,5px],[18,9px],[20,12px]]
+                color-light_rail:
+                    filter: { kind: [light_rail] }
+                    draw:
+                        lines:
+                            color: [0.817,0.000,1.000]
+                            width: [[9,0.5px],[13,1px],[16,3px],[18,7px],[20,10px]]
+                color-tram:
+                    filter: { kind: [tram] }
+                    draw:
+                        lines:
+                            color: [0.817,0.000,1.000]
+                            width: [[9,0.5px],[13,0.75px],[16,2px],[18,6px],[20,9px]]
+                early-light_rail:
+                    filter: { kind: [light_rail], $zoom: { max: 11 } }
+                    draw:
+                        lines:
+                            visible: false
+                early-tram:
+                    filter: { kind: [tram], $zoom: { max: 12 } }
+                    draw:
+                        lines:
+                            visible: false
+
+        platforms:
+            filter: { kind: platform }
+            draw:
+                lines_transparent:
+                    order: function() { if($zoom<17) { return feature.sort_rank; } else { return 435; } }
+                    color: [0.278,0.412,1.000,0.20]
+                    width: 5m
+                    visible: true
+                polygons_transparent:
+                    order: function() { if($zoom<17) { return feature.sort_rank; } else { return 435; } }
+            polygon_geom:
+                filter: { $geometry: polygon }
+                draw:
+                    polygons_transparent:
+                        color: [0.278,0.412,1.000,0.20]
+                        visible: true
+                    lines_transparent:
+                        visible: false
+
+styles:
+    transit-glow:
+        base: lines
+        mix: [lines-glow]
+        shaders:
+            defines:
+                GLOW_WIDTH: 0.5
+                GLOW_BRIGHTNESS: .4
+
+    railway-dashed:
+        base: lines
+        dash: [6,2]
+        dash_background_color: [0.212,0.302,0.427]
+        # shaders:
+        #     blocks:
+        #         position: |
+        #             v_texcoord.y *= 11.;
+
+    lines_transparent:
+        base: lines
+        blend: overlay
+
+    polygons_transparent:
+        base: polygons
+        blend: overlay

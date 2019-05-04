@@ -1,0 +1,59 @@
+import:
+    - ../space/tile.yaml
+
+styles:
+    patterns-grid:
+        doc:
+            author: 
+                name: Patricio Gonzalez Vivo
+                twitter: patriciogv
+            version: 0.0.1
+            tangram-version: 0.0.7
+            licence: MIT
+            description: |  
+                Collection of functions to draw grids. To learn more about patterns check [this chapter from the Book of Shaders](https://thebookofshaders.com/09/)    
+            examples:
+                blueprint:
+                    url: https://tangrams.github.io/tangram-sandbox/styles/blueprint.yaml
+                    img: https://tangrams.github.io/tangram-sandbox/styles/blueprint.png
+                    lines: 75-76
+                grain:
+                    url: https://tangrams.github.io/tangram-sandbox/styles/grain.yaml
+                    img: https://tangrams.github.io/tangram-sandbox/styles/grain.png
+                    lines: 15
+        mix: [space-tile]
+        shaders:
+            blocks:
+                global: |
+                    // Draw a grid in the space a specific resolution and pressition
+                    bool grid (vec2 st, float res, float press) {
+                        vec2 grid = fract(st*res);
+                        return grid.x < res*press || grid.y < res*press;
+                    }
+                    //
+                    // Draw a grid in the space a specific resolution
+                    bool grid (vec2 st, float res) {
+                        return grid(st, res, 1.0);
+                    }
+
+                    //
+                    // Draw a grid in 45 degress with a specific width
+                    float diagonalGrid(vec2 st, float width){
+                        return step(.5,max( smoothstep(st.x-width,st.x,st.y)*(1.-smoothstep(st.x,st.x+width,st.y)),
+                                            smoothstep(st.x-width,st.x,1.0-st.y)*(1.-smoothstep(st.x,st.x+width,1.0-st.y))));
+                    }
+
+                    // Draw a grid using tile coordenates in a specific resolution
+                    float tileGrid (float res) {
+                        vec2 st = getTileCoords()*100.*res;
+                        float pct = 0.0;
+                        float press = 0.4+(1.0-fract(u_map_position.z))*0.1;
+                        if (grid(st,0.01,press)) pct += 0.5;
+                        if (grid(st,0.1,press)) pct += 0.1;
+                        return pct;
+                    }
+
+                    // Draw two grid that smoothly interpolates acording to zooms
+                    float tileGrid() { 
+                        return mix(tileGrid(1.),tileGrid(2.),fract(u_map_position.z)); 
+                    }

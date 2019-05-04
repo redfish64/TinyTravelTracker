@@ -1,0 +1,20 @@
+styles:
+    tiling-tile:
+        doc:
+            author: 
+                name: Patricio Gonzalez Vivo
+                twitter: patriciogv
+            version: 0.0.1
+            tangram-version: 0.0.7
+            licence: MIT
+            description: |
+                Repeats a coordinate space (`vec2 st`) in diferent brick-like tiles N times (`float zoom`). For more information about tilling patterns read [this chapter of The Book of Shaders](https://thebookofshaders.com/09/)
+        shaders:
+            blocks:
+                global: |
+                    // Repeats a coordinate space (st) in diferent tiles
+                    // ================================
+                    vec2 tile (vec2 st, float zoom) {
+                        st *= zoom;
+                        return fract(st);
+                    }

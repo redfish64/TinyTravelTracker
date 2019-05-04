@@ -1,0 +1,28 @@
+import: 
+    - ../functions/aastep.yaml
+
+styles:
+    shapes-type:
+        doc:
+            author: 
+                name: Patricio Gonzalez Vivo
+                twitter: patriciogv
+            version: 0.0.1
+            tangram-version: 0.0.7
+            licence: MIT
+            description: |  
+                This block provides to functions `fill` and `stroke`. Each one transform a SDF to a fill shape or a stroke shape (border). The stroke width can be control with the define `STROKE`. 
+                To learn more about how to make shapes on shaders go to From check [this chapter about shapes from the Book of Shaders](https://thebookofshaders.com/07/)
+        mix: [functions-aastep]
+        shaders:
+            defines:
+                STROKE: 0.15
+            blocks:
+                global: |
+                    float fill (in float size, in float x) {
+                        return 1.-aastep(size, x);
+                    }
+
+                    float stroke (in float size, in float x) {
+                        return aastep(size, x+STROKE) - aastep(size, x);
+                    }

@@ -1,0 +1,26 @@
+# Fonts
+fonts:
+    Aldrich:
+        - weight: normal # Regular
+          # url: https://fonts.gstatic.com/s/aldrich/v6/VWXaIPGrUapL_Y2vGs0lKALUuEpTyoUstqEm5AMlJo4.woff
+          url: fonts/VWXaIPGrUapL_Y2vGs0lKALUuEpTyoUstqEm5AMlJo4.woff
+    Audiowide:
+        - weight: normal # Regular
+          # url: https://fonts.gstatic.com/s/audiowide/v4/8XtYtNKEyyZh481XVWfVOrO3LdcAZYWl9Si6vvxL-qU.woff
+          url: fonts/8XtYtNKEyyZh481XVWfVOrO3LdcAZYWl9Si6vvxL-qU.woff
+    Cairo:
+        - weight: normal # Regular
+          # url: https://fonts.gstatic.com/s/cairo/v1/ZA_4ooaF_Dfdn26t_IoQOaCWcynf_cDxXwCLxiixG1c.woff
+          url: fonts/ZA_4ooaF_Dfdn26t_IoQOaCWcynf_cDxXwCLxiixG1c.woff
+    Orbitron:
+        - weight: normal # Regular
+          # url: https://fonts.gstatic.com/s/orbitron/v7/94ug0rEgQO_WuI_xKJMFc3YhjbSpvc47ee6xR_80Hnw.woff
+          url: fonts/94ug0rEgQO_WuI_xKJMFc3YhjbSpvc47ee6xR_80Hnw.woff
+    Play:
+        - weight: normal # Regular
+          # url: https://fonts.gstatic.com/s/play/v7/IkErdnKw9ItVkLeeur9GHfesZW2xOQ-xsNqO47m55DA.woff
+          url: fonts/IkErdnKw9ItVkLeeur9GHfesZW2xOQ-xsNqO47m55DA.woff
+    Montserrat:
+        - weight: 700
+          #url: https://fonts.gstatic.com/s/montserrat/v10/IQHow_FEYlDC4Gzy_m8fcnbFhgvWbfSbdVg11QabG8w.woff
+          url: fonts/Montserrat-Bold.woff

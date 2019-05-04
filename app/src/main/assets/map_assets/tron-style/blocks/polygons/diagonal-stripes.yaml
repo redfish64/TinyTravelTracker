@@ -1,0 +1,51 @@
+import:
+    - ../space/tile.yaml
+    - ../patterns/stripes.yaml
+
+styles:
+    polygons-diagonal-stripes:
+        doc:
+            author: 
+                name: Patricio Gonzalez Vivo
+                twitter: patriciogv
+            version: 0.0.1
+            tangram-version: 0.0.7
+            licence: MIT
+            description: |  
+                Apply a diagonal stripe pattern to the polygon style. To learn more about patterns check [this chapter from the Book of Shaders](https://thebookofshaders.com/09/)
+        ui:
+            shaders:
+                defines:
+                    STRIPES_SCALE:
+                        type: number
+                        label: Scale
+                        range: 
+                            min: 1.
+                            max: 1000.
+                            step: 1.
+                    STRIPES_WIDTH:
+                        type: number
+                        label: Alpha
+                        range: 
+                            min: 0.
+                            max: 1.
+                            step: 0.01
+                    STRIPES_ALPHA:
+                        type: number
+                        label: Alpha
+                        range: 
+                            min: 0.
+                            max: 1.
+                            step: 0.01
+
+        base: polygons
+        mix: [patterns-stripes, space-tile]
+        shaders:
+            defines:
+                STRIPES_ALPHA: 1.
+                STRIPES_SCALE: 2.
+                STRIPES_WIDTH: .5
+            blocks:
+                color: |
+                    color.a = diagonalStripes( (getTileCoords()*0.9999)*floor(STRIPES_SCALE), 
+                                                STRIPES_WIDTH) * STRIPES_ALPHA;

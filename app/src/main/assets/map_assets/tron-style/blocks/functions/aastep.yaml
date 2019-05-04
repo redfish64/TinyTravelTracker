@@ -1,0 +1,29 @@
+styles:
+    functions-aastep:
+        doc:
+            author: 
+                name: Matt DesLauriers
+                twitter: mattdesl
+            version: 0.0.1
+            tangram-version: 0.0.7
+            licence: MIT
+            description: |
+                AnitAliased ```step()``` function implemented by [Matt DesLauriers](https://twitter.com/mattdesl) in this module <https://github.com/stackgl/glsl-aastep>
+        shaders:
+            extensions: OES_standard_derivatives
+            blocks:
+                global: |
+                    // AntiAliased Step function
+                    //=============================
+                    float aastep(float threshold, float value) {
+                        #ifdef TANGRAM_FRAGMENT_SHADER
+                            #ifdef TANGRAM_EXTENSION_OES_standard_derivatives
+                                float afwidth = length(vec2(dFdx(value), dFdy(value))) * 0.70710678118654757;
+                                return smoothstep(threshold-afwidth, threshold+afwidth, value);
+                            #else
+                                return step(threshold, value);
+                            #endif  
+                        #else
+                            return step(threshold, value);
+                        #endif
+                    }

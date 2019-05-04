@@ -1,0 +1,51 @@
+layers:
+    boundaries:
+        data: { source: mapzen, layer: boundaries }
+        draw:
+            lines:
+                order: global.order
+
+        country:
+            filter:
+                kind: country
+            draw:
+                lines:
+                    width: [[1,0px],[2,0px],[3,0.5px],[9,2px],[16,4px],[17,14m]]
+                    color: black
+            water:
+                filter: { maritime_boundary: true }
+                draw:
+                    lines:
+                        visible: false
+
+        country_disputed:
+            filter: { kind: [disputed, indefinite, indeterminate, lease_limit, line_of_control, overlay_limit] }
+            draw:
+                dashed:
+                    order: global.order
+                    color: black
+                    width: [[1, 0.2px], [3, 0px], [4, 1.0px], [9, 1.5px], [14, 2.5px], [16, 3.5px], [17, 10m]]
+
+        region:
+            filter:
+                kind: region
+            draw:
+                lines:
+                    width: [[0,0px],[4,0px],[5,0.5px],[8,1px],[14,1.5px],[16,3.0px],[17,10m]]
+                    color: black
+            water:
+                filter: { maritime_boundary: true }
+                draw:
+                    lines:
+                        visible: false
+            early:
+                filter: { not: { min_zoom: 2 }, $zoom: { max: 8 } }
+                draw:
+                    lines:
+                        visible: false
+
+styles:
+    dashed:
+        base: lines
+        dash: [1.25, 1.25]
+        #dash_background_color: [0.808,0.860,0.851]

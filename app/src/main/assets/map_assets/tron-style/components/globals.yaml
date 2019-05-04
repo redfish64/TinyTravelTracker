@@ -1,0 +1,235 @@
+global:
+    # Sign up for a Mapzen API key to enjoy higher rate limits
+    # https://mapzen.com/documentation/overview/#developer-accounts-and-api-keys
+    sdk_api_key: ''     # set this value to your Mapzen API key
+
+    sdk_animated: true
+    sdk_interactive: true
+
+    pseudoRandomColor: |
+        function() {
+            return [
+                0.5 * (parseInt(feature.id, 12) / 100 % 1),     // jshint ignore:line
+                0.5 * (parseInt(feature.id, 12) / 10000 % 1),   // jshint ignore:line
+                0.5 * (parseInt(feature.id, 12) / 1000000 % 1), // jshint ignore:line
+                1
+            ];
+        }
+
+    ux_application_mode: navigation
+    ux_language: false             # l10n language code, trusting OSM in v0.10 tiles, fixed in v1.0 tiles
+    ux_language_fallback: false    # l10n language code, trusting OSM in v0.10 tiles, fixed in v1.0 tiles
+    ux_language_text_source: |
+        function() {
+            // if a ux_langauge has been defined use that, else if there is feature name in the fallback_ux_language then use that, else use the feature's default name in the local language
+            return (global.ux_language && feature['name:'+global.ux_language]) || (global.ux_language_fallback && feature['name:'+global.ux_language_fallback]) || feature.name;
+        }
+    ux_language_text_source_left: |
+        function() {
+            // if a ux_langauge has been defined use that, else if there is feature name in the fallback_ux_language then use that, else use the feature's default name in the local language
+            return (global.ux_language && feature['name:left:'+global.ux_language]) || (global.ux_language_fallback && feature['name:left:'+global.ux_language_fallback]) || feature['name:left'];
+        }
+    ux_language_text_source_right: |
+        function() {
+            // if a ux_langauge has been defined use that, else if there is feature name in the fallback_ux_language then use that, else use the feature's default name in the local language
+            return (global.ux_language && feature['name:right:'+global.ux_language]) || (global.ux_language_fallback && feature['name:right:'+global.ux_language_fallback]) || feature['name:right'];
+        }
+    ux_language_text_source_boundary_lines_left_right:
+        left: global.ux_language_text_source_left
+        right: global.ux_language_text_source_right
+    ux_language_text_source_boundary_lines: |
+        function() {
+            var right = (global.ux_language && feature['name:right:'+global.ux_language]) || (global.ux_language_fallback && feature['name:right:'+global.ux_language_fallback]) || feature['name:right'];
+            var left = (global.ux_language && feature['name:left:'+global.ux_language]) || (global.ux_language_fallback && feature['name:left:'+global.ux_language_fallback]) || feature['name:left'];
+            if( right && left ) {
+                //if( right.includes(' ') || left.includes(' ') ) {
+                    return left + " - " + right;
+                //} else {
+                //    return right + '\n' + left;
+                //}
+            } else {
+                return (global.ux_language && feature['name:'+global.ux_language]) || (global.ux_language_fallback && feature['name:'+global.ux_language_fallback]) || feature.name;
+            }
+        }
+    ux_language_text_source_short: |
+        function() {
+            return (global.ux_language && feature['name:short:'+global.ux_language]) || (global.ux_language_fallback && feature['name:short:'+global.ux_language_fallback]) || feature['name:short'];
+        }
+    ux_language_text_source_short_proxy_name: |
+        function() {
+            var name  = (global.ux_language && feature['name:'+global.ux_language]) || (global.ux_language_fallback && feature['name:'+global.ux_language_fallback]) || feature['name'] || '';
+            var short = (global.ux_language && feature['name:short:'+global.ux_language]) || (global.ux_language_fallback && feature['name:short:'+global.ux_language_fallback]) || feature['name:short'];
+            return short ? name : '';
+        }
+    ux_language_text_source_abbreviation: |
+        function() {
+            var name  = (global.ux_language && feature['name:'+global.ux_language]) || (global.ux_language_fallback && feature['name:'+global.ux_language_fallback]) || feature['name'] || '';
+            var abbrev = (global.ux_language && feature['name:abbreviation:'+global.ux_language]) || (global.ux_language_fallback && feature['name:abbreviation:'+global.ux_language_fallback]) || feature['name:abbreviation'];
+            return abbrev || name;
+        }
+    ux_language_text_source_iata: |
+        function() {
+            var name = (global.ux_language && feature['name:'+global.ux_language]) || (global.ux_language_fallback && feature['name:'+global.ux_language_fallback]) || feature['name'];
+            if(feature.iata) {
+                if (name) {
+                    return name + ' (' + feature.iata + ')';
+                }
+                else {
+                    return feature.iata;
+                }
+            } else {
+                return name;
+            }
+        }
+    ux_language_text_source_ocean: |
+        function() {
+            var name = (global.ux_language && feature['name:'+global.ux_language]) || (global.ux_language_fallback && feature['name:'+global.ux_language_fallback]) || feature['name'] || '';
+            name = name.split(' ').join('\n');
+            return name.split('').join('  ');
+        }
+    ux_language_text_source_sea: |
+        function() {
+            var name = (global.ux_language && feature['name:'+global.ux_language]) || (global.ux_language_fallback && feature['name:'+global.ux_language_fallback]) || feature['name'] || '';
+            name = name.split(' ').join('\n');
+            return name.split('').join(' ');
+        }
+    ux_language_text_source_continent_stacked_only: |
+        function() {
+            var name = (global.ux_language && feature['name:'+global.ux_language]) || (global.ux_language_fallback && feature['name:'+global.ux_language_fallback]) || feature['name'] || '';
+            return name.split(' ').join('\n');
+        }
+    ux_language_text_source_continent: |
+        function() {
+            var name = (global.ux_language && feature['name:'+global.ux_language]) || (global.ux_language_fallback && feature['name:'+global.ux_language_fallback]) || feature['name'] || '';
+            name = name.split(' ').join('\n');
+            return name.split('').join(' ');
+        }
+    ux_language_text_source_road_ref_and_name: |
+        function() {
+            var name = (global.ux_language && feature['name:'+global.ux_language]) || (global.ux_language_fallback && feature['name:'+global.ux_language_fallback]) || feature['name'];
+            if(feature.ref && name) {
+                return (feature.ref + ' ' + name);
+            } else {
+                return name;
+            }
+        }
+    ux_language_text_source_road_ref_and_name_short: |
+        function() {
+            var name = (global.ux_language && feature['name:'+global.ux_language]) || (global.ux_language_fallback && feature['name:'+global.ux_language_fallback]) || feature['name'];
+            if (feature.ref && (feature.ref.length < 6) && name) {
+                return feature.ref + ' ' + name;
+            } else {
+                return name;
+            }
+        }
+    ux_language_text_source_piste_advanced: |
+        function() {
+            var name = (global.ux_language && feature['name:'+global.ux_language]) || (global.ux_language_fallback && feature['name:'+global.ux_language_fallback]) || feature['name'];
+            return name ? ('◆ ' + name) : '◆';
+        }
+    ux_language_text_source_piste_expert: |
+        function() {
+            var name = (global.ux_language && feature['name:'+global.ux_language]) || (global.ux_language_fallback && feature['name:'+global.ux_language_fallback]) || feature['name'];
+            return name ? ('◆◆ ' + name) : '◆◆';
+        }
+    ux_language_text_source_building_and_address: |
+        function() {
+            var name = (global.ux_language && feature['name:'+global.ux_language]) || (global.ux_language_fallback && feature['name:'+global.ux_language_fallback]) || feature['name'];
+            if (name && feature.addr_housenumber) {
+                return name + '\n' + feature.addr_housenumber;
+            } else {
+                return name;
+            }
+        }
+
+    # Order functions
+    order_add_9: function () { return (feature.sort_rank * 20 + 9); }
+    order_add_8: function () { return (feature.sort_rank * 20 + 8); }
+    order_add_7: function () { return (feature.sort_rank * 20 + 7); }
+    order_add_6: function () { return (feature.sort_rank * 20 + 6); }
+    order_add_5: function () { return (feature.sort_rank * 20 + 5); }
+    order_add_4: function () { return (feature.sort_rank * 20 + 4); }
+    order_add_3: function () { return (feature.sort_rank * 20 + 3); }
+    order_add_2: function () { return (feature.sort_rank * 20 + 2); }
+    order_add_1: function () { return (feature.sort_rank * 20 + 1); }
+    order: function () { return (feature.sort_rank * 20) || 0; }
+    order_sub_1: function () { return (feature.sort_rank * 20 - 1); }
+    order_sub_2: function () { return (feature.sort_rank * 20 - 2); }
+    order_sub_3: function () { return (feature.sort_rank * 20 - 3); }
+    order_sub_4: function () { return (feature.sort_rank * 20 - 4); }
+    order_sub_5: function () { return (feature.sort_rank * 20 - 5); }
+    order_sub_6: function () { return (feature.sort_rank * 20 - 6); }
+    order_sub_7: function () { return (feature.sort_rank * 20 - 7); }
+    order_sub_8: function () { return (feature.sort_rank * 20 - 8); }
+    order_sub_9: function () { return (feature.sort_rank * 20 - 9); }
+
+    # To facilitate data visualizations several recommended sort orders are provided
+    #
+    # Your classic raster map overlay.
+    # Over all line and polygon features.
+    # Under map labels (icons and text), under UI elements
+    # (like routeline and search result pins).
+    sdk_order_over_everything_but_text_0: 490
+    sdk_order_over_everything_but_text_1: 491
+    sdk_order_over_everything_but_text_2: 492
+    sdk_order_over_everything_but_text_3: 493
+    sdk_order_over_everything_but_text_4: 494
+    sdk_order_over_everything_but_text_5: 495
+    sdk_order_over_everything_but_text_6: 496
+    sdk_order_over_everything_but_text_7: 497
+    sdk_order_over_everything_but_text_8: 498
+    sdk_order_over_everything_but_text_9: 499
+
+    # Your classic "underlay"
+    # Under roads. Above borders, water, landuse, and earth.
+    sdk_order_under_roads_0: 290
+    sdk_order_under_roads_1: 291
+    sdk_order_under_roads_2: 292
+    sdk_order_under_roads_3: 293
+    sdk_order_under_roads_4: 294
+    sdk_order_under_roads_5: 295
+    sdk_order_under_roads_6: 296
+    sdk_order_under_roads_7: 297
+    sdk_order_under_roads_8: 298
+    sdk_order_under_roads_9: 299
+
+    # Under water.
+    # Above earth and most landuse.
+    sdk_order_under_water_0: 190
+    sdk_order_under_water_1: 191
+    sdk_order_under_water_2: 192
+    sdk_order_under_water_3: 193
+    sdk_order_under_water_4: 194
+    sdk_order_under_water_5: 195
+    sdk_order_under_water_6: 196
+    sdk_order_under_water_7: 197
+    sdk_order_under_water_8: 198
+    sdk_order_under_water_9: 199
+
+    # Under everything.
+    # Tip: disable earth layer.
+    sdk_order_under_everything_0: 0
+    sdk_order_under_everything_1: 1
+    sdk_order_under_everything_2: 2
+    sdk_order_under_everything_3: 3
+    sdk_order_under_everything_4: 4
+    sdk_order_under_everything_5: 5
+    sdk_order_under_everything_6: 6
+    sdk_order_under_everything_7: 7
+    sdk_order_under_everything_8: 8
+    sdk_order_under_everything_9: 9
+
+    sdk_building_extrude: true                  # building extrusion toggle
+    building_extrude_height: |                  # building extrude height logic
+        function() { return feature.height || 70; }
+
+    #
+    # TRANSIT OVERLAY
+    # should default to "auto", with SDK overriding it to true or false,
+    # or app logic sets other booleans that triggers auto behavior later
+    sdk_transit_overlay: false
+
+    # SHIELDS
+    sdk_shield_color: [1.000,0.855,0.365]
+    sdk_shield_text_color: [0.127,0.130,0.229]
+    sdk_shield_visible: true

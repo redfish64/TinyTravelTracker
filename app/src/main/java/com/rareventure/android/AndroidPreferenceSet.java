@@ -115,6 +115,8 @@ public abstract class AndroidPreferenceSet {
 	{
 		if(val == null || val instanceof String)
 			editor.putString(fieldName, (String)val);
+		else if(val instanceof Enum)
+			editor.putString(fieldName, ((Enum)val).toString());
 		else if(val instanceof Boolean)
 			editor.putBoolean(fieldName, (Boolean)val);
 		else if(val instanceof Float)

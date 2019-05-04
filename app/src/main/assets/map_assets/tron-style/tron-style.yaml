@@ -1,0 +1,121 @@
+import:
+    # Components
+    - components/globals.yaml
+    - components/fonts.yaml
+
+    # Styles
+    - styles/common.yaml
+    - styles/lines.yaml
+    - styles/polygons.yaml
+
+    # Layers
+    - layers/water.yaml
+    - layers/water-labels.yaml
+    - layers/earth.yaml
+    - layers/earth-labels.yaml
+    - layers/roads.yaml
+    - layers/roads-labels.yaml
+    - layers/transit.yaml
+    - layers/transit-overlay.yaml
+    - layers/buildings.yaml
+    - layers/buildings-labels.yaml
+    - layers/landuse.yaml
+    - layers/landuse-labels.yaml
+    - layers/boundaries.yaml
+    - layers/boundaries-labels.yaml
+    - layers/places.yaml
+    - layers/pois.yaml
+    - layers/ux-sdk-overlay.yaml
+
+    # Icons
+    - themes/tron-icons.yaml
+
+    # Label
+    - themes/label-5.yaml
+
+# Sources
+sources:
+    mapzen:
+        type: MVT
+        url: https://tile.nextzen.org/tilezen/vector/v1/512/all/{z}/{x}/{y}.mvt
+        url_params:
+            api_key: global.sdk_api_key
+        rasters: [normals-elevation]
+        tile_size: 512
+        max_zoom: 16
+    normals-elevation:
+        type: Raster
+        url: https://tile.nextzen.org/tilezen/terrain/v1/512/normal/{z}/{x}/{y}.png
+        url_params:
+            api_key: global.sdk_api_key
+        tile_size: 512
+        max_zoom: 14
+
+    # Only enable this for local debug, should not be enabled for prod (app inserts these at runtime)
+    # These are all in San Francisco, California
+    #
+    # Current location gem
+    # mz_current_location:
+    #    type: GeoJSON
+    #    url: https://gist.githubusercontent.com/anonymous/9e9588228b0a604264a2/raw/b28be49bea0b7feb859eb65b588c28e9fee5ae2c/map.geojson
+    # # Route line
+    # mz_route_line:
+    #    type: GeoJSON
+    #    # sf to ny
+    #    url: https://gist.githubusercontent.com/anonymous/30c6c1a75c168d91d90c/raw/92bfe55e622766d250b1f2f5d17bdc7c26acb956/map.geojson
+    #    # local sf trip
+    #    # url: https://gist.githubusercontent.com/anonymous/9a610ebda6fe4be7bccc/raw/8d217e43f2412d48d01534ba115f1e42dac72e68/map.geojson
+    # # Dashed route line
+    # mz_dash_line:
+    #    type: GeoJSON
+    #    url: https://gist.githubusercontent.com/anonymous/d73b851c64c3e5fbfc2754aa32f44c10/raw/938ae435776e176919c4797bed1465a92e403ef3/map.geojson
+    # # Transit route line
+    # mz_route_line_transit:
+    #    type: GeoJSON
+    #    url: https://gist.githubusercontent.com/anonymous/71ae88cbc6d62c4d141ecd6a61060050/raw/2254bbc18243f5dc609e663a580c9412a7447936/map.geojson
+    # # Pin at start of route
+    # mz_route_start:
+    #    type: GeoJSON
+    #    url: https://gist.githubusercontent.com/anonymous/5262969cb7549ea69221/raw/be03f233fa323d9b5cf50ef1d8e89a1faa3750f1/map.geojson
+    # # Pin at end of route
+    # mz_route_destination:
+    #    type: GeoJSON
+    #    url: https://gist.githubusercontent.com/anonymous/dbae9635dfe46796490e/raw/df55c318635a7d91b309ed40754d4738a292fd38/map.geojson
+    # # Arrow for current route location
+    # mz_route_location:
+    #    type: GeoJSON
+    #    url: https://gist.githubusercontent.com/anonymous/36613092be6e2aa004fd/raw/f753d13069425199e1dea1b449ef67d723f6510e/map.geojson
+    # # Dots for transit stops in route preview
+    # mz_route_transit_stop:
+    #    type: GeoJSON
+    #    url: https://gist.githubusercontent.com/anonymous/b9f16bca4a804f50faf71277d52ee4ab/raw/db13e4e765fa1ac8844b8ba02f4a0f66fe772907/map.geojson
+    # # Pins showing search result locations
+    # mz_search_result:
+    #    type: GeoJSON
+    #    url: https://gist.githubusercontent.com/anonymous/57dc09eeb120919f76de/raw/43426217da3c2bae0522dc4257aaa61e4df3981e/map.geojson
+    # # Default point styling (SDK)
+    # mz_default_point:
+    #    type: GeoJSON
+    #    url: https://gist.githubusercontent.com/anonymous/16324c771edfce45be0721390389b878/raw/7dbaebf17da7da8562e6c6f8768bc8cff83efa88/map.geojson
+    #    # Default shield styling (SDK)
+    # mz_default_shield:
+    #     type: GeoJSON
+    #     url: https://gist.githubusercontent.com/anonymous/5a789f6bd8b51b5693ba9cd57a767aa1/raw/d4523a6c9deebca125298c31085958262caa1ecd/map.geojson
+    # # Default line styling (SDK)
+    # mz_default_line:
+    #    type: GeoJSON
+    #    url: https://gist.githubusercontent.com/anonymous/26f4e8b6b34b2617b5d5533d89decb39/raw/df8e180ab4f7f19448014dccc4a755f7cfa20003/map.geojson
+    # # Default polygon styling (SDK)
+    # mz_default_polygon:
+    #    type: GeoJSON
+    #    url: https://gist.githubusercontent.com/anonymous/88235c795bb44b8c45150bdd5561f947/raw/71d4fab97b6513833bf1a589167119e6169ef86d/map.geojson
+
+# Camera
+cameras:
+    cam:
+        type: perspective
+
+scene:
+    animated: global.sdk_animated
+    background:
+        color: '#364d6d'

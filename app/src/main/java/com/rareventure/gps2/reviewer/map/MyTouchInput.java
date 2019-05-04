@@ -25,12 +25,9 @@ import java.util.EnumSet;
  * {@code TouchInput} collects touch data, applies gesture detectors, resolves simultaneous
  * detection, and calls the appropriate input responders.
  */
-public class MyTouchInput implements OnTouchListener, OnScaleGestureListener,
-        OnRotateGestureListener, OnGestureListener, OnDoubleTapListener, OnShoveGestureListener {
+public class MyTouchInput implements OnTouchListener {
 
     private boolean longPressActive;
-
-    private GestureDetector panTapGestureDetector;
 
     /**
      * This is used to detect long presses. It is the same as panTapGestureDetector, but with
@@ -44,17 +41,13 @@ public class MyTouchInput implements OnTouchListener, OnScaleGestureListener,
      * </p>
      */
     private final GestureDetector longPressGestureDetector;
-    private ScaleGestureDetector scaleGestureDetector;
-    private RotateGestureDetector rotateGestureDetector;
-    private ShoveGestureDetector shoveGestureDetector;
+    private final GestureDetector panGestureDetector;
 
     private TouchInput orig;
 
     public MyTouchInput(Context context, TouchInput onTouchListener) {
         this.orig = onTouchListener;
 
-        this.panTapGestureDetector = new GestureDetector(context, this);
-        this.panTapGestureDetector.setIsLongpressEnabled(false);
         this.longPressGestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener()
         {
             @Override
@@ -63,69 +56,24 @@ public class MyTouchInput implements OnTouchListener, OnScaleGestureListener,
             }
         }
         );
-        this.scaleGestureDetector = new ScaleGestureDetector(context, this);
-        this.rotateGestureDetector = new RotateGestureDetector(context, this);
-        this.shoveGestureDetector = new ShoveGestureDetector(context, this);
+
+        this.panGestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener()
+        {
+            @Override
+            public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+                return MyTouchInput.this.onScroll(e1, e2, distanceX, distanceY);
+            }
+        }
+        );
+
+        panGestureDetector.setIsLongpressEnabled(false);
     }
 
-    @Override
-    public boolean onSingleTapConfirmed(MotionEvent motionEvent) {
-        return orig.onSingleTapConfirmed(motionEvent);
-    }
-
-    @Override
-    public boolean onDoubleTap(MotionEvent motionEvent) {
-        return orig.onDoubleTap(motionEvent);
-    }
-
-    @Override
-    public boolean onDoubleTapEvent(MotionEvent motionEvent) {
-        return orig.onDoubleTapEvent(motionEvent);
-    }
-
-    @Override
-    public boolean onDown(MotionEvent motionEvent) {
-        return orig.onDown(motionEvent);
-    }
-
-    @Override
-    public void onShowPress(MotionEvent motionEvent) {
-        orig.onShowPress(motionEvent);
-
-    }
-
-    @Override
-    public boolean onSingleTapUp(MotionEvent motionEvent) {
-        return orig.onSingleTapUp(motionEvent);
-    }
-
-    @Override
     public void onLongPress(MotionEvent e) {
         longPressActive = true;
          if (longPressResponder != null) {
              longPressResponder.onLongPress(e.getX(), e.getY());
          }
-
-    }
-
-    @Override
-    public boolean onFling(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) {
-        return orig.onFling(motionEvent,motionEvent1,v,v1);
-    }
-
-    @Override
-    public boolean onScale(ScaleGestureDetector scaleGestureDetector) {
-        return orig.onScale(scaleGestureDetector);
-    }
-
-    @Override
-    public boolean onScaleBegin(ScaleGestureDetector scaleGestureDetector) {
-        return orig.onScaleBegin(scaleGestureDetector);
-    }
-
-    @Override
-    public void onScaleEnd(ScaleGestureDetector scaleGestureDetector) {
-        orig.onScaleEnd(scaleGestureDetector);
 
     }
 
@@ -141,50 +89,20 @@ public class MyTouchInput implements OnTouchListener, OnScaleGestureListener,
             //notify the responder that the long press is finished
             if(longPressActive)
             {
+                //notify the responder that the long press is finished
                 if(longPressResponder != null)
                     longPressResponder.onLongPressUp(event.getX(), event.getY());
                 longPressActive = false;
             }
         }
 
-
-        panTapGestureDetector.onTouchEvent(event);
         longPressGestureDetector.onTouchEvent(event);
-        scaleGestureDetector.onTouchEvent(event);
-        shoveGestureDetector.onTouchEvent(event);
-        rotateGestureDetector.onTouchEvent(event);
+        panGestureDetector.onTouchEvent(event);
+
+        if(!longPressActive)
+            orig.onTouch(view,event);
 
         return true;
-    }
-
-    @Override
-    public boolean onRotate(RotateGestureDetector detector) {
-        return orig.onRotate(detector);
-    }
-
-    @Override
-    public boolean onRotateBegin(RotateGestureDetector detector) {
-        return orig.onRotateBegin(detector);
-    }
-
-    @Override
-    public void onRotateEnd(RotateGestureDetector detector) {
-        orig.onRotateEnd(detector);
-    }
-
-    @Override
-    public boolean onShove(ShoveGestureDetector detector) {
-        return orig.onShove(detector);
-    }
-
-    @Override
-    public boolean onShoveBegin(ShoveGestureDetector detector) {
-        return orig.onShoveBegin(detector);
-    }
-
-    @Override
-    public void onShoveEnd(ShoveGestureDetector detector) {
-        orig.onShoveEnd(detector);
     }
 
     /**
@@ -229,19 +147,9 @@ public class MyTouchInput implements OnTouchListener, OnScaleGestureListener,
         this.longPressResponder = responder;
     }
 
-    @Override
     public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-        //if we are long pressing,  then we handle it, otherwise let the original
-        //TouchInput do it
-        if(longPressActive)
-        {
-            if(longPressResponder == null)
-                return false;
-        }
-        else
-        {
-            return orig.onScroll(e1, e2, distanceX, distanceY);
-        }
+        if(longPressResponder == null || !longPressActive)
+            return false;
 
         //copied from TouchInput
         float x = 0, y = 0;

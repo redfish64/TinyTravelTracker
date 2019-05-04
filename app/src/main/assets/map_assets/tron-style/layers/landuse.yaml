@@ -1,0 +1,354 @@
+layers:
+    landuse:
+        data: { source: mapzen }
+        draw:
+            polygons:
+                order: global.order
+                visible: false
+
+
+        landuse-styling:
+#        tier1:
+            national_park:
+                filter:
+                    all:
+                        - kind: [national_park,battlefield,protected_area]
+                    any:
+                        - not: { operator: ["United States Forest Service"] }
+                        - protect_class: ['2','3','5']
+                draw:
+                    polygons:
+                        style: landuse
+                        color: [0.402,0.568,0.818]
+                        visible: true
+                us_national_park:
+                    # yosemite national park, death valley national park, grand canyon national park
+                    filter:
+                        any:
+                            - operator: [ "United States National Park Service"]
+                            - protect_class: ['2','3','5']
+                    draw:
+                        polygons:
+                            color: [0.340,0.703,1.000]
+                            visible: true
+#        tier2:
+            conservation:
+                filter:
+                    all:
+                        - $zoom: { min: 4 }
+                        - kind: [protected_area, nature_reserve, national_park]
+                        - not: { protect_class: ['2','3','5'] }
+                draw:
+                    polygons:
+                        style: landuse
+                        color: [0.090,0.409,1.000]
+                        visible: true
+
+            national_forest_level_6:
+                filter:
+                    all:
+                        - kind: forest
+                    any:
+                        - protect_class: ['6']
+                        - operator: ['United States Forest Service']
+                draw:
+                    polygons:
+                        style: landuse
+                        color: [0.149,0.353,0.714]
+                        visible: true
+
+            farm:
+                filter:
+                    kind: [farm, farmland]
+                    $zoom: { min: 10 }
+                draw:
+                    polygons:
+                        style: landuse
+                        color: [0.024,0.189,0.238]
+                        visible: true
+            forest:
+                filter: { kind: [forest, natural_forest, wood, natural_wood, natural_park], $zoom: { min: 10 }, not: { operator: "United States Forest Service" } }
+                draw:
+                    polygons:
+                        style: landuse
+                        color: [0.238,0.529,0.820]
+                        visible: true
+
+            parks_and_national_forests_not_national_park:
+                filter:
+                    all:
+                        - $zoom: { min: 4 }
+                        - kind: [park, national_park]
+                    any:
+                        - not: { operator: ["United States National Park Service"] }
+                        - not: { protect_class: ['2','3','5','6'] }
+
+                # default for national forests and more?
+                draw:
+                    polygons:
+                        style: landuse
+                        color: [0.280,0.762,1.000]
+                        visible: true
+
+                national_park:
+                    filter:
+                        all:
+                            - kind: national_park
+                            - not: { protect_class: ['2','3','5','6'], operator: ["United States National Park Service"] }
+                    draw:
+                        polygons:
+                            style: landuse
+                            color: [0.238,0.529,0.820]
+                            visible: true
+#        tier3:
+            university:
+                filter:
+                    kind: [university, college]
+                draw:
+                    polygons:
+                        style: landuse-tier3-university
+                        color: [0.212,0.302,0.427]
+                        visible: true
+#        tier4:
+            golf_course:
+                filter:
+                    kind: golf_course
+                draw:
+                    polygons:
+                        style: landuse-tier4-golf-course
+                        # color: [0.599,0.350,1.000]
+                        color: [0.407,0.459,0.690]
+                        visible: true
+            # industrial:
+            #     filter:
+            #         kind: industrial
+            #     draw:
+            #         polygons:
+            #             style: landuse-tier4-industrial
+            #             # color: [0.186,0.214,0.600]
+            #             color: [0.191,0.316,0.490]
+            #             # color: [0.240,0.264,0.600]
+            #             visible: true
+
+            hospital:
+                filter:
+                    kind: hospital
+                draw:
+                    polygons:
+                        style: landuse-tier4-hospital
+                        color: [0.212,0.302,0.427]
+                        visible: true
+            power:
+                filter:
+                    kind: [plant, generator, substation]
+                draw:
+                    polygons:
+                        style: landuse-tier4-power
+                        color: [0.231,0.263,0.478]
+                        visible: true
+            man-made:
+                filter: { kind: [pier,wastewater_plant,works,bridge,tower,breakwater,water_works,groyne,dike,cutline] }
+                draw:
+                    polygons:
+                        style: landuse-tier4-manmade
+                        color: [[13,[0.212,0.302,0.427]],[16,[0.204,0.292,0.730]]]
+                        visible: true
+                pier:
+                    filter: { kind: [pier,bridge,breakwater,groyne,dike,cutline] }
+                    draw:
+                        polygons:
+                            color: [[13,[0.212,0.302,0.427]],[16,[0.204,0.292,0.730]]]
+                            visible: true
+#        tier6:
+            parking:
+                filter:
+                    kind: parking
+                draw:
+                    polygons:
+                        style: landuse-tier6-parking
+                        color: [0.251,0.310,0.427]
+                        visible: true
+            pedestrian:
+                filter:
+                    kind: [pedestrian,common,footway]
+                draw:
+                    polygons:
+                        style: landuse-tier6-pedestrian
+                        color: [0.167,0.242,0.450]
+                        visible: true
+
+#        landuse-not-filtered:
+#            data: { source: mapzen, layer: landuse }
+#            filter:
+#                kind:
+#                    - runway
+            runway:
+                filter:
+                    kind: runway
+                draw:
+                    polygons:
+                        visible: true
+                        order: global.order
+                        color: [[9,[0.215,1.000,1.000]],[11,[0.215,1.000,1.000]],[13,[0.078,0.129,0.259]]]
+
+            urban_area-early:
+                filter:
+                    kind: [urban_area]
+                    $zoom: { max: 6 }
+                draw:
+                    polygons:
+                        style: urban-early
+                        color: [0.267,0.365,0.502]
+                        visible: true
+
+styles:
+    urban-early:
+        base: polygons
+        mix: [functions-zoom, polygons-diagonal-stripes]
+        shaders:
+            defines:
+                ZOOM_START: 0.
+                ZOOM_END: 6.5
+                ZOOM_MAX: 6.
+
+                STRIPES_ALPHA: 1.
+                STRIPES_SCALE: mix(25.,50.,smoothstep(0.,1.,1.-zoom()))
+                STRIPES_WIDTH: 1.-zoom()-.2
+
+                COLOR_A: color.rgb
+                # COLOR_B: vec3(0.031,0.973,1.000)
+                COLOR_B: vec3(0.000,0.676,0.767)
+            blocks:
+                color: |
+                    color.rgb = mix(COLOR_A, COLOR_B, sin(zoom()*3.1415));
+    landuse:
+        base: polygons
+        mix: [functions-zoom, elevation-stripes]
+        shaders:
+            defines:
+                ZOOM_START: 0.
+                ZOOM_END: 13.
+                STRIPES_ALPHA: .5
+                STRIPES_SCALE: 70.
+                STRIPES_DIR: vec3(-0.600,-0.420,0.560)
+                STRIPES_PCT: 1.8
+                STRIPES_WIDTH: mix( (1.-zoom()),
+                                    dot((sampleRaster(int(NORMAL_TEXTURE_INDEX)).rgb-.5)*2.,
+                                        STRIPES_DIR),
+                                    zoom())*STRIPES_PCT
+    landuse-tier3-university:
+        base: polygons
+        mix: [polygons-dots]
+        shaders:
+            defines:
+                DOTS_COLOR: vec3(0.224,0.192,0.702)
+                DOTS_SCALE: 10.
+                DOTS_SIZE: 0.41
+                DOTS_STROKE: 0.15
+                DOTS_TYPE: stroke
+                DOTS_TILE_STYLE: tile
+    landuse-tier6-pedestrian:
+        base: polygons
+        mix: [functions-zoom, polygons-diagonal-grid]
+        shaders:
+            defines:
+                ZOOM_START: 11.
+                ZOOM_END: 16.
+                ZOOM_IN: .0
+                ZOOM_OUT: 1.
+
+                GRID_SCALE: 15.
+                GRID_WIDTH: zoom()*.7
+                GRID_BACKGROUND_COLOR: vec3(0.251,0.267,0.486)
+    landuse-tier4-power:
+        mix: [polygons-dots]
+        shaders:
+            defines:
+                DOTS_COLOR: vec3(0.248,0.203,0.655)
+                DOTS_GLOW_COLOR: vec3(0.248,0.203,0.655)
+                DOTS_GLOW_SIZE: 2.
+                DOTS_GLOW_AMOUNT: 0.25
+                DOTS_SCALE: 16.
+                DOTS_SIZE: 0.21
+                DOTS_BACKGROUND_COLOR: color.rgb
+                DOTS_TYPE: fill
+                DOTS_TILE_STYLE: brick
+            blocks:
+                color: |
+                    float sdf = circleDF(vec2(0.5)-DOTS_TILE_STYLE(getTileCoords()*DOTS_SCALE,2.));
+
+                    color.rgb = mix(DOTS_BACKGROUND_COLOR,
+                                    DOTS_COLOR,
+                                    DOTS_TYPE( DOTS_SIZE, sdf));
+                    color.rgb += (DOTS_GLOW_COLOR*(1.-sdf*2.))*DOTS_GLOW_AMOUNT;
+    landuse-tier4-hospital:
+        mix: [polygons-dots]
+        raster: custom
+        shaders:
+            defines:
+                NORMAL_TEXTURE_INDEX: 0
+                DOTS_DIR: vec3(-0.600,-0.420,0.600)
+
+                DOTS_COLOR: vec3(0.345,0.224,0.392)
+                DOTS_SCALE: 30.
+                DOTS_SIZE: shade*2.
+            blocks:
+                normal: |
+                    float shade = dot((sampleRaster(int(NORMAL_TEXTURE_INDEX)).rgb-.5)*2., DOTS_DIR);
+                    shade = shade*shade*shade;
+    landuse-tier6-parking:
+        base: polygons
+        mix: [functions-zoom, polygons-diagonal-grid]
+        shaders:
+            defines:
+                ZOOM_START: 12.
+                ZOOM_END: 18.
+                ZOOM_IN: .0
+                ZOOM_OUT: 1.
+
+                GRID_SCALE: 20.
+                GRID_WIDTH: zoom()*.5
+                GRID_BACKGROUND_COLOR: vec3(0.254,0.262,0.423)
+    landuse-tier4-manmade:
+        base: polygons
+        mix: [functions-zoom, polygons-diagonal-grid]
+        shaders:
+            defines:
+                ZOOM_START: 14.
+                ZOOM_END: 18.
+                ZOOM_IN: .0
+                ZOOM_OUT: 1.
+
+                GRID_SCALE: 20.
+                GRID_WIDTH: zoom()*.5
+                GRID_BACKGROUND_COLOR: vec3(0.212,0.302,0.431)
+
+    landuse-tier4-industrial:
+        base: polygons
+        mix: [functions-zoom, polygons-diagonal-grid]
+        shaders:
+            defines:
+                ZOOM_START: 14.
+                ZOOM_END: 18.
+                ZOOM_IN: .0
+                ZOOM_OUT: 1.
+
+                GRID_SCALE: 20.
+                GRID_WIDTH: zoom()*.5
+                GRID_BACKGROUND_COLOR: vec3(0.212,0.302,0.431)
+
+    landuse-tier4-golf-course:
+        mix: [elevation-dash]
+        shaders:
+            defines:
+                DASH_COLOR: vec3(0.208,0.290,0.416)
+                DASH_BACKGROUND_COLOR: vec3(0.149,0.353,0.714)
+                DASH_SCALE: 12.
+                DASH_SIZE: 0.9
+                DASH_TYPE: fill
+                DASH_TILE_STYLE: tile
+                DASH_DIR: vec3(-0.600,-0.420,0.560)
+                NORMAL_TEXTURE_INDEX: 0
+                DASH_MIN_SIZE: .8
+                DASH_MAX_SIZE: 1.
+                DASH_SIZE: shade

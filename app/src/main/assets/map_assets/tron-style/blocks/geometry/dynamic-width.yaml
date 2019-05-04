@@ -1,0 +1,24 @@
+styles:
+    geometry-dynamic-width:
+        doc:
+            author: 
+                name: Patricio Gonzalez Vivo
+                twitter: patriciogv
+            version: 0.0.1
+            tangram-version: 0.0.7
+            licence: MIT
+            description: |  
+                Change the width of a line acording to the altitud
+            examples:
+                blueprint:
+                    url: https://tangrams.github.io/tangram-sandbox/styles/blueprint.yaml
+                    img: https://tangrams.github.io/tangram-sandbox/styles/blueprint.png
+                    lines: 7-28
+        shaders:
+            defines:
+                WIDTH_MIN: .2
+                WIDTH_MAX: 1.
+                WIDTH_Z_SCALE: 0.006
+            blocks:
+                width: |
+                    width *= min(WIDTH_MIN+(position.z*WIDTH_Z_SCALE)*(position.z*WIDTH_Z_SCALE),WIDTH_MAX);

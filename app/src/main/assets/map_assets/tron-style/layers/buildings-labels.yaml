@@ -1,0 +1,70 @@
+layers:
+    # tuck this into existing buildings layer
+    buildings:
+        buildings-labels:
+            filter:
+                all:
+                    - { $zoom: { min: 17 } }
+                    - $geometry: point
+                    - not: { location: underground, kind: address }
+                    - name: true
+                    - function() { return global.text_visible_building; }
+    #                - kind: [false, building, university, college, school, kindergarten]
+                any:
+                    - { $zoom: [16], area: { min: 5000 } }
+                    - { $zoom: [16], area: { min: 5000 } }
+                    - { $zoom: [16], area: { min: 10000 }, landuse_kind: true }
+                    - { $zoom: [16], area: { min: 7000 }, kind_detail: [university, college, school, kindergarten] }
+                    - { $zoom: [16], volume: { min: 50000 }, name: true }
+                    - { $zoom: [17], area: { min: 3000 } }
+                    - { $zoom: [17], area: { min: 2000 }, kind_detail: [university, college, school, kindergarten] }
+                    - { $zoom: [18], area: { min: 1000 } }
+                    - { $zoom: [18], kind_detail: [university, college, school, kindergarten] }
+                    - { $zoom: [19], area: { min: 200 } }
+                    - { $zoom: { min: 19 }, kind_detail: [university, college, school, kindergarten] }
+                    - { $zoom: { min: 20 }, area: true }
+            draw:
+                text:
+                    text_source: global.ux_language_text_source
+                    interactive: global.sdk_interactive
+                    move_into_tile: true
+                    priority: 70
+                    order: 7
+                    font:
+                        fill: [0.882,0.894,0.914]
+                        family: Aldrich
+                        size: [[17,10px],[18,11px],[20,12px]]
+            building-labels-z16:
+                filter: function() { if( $zoom == 16 && feature.name.length > 20 ) { return true; } else { return false; } }
+                draw:
+                    text:
+                        visible: false
+            building-labels-z17:
+                filter: function() { if( $zoom == 17 && feature.name.length > 30 ) { return true; } else { return false; } }
+                draw:
+                    text:
+                        visible: false
+            building-labels-z20+:
+                filter: { $zoom: { min: 20 } }
+                draw:
+                    text:
+                        text_source: global.ux_language_text_source_building_and_address
+        address-labels:
+            data: { source: mapzen, layer: buildings }
+            filter:
+                all:
+                    - $zoom: { min: 20 }
+                    - function() { return global.text_visible_address; }
+                any:
+                    - kind: address
+                    - { label_position: yes, addr_housenumber: true, name: false }
+            draw:
+                text:
+                    text_source: global.ux_language_text_source
+                    interactive: global.sdk_interactive
+                    order: 7
+                    text_source: addr_housenumber
+                    font:
+                        fill: [0.882,0.894,0.914]
+                        family: Cairo
+                        size: 10px

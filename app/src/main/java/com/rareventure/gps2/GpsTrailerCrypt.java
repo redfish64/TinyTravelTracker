@@ -229,7 +229,7 @@ public class GpsTrailerCrypt {
 			System.arraycopy(output, 0, output2, 0, keyLength);
 
 			// Private keys are encoded with PKCS#8 (or so they say)
-			PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(output);
+			PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(output2);
 
 			KeyFactory keyFactory = KeyFactory.getInstance("RSA");
 			return keyFactory.generatePrivate(keySpec);

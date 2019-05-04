@@ -1,0 +1,75 @@
+import:
+    - ../block.yaml
+    - ../space/tile.yaml
+    - ../tiling/brick.yaml
+    - ../tiling/tile.yaml
+    - ../shapes/type.yaml
+
+styles:
+    polygons-diagonal-dash:
+        doc:
+            author: 
+                name: Patricio Gonzalez Vivo
+                twitter: patriciogv
+            version: 0.0.1
+            tangram-version: 0.0.7
+            licence: MIT
+            description: |  
+                Apply a diagonal dash pattern to the polygon style. To learn more about patterns check [this chapter from the Book of Shaders](https://thebookofshaders.com/09/)
+        ui:
+            shaders:
+                defines:
+                    DASH_SCALE:
+                        type: number
+                        label: Scale
+                        range: 
+                            min: 1.
+                            max: 1000.
+                            step: 1.
+                    DASH_SIZE:
+                        type: number
+                        label: Alpha
+                        range: 
+                            min: 0.
+                            max: 1.
+                            step: 0.01
+                    STRIPES_ALPHA:
+                        type: number
+                        label: Alpha
+                        range: 
+                            min: 0.
+                            max: 1.
+                            step: 0.01
+                    DASH_COLOR: 
+                        type: color
+                        label: Color
+                    DASH_BACKGROUND_COLOR: 
+                        type: color
+                        label: 'Background color'
+                    DASH_TYPE: 
+                        type: dropdownArray
+                        label: Type
+                        values: ['fill', 'stroke']
+                    DASH_TILE_STYLE: 
+                        type: dropdownArray
+                        label: 'Tile type'
+                        values: ['tile', 'brick']
+        base: polygons
+        mix: [block, space-tile, tiling-brick, tiling-tile, shapes-type]
+        shaders:
+            defines:
+                DASH_COLOR: color.rgb*.5
+                DASH_BACKGROUND_COLOR: color.rgb
+                DASH_SCALE: 10.
+                DASH_SIZE: 0.9
+                DASH_TYPE: fill
+                DASH_TILE_STYLE: tile
+            blocks:
+                global: |
+                    float dashDF(vec2 st) {
+                        return min(cos((st.x-st.y)*PI),-cos((st.x+st.y+.5)*PI*.6666)*5.);
+                    }
+                color: |
+                    color.rgb = mix(DASH_BACKGROUND_COLOR, 
+                                    DASH_COLOR, 
+                                    DASH_TYPE( DASH_SIZE, dashDF(DASH_TILE_STYLE(getTileCoords()*DASH_SCALE,3.))) );

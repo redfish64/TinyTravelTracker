@@ -50,6 +50,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -706,18 +707,18 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 //			mapData.beginChangeBlock();
 			mapData.clear();
 
-			//co:hack to show top and bottom of view area
-//			LngLat tl = mapController.coordinatesAtScreenPosition(0,0);
-//			LngLat br = mapController.coordinatesAtScreenPosition(osmMapView.windowWidth,
-//					osmMapView.pointAreaHeight);
-//
-//			props.put("color","#ffffff");
-//			props.put("size",String.format("%dpx %dpx", 10, 10));
-//			mapData.addPoint(tl,props);
-//
-//			props.put("color","#000000");
-//			props.put("size",String.format("%dpx %dpx", 10, 10));
-//			mapData.addPoint(br,props);
+			//hack to show top and bottom of view area FIXME
+			LngLat tl = mapController.screenPositionToLngLat(new PointF(10,10));
+			LngLat br = mapController.screenPositionToLngLat(new PointF(osmMapView.windowWidth,
+					osmMapView.pointAreaHeight));
+
+			props.put("color","#ffffff");
+			props.put("size",String.format("%dpx %dpx", 10, 10));
+			mapData.addPoint(tl,props);
+
+			props.put("color","#000000");
+			props.put("size",String.format("%dpx %dpx", 10, 10));
+			mapData.addPoint(br,props);
 
 			while(iter.hasNext()) {
 				ViewNode vn = iter.next();
@@ -744,8 +745,8 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 				int circleSizePx = (int) (Math.max(minCirclePxRadius, 2*(p2.x-p.x))* speedMult) * 2;
 
 				int paintIndex = figurePaintIndex(vn.overlappingRange[0],vn.overlappingRange[1]);
-				props.put("color",String.format("#%06x",paintColors[paintIndex]));
-				props.put("size",String.format("%dpx %dpx", circleSizePx, circleSizePx));
+				props.put("color",String.format(Locale.US,"#%6x",paintColors[paintIndex]));
+				props.put("size",String.format(Locale.US,"%dpx", circleSizePx));
 
 				//Here we add the actual point into mapzen.
 				//

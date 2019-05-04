@@ -1,0 +1,135 @@
+global:
+    building_style: buildings_with_labels
+    building_lines_with_or_without_labels: [0.512,0.594,0.840]
+
+layers:
+    buildings:
+        data: { source: mapzen }
+        filter:
+            not: { location: underground }
+        draw:
+            polygons:
+                visible: false
+                order: global.order
+                # order: 6580
+                color: [0.212,0.302,0.431]
+            lines:
+                style: lines
+                order: global.order_add_1
+                # order: 6600
+                visible: false
+                # color: [0.412,0.686,0.859]
+                color: [0.004,0.165,0.933]
+                width: 1px
+        footprints:
+            filter:
+                any:
+                    # show footprints for buildings at least one zoom level before they will be extruded
+                    - { $zoom: [14], scale_rank: [0,1,2,3,4] }
+#                    - { $zoom: [14], area: { min: 5000 } }
+#                    - { $zoom: [14], height: { min: 190 } }
+#                    - { $zoom: [14], volume: { min: 150000 } }
+                    - { $zoom: [15], height: { min: 100 } }
+                    - { $zoom: [15], area: { min: 2500 } }
+                    - { $zoom: [15], volume: { min: 100000 } }
+                    - { $zoom: [15], scale_rank: [0,1,2,3] }
+                    - { $zoom: { min: 16 }, area: true }
+            draw:
+                polygons:
+                    color: [0.212,0.302,0.431]
+                    visible: true
+                lines:
+                    color: [0.392,0.627,0.651]
+                    width: [[14,0.55px],[16,0.5px]]
+                    visible: true
+            # before zoom 15, we want buidings to be below roads...
+            # (once they extrude, then we want them to be above roads, which is the default data value)
+            before_z15:
+                filter:
+                    $zoom: { max: 16 }
+                draw:
+                    polygons:
+                        order: 5800 #290 * 20
+                    lines:
+                        order: 5820 #291 * 20
+
+            extrude:
+                filter:
+                    all:
+                        - function() { return global.sdk_building_extrude; }
+                        - $zoom: { min: 13 }
+                        - not:
+                            - layer: [-1, -2, -3, -4, -5]
+                draw:
+                    polygons:
+                        visible: true
+                        style: global.building_style
+                        color: global.pseudoRandomColor
+                        # color: [0.592,0.827,0.851]
+                        extrude: global.building_extrude_height
+                    lines:
+                        visible: true
+                        style: buildings-lns
+                        color: [[16,[0.428,0.687,0.717]],[18,global.building_lines_with_or_without_labels]]
+                        width: [[12, .75px], [18, 1.0px]]
+                        extrude: global.building_extrude_height
+            basement:
+                filter:
+                    all:
+                        - layer: [-1, -2, -3, -4, -5]
+                draw:
+                    polygons:
+                        style: global.building_style
+                        extrude: false
+                        order: 329
+                    lines:
+                        style: buildings-lns
+                        extrude: false
+                        order: 330
+                early:
+                    filter:
+                        - $zoom: { max: 17 }
+                    draw:
+                        polygons:
+                            visible: false
+                        lines:
+                            visible: false
+
+styles:
+    geometry-dynamic-height:
+        shaders:
+            defines:
+                ZOOM_START: 16.0
+                ZOOM_END: 20.0
+                HEIGHT_MIN: .0
+                HEIGHT_MAX: 2.0
+
+    buildings_with_labels:
+        base: polygons
+        mix: [polygons-building-wall]
+        texcoords: true
+        blend: add
+        shaders:
+            defines:
+                WALL_PCT: .95
+                WALL_HEIGHT: .85
+
+    buildings_no_labels:
+        base: polygons
+        mix: [polygons-building-wall]
+        texcoords: true
+        blend: add
+        shaders:
+            defines:
+                WALL_PCT: 1.0
+
+    buildings-lns:
+        base: lines
+        mix: [geometry-dynamic-width, geometry-dynamic-height]
+        shaders:
+            defines:
+                ZOOM_START: 13.
+                ZOOM_END: 20.
+                WIDTH_MIN: .7
+                WIDTH_MAX: 1.0
+

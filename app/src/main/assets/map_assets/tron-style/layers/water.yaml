@@ -1,0 +1,197 @@
+layers:
+    water:
+        data: { source: mapzen }
+        draw:
+            polygons:
+                style: water
+                order: global.order
+                # color: [0.149,0.153,0.329]
+                # color: [0.189,0.193,0.369]
+                color: [0.200,0.200,0.360]
+
+        later:
+            filter: { $zoom: { min: 11 } }
+            draw:
+                polygons:
+                    style: water-later
+        lakes:
+            filter:
+                all:
+                    - kind: [ocean, lake, water, riverbank, reservoir, swimming_pool]
+                # WARNING: any area filters here must match the area filters in the water-boundaries-not_ocean layer
+                any:
+                    # limit show smaller landuse areas to higher zooms
+                    - { $zoom: { min: 1 },  area: { min: 40000000000 } }
+                    - { $zoom: { min: 2 },  area: { min: 20000000000 } }
+                    # some weird natural earth scale set transition
+                    - { $zoom: { min: 3 },  area: { min: 80000000000 } }
+                    - { $zoom: { min: 4 },  area: { min: 5000000000 } }
+                    - { $zoom: { min: 5 },  area: { min: 700000000 } }
+                    - { $zoom: { min: 6 },  area: { min: 500000000 } }
+                    - { $zoom: { min: 7 },  area: { min: 160000000 } }
+                    - { $zoom: { min: 8 },  area: { min: 40000000 } }
+                    - { $zoom: { min: 9 },  area: { min: 10000000 } }
+                    - { $zoom: { min: 10 }, area: { min: 8000000 } }
+                    - { $zoom: { min: 11 }, area: { min: 2000000 } }
+                    - { $zoom: { min: 12 }, area: { min: 200000 } }
+                    - { $zoom: { min: 13 }, area: { min: 100000 } }
+                    - { $zoom: { min: 14 }, area: { min: 2000 } }
+                    - { $zoom: { min: 15 } }
+            draw:
+                polygons:
+                    style: water
+
+        other_areas:
+            filter: { not: { kind: [ocean, lake, water, reservoir] }, $zoom: { min: 10 }, area: { min: 100 } }
+            draw:
+                polygons:
+                    style: water
+
+            later:
+                filter: { $zoom: { min: 11 } }
+                draw:
+                    polygons:
+                        style: water-later
+
+                swimming-pool-later:
+                    filter:
+                        kind: swimming_pool
+                    draw:
+                        polygons:
+                            style: polygons
+                            color: [0.000,0.496,0.930]
+
+        playas:
+            filter: { kind: playa, $zoom: { min: 4 } }
+            draw:
+                polygons:
+                    style: polygons
+                    order: global.order
+                    color: [[4,[0.263,0.361,0.498]],[9,[0.193,0.275,0.389]]]
+
+        swimming_pool:
+            filter: { kind: swimming_pool }
+            draw:
+                polygons:
+                    style: polygons
+                    color: [0.000,0.496,0.930]
+
+        boundaries:
+            filter: { boundary: true, kind: ocean }
+            # don't animate early, save the fan, save the planet!
+            early:
+                filter: { $zoom: { max: 16 } }
+                draw:
+                    lines:
+                        style: coastline-glow
+                        order: global.order
+                        width: [[4,0px],[11,2.5px],[14,6px],[16,10px]]
+                        color: [0.370,0.622,1.000]
+                        join: round
+            animated:
+                filter: { $zoom: { min: 16 } }
+                draw:
+                    lines:
+                        style: water-boundaries-animated
+                        order: global.order
+                        width: [[16,21px],[18,30px],[20,36]]
+                        color: [0.091,0.329,0.692]
+                        join: round
+
+        boundaries-not_ocean:
+            filter:
+                all:
+                    - boundary: true
+                    - not: { kind: [ocean, playa] }
+                    - $zoom: { min: 8 }
+                # WARNING: any area filters here must match the area filters in the lakes layer
+                any:
+                    # limit show smaller landuse areas to higher zooms
+                    - { $zoom: { min: 1 },  area: { min: 40000000000 } }
+                    - { $zoom: { min: 2 },  area: { min: 20000000000 } }
+                    # some weird natural earth scale set transition
+                    - { $zoom: { min: 3 },  area: { min: 80000000000 } }
+                    - { $zoom: { min: 4 },  area: { min: 5000000000 } }
+                    - { $zoom: { min: 5 },  area: { min: 700000000 } }
+                    - { $zoom: { min: 6 },  area: { min: 500000000 } }
+                    - { $zoom: { min: 7 },  area: { min: 160000000 } }
+                    - { $zoom: { min: 8 },  area: { min: 40000000 } }
+                    - { $zoom: { min: 9 },  area: { min: 10000000 } }
+                    - { $zoom: { min: 10 }, area: { min: 8000000 } }
+                    - { $zoom: { min: 11 }, area: { min: 2000000 } }
+                    - { $zoom: { min: 12 }, area: { min: 200000 } }
+                    - { $zoom: { min: 13 }, area: { min: 100000 } }
+                    - { $zoom: { min: 14 }, area: { min: 2000 } }
+                    - { $zoom: { min: 15 } }
+            draw:
+                lines:
+                    order: global.order
+                    color: [0.155,0.482,0.910]
+                    width: [[8,0px],[13,1px],[15,1.25px],[20,3px]]
+                    join: round
+
+            swimming_pool:
+                filter: { kind: swimming_pool }
+                draw:
+                    lines:
+                        style: swimming-pool-glow
+                        color: [0.407,0.846,0.850]
+                        width: [[8,0px],[13,3px],[15,4px],[20,12px]]
+
+            boundaries-not_ocean-riverbank:
+                # river boundaries like the thames in london, la seine in paris
+                filter: { kind: riverbank }
+                draw:
+                    lines:
+                        color: [0.155,0.482,0.910]
+                        width: [[8,0px],[13,1px],[15,1.25px],[20,8px]]
+
+styles:
+    water:
+        base: polygons
+        mix: [functions-zoom, polygons-diagonal-opaque-stripes]
+        shaders:
+            defines:
+                ZOOM_START: 3.
+                ZOOM_END: 12.
+                ZOOM_MAX: 14.
+                ZOOM_IN: .9
+                ZOOM_OUT: -.2
+
+                STRIPES_ALPHA: 1.
+                STRIPES_SCALE: 25.
+                STRIPES_WIDTH: zoom()
+
+    water-later:
+        base: polygons
+        mix: [functions-zoom, polygons-shimmering]
+        shaders:
+            defines:
+                ZOOM_START: 11.
+                ZOOM_END: 20.
+
+                SHIMMERING_COLOR: color.rgb
+                SHIMMERING_BACKGROUND_COLOR: vec3(0.03,0.05,0.07)
+                SHIMMERING_SPEED: .5
+                SHIMMERING_AMOUNT: .1+zoom()*.9
+                SHIMMERING_ANIMATED: global.sdk_animated
+    water-boundaries-animated:
+        base: lines
+        mix: [lines-coast]
+        shaders:
+            defines:
+                COAST_WAVES_ANIMATED: global.sdk_animated
+    swimming-pool-glow:
+        base: lines
+        mix: [lines-glow]
+        shaders:
+            defines:
+                GLOW_WIDTH: .75
+                GLOW_BRIGHTNESS: .25
+    coastline-glow:
+        base: lines
+        mix: [lines-glow]
+        shaders:
+            defines:
+                GLOW_WIDTH: .5
+                GLOW_BRIGHTNESS: .5

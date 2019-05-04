@@ -1,0 +1,97 @@
+import:
+    # Blocks
+    - ../blocks/elevation/stripes.yaml
+    - ../blocks/elevation/dash.yaml
+    - ../blocks/polygons/dots.yaml
+    - ../blocks/tiling/simplex.yaml
+    - ../blocks/generative/noise.yaml
+    - ../blocks/polygons/stripes.yaml
+    - ../blocks/polygons/diagonal-stripes.yaml
+    - ../blocks/polygons/diagonal-grid.yaml
+    # Utils
+    - ../blocks/geometry/normal.yaml
+
+styles:
+    polygons-diagonal-opaque-stripes:
+        base: polygons
+        mix: [polygons-diagonal-stripes]
+        shaders:
+            defines:
+                BACKGROUND_COLOR: vec3(0.)
+            blocks:
+                filter: |
+                    color.rgb = mix(BACKGROUND_COLOR,color.rgb, color.a);
+                    color.a = 1.;
+
+    polygons-building-wall:
+        base: polygons
+        mix: [functions-zoom, geometry-normal,generative-random, tron-palette, geometry-dynamic-height]
+        texcoords: true
+        blend: add
+        shaders:
+            defines:
+                ZOOM_START: 12.
+                ZOOM_END: 20.
+                WALL_LINES_COLOR: vec3(0.181,0.259,0.370)
+                WALL_PCT: 1.
+                WALL_HEIGHT: .7
+            blocks:
+                color: |
+                    if (isWall()) {
+                        float r = 0.5+random(color.r)*.9;
+                        float g = 0.5+random(color.g)*.9;
+                        float b = 0.5+random(color.b)*.9;
+                        float z = zoom();
+
+                        float lineWidth = 0.003*z;
+                        color = mix(vec4(0.),
+                                    vec4(WALL_LINES_COLOR,1.),
+                                    1.0-(step(lineWidth,v_texcoord.x)-step(1.0-lineWidth,v_texcoord.x))*
+                                        (step(lineWidth,v_texcoord.y)-step(1.0-lineWidth,v_texcoord.y)) );
+                        vec2 st = v_texcoord.xy;
+                        if (r > 0.5 ) st = vec2(v_texcoord.x, worldPosition().z*0.01);
+                        if (g > 0.5 ) st *= mix(10.,50.,random(g));
+                        if (b > 0.5 ) st.x += step(1., mod(st.y,2.0)) * 0.5;
+
+                        float n = random(floor(st));
+                        color = mix(color,
+                                    mix(vec4(WALL_LINES_COLOR, n),
+                                        vec4(palette(r), 1.)*n,
+                                        z),
+                                    mix(.15,WALL_PCT,z)-v_texcoord.y*WALL_HEIGHT);
+                    } else {
+                        color = vec4(0.);
+                    }
+    polygons-shimmering:
+        base: polygons
+        mix: [functions-zoom, tiling-simplex, generative-noise]
+        animated: true
+        shaders:
+            defines:
+                ZOOM_START: 11.
+                ZOOM_END: 20.
+                SHIMMERING_ZOOM_IN: 0.01
+                SHIMMERING_ZOOM_OUT: 30.
+
+                SHIMMERING_SCALE: 1.
+                SHIMMERING_COLOR: color.rgb
+                SHIMMERING_BACKGROUND_COLOR: color.rgb*.5
+                SHIMMERING_SPEED: 0.1
+                SHIMMERING_AMOUNT: 1.
+                SHIMMERING_ANIMATED: true
+
+                SPACE_CONSTANT_PIXEL_SCALE: 695.
+                SPACE_CONSTANT_DOT_WRAP: 1e4
+            blocks:
+                color: |
+                    float z = mix(SHIMMERING_ZOOM_IN, SHIMMERING_ZOOM_OUT, zoom());
+                    vec2 S = skew((worldPosition().xy*(floor(z)*0.001)*SHIMMERING_SCALE));
+                    vec2 S_f = fract(S);
+                    #ifdef SHIMMERING_ANIMATED
+                    float n = snoise(vec3(floor(S+step(S_f.x,S_f.y)*5.),u_time*SHIMMERING_SPEED));
+                    #else
+                    float n = snoise(floor(S+step(S_f.x,S_f.y)*5.));
+                    #endif
+                    color.rgb = mix(SHIMMERING_COLOR,
+                                    mix(SHIMMERING_BACKGROUND_COLOR,SHIMMERING_COLOR,n),
+                                    SHIMMERING_AMOUNT);

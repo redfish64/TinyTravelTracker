@@ -21,24 +21,27 @@ package com.rareventure.gps2.reviewer.map;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Map;
 
 import android.content.Context;
 import android.graphics.Paint;
 import android.graphics.PointF;
-import android.opengl.GLSurfaceView;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Vibrator;
+import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.Log;
 
-import com.mapzen.tangram.ConfigChooser;
+import com.mapzen.tangram.CameraPosition;
+import com.mapzen.tangram.MapChangeListener;
+import com.mapzen.tangram.networking.HttpHandler;
 import com.mapzen.tangram.LngLat;
 import com.mapzen.tangram.MapController;
 import com.mapzen.tangram.MapView;
 
-import com.mapzen.tangram.SceneError;
 import com.mapzen.tangram.TouchInput;
+import com.mapzen.tangram.viewholder.GLViewHolderFactory;
+import com.rareventure.android.AndroidPreferenceSet;
 import com.rareventure.gps2.R;
 import com.rareventure.android.SuperThread;
 import com.rareventure.android.Util;
@@ -47,13 +50,13 @@ import com.rareventure.gps2.GTG;
 import com.rareventure.gps2.database.cache.AreaPanel;
 import com.rareventure.gps2.database.cache.AreaPanelSpaceTimeBox;
 
-public class OsmMapView extends MapView
-{
+public class OsmMapView extends MapView implements MapView.MapReadyCallback {
 	private static final float ZOOM_STEP = 1.5f;
 	private static final int ZOOM_EASE_MS = 500;
 	private static final int PAN_EASE_MS = 500;
 	private static final int AUTOZOOM_PAN_EASE_MS = 1000;
 	private static final int AUTOZOOM_ZOOM_EASE_MS = 1000;
+	private static final int CAMERA_FLY_SPEED = 1000;
 	private ArrayList<GpsOverlay> overlays = new ArrayList<GpsOverlay>();
 
 	/**
@@ -82,8 +85,6 @@ public class OsmMapView extends MapView
 
 	private OsmMapGpsTrailerReviewerMapActivity activity;
 
-	private Handler notifyScreenChangeHandler = new Handler();
-
 	/**
 	 * Center of screen in pixels
 	 */
@@ -104,21 +105,24 @@ public class OsmMapView extends MapView
 	 * would start the screen in motion, and when the screen has stopped, we turn off our
 	 * polling.
 	 */
-	private Runnable notifyScreenChangeRunnable = new Runnable() {
-		LngLat lastP1 = new LngLat(), lastP2 = new LngLat();
-		PointF p = new PointF();
+	private MapChangeListener mapChangeListener = new MapChangeListener() {
+		@Override
+		public void onViewComplete() {
+
+		}
 
 		@Override
-		public void run() {
-//			p.x = 0;
-//			p.y = 0;
-//			LngLat p1 = mapController.screenPositionToLngLat(p);
-//			p.x = windowWidth;
-//			p.y = pointAreaHeight;
-//			LngLat p2 = mapController.screenPositionToLngLat(p);
+		public void onRegionWillChange(boolean animated) {
 
-			//we normalize because mapcontroller lovingly returns values outside of -180/180 longitude
-			//if user wraps world while scrolling
+		}
+
+		@Override
+		public void onRegionIsChanging() {
+
+		}
+
+		@Override
+		public void onRegionDidChange(boolean animated) {
 			LngLat p1 = Util.normalizeLngLat(mapController.screenPositionToLngLat(new PointF(0,0)));
 			LngLat p2 = Util.normalizeLngLat(mapController.screenPositionToLngLat(new PointF(windowWidth, pointAreaHeight)));
 
@@ -144,48 +148,32 @@ public class OsmMapView extends MapView
 			updateScaleWidget();
 
 			notifyOverlayScreenChanged();
-
-			//if we haven't moved since our last run
-			//note that we place this check after we notify, so that if we are queued,
-			//we'll always redraw once no matter what. (used by redrawMap())
-			if(p1.equals(lastP1) && p2.equals(lastP2))
-				return;
-
-			lastP1 = p1;
-			lastP2 = p2;
-
-			//we keep queuing as long as there is a change
-			//we need to time them out, as to not waste resources, hence we use a handler and delay
-			//the next call
-			notifyScreenChangeHandler.postDelayed(
-					notifyScreenChangeHandlerRunnable
-				, 250);
 		}
-
 	};
 
-	@Override
-	protected void configureGLSurfaceView() {
-		//we override this method so we can create a special glsurfaceview that
-		//can provide its onTouchListener. This way we can override the ontouchlistener
-		//to provide different functionality for long press, without altering the original
-		//tangram library (which is a very big pain)
-		glSurfaceView = new MyGLSurfaceView(getContext());
-		glSurfaceView.setEGLContextClientVersion(2);
-		glSurfaceView.setPreserveEGLContextOnPause(true);
-		glSurfaceView.setEGLConfigChooser(new ConfigChooser(8, 8, 8, 0, 16, 8));
-		addView(glSurfaceView);
-	}
 
-	//used to space out our checks for the map position
-	private Runnable notifyScreenChangeHandlerRunnable =
-		new Runnable() {
-			@Override
-			public void run() {
-				mapController.queueEvent(notifyScreenChangeRunnable);
-			}
-	};
+//
+//			new Runnable() {
+//		LngLat lastP1 = new LngLat(), lastP2 = new LngLat();
+//		PointF p = new PointF();
+//
+//		@Override
+//		public void run() {
+////			p.x = 0;
+////			p.y = 0;
+////			LngLat p1 = mapController.screenPositionToLngLat(p);
+////			p.x = windowWidth;
+////			p.y = pointAreaHeight;
+////			LngLat p2 = mapController.screenPositionToLngLat(p);
+//
+//			//we normalize because mapcontroller lovingly returns values outside of -180/180 longitude
+//			//if user wraps world while scrolling
+//		}
+//
+//	};
+
 	private int windowHeight;
+	private Preferences.MapStyle lastLoadedSceneFile;
 
 //	private MultiTouchController<OsmMapView> multiTouchController = new MultiTouchController<OsmMapView>(this);
 
@@ -198,11 +186,6 @@ public class OsmMapView extends MapView
 		super.onCreate(savedInstanceState);
 	}
 
-	@Override
-	protected MapController getMapInstance() {
-		return new MyMapController(glSurfaceView);
-	}
-
 	/**
 	 * Must be called after all addOverlay() calls
      */
@@ -211,10 +194,7 @@ public class OsmMapView extends MapView
 
 		this.activity = activity;
 
-		//this initializes the mapController protected variable
-		getMap(mySceneLoadListener);
-
-		mapController.loadSceneFile("map_style.yaml");
+		getMapAsync(this);
 	}
 
 	/**
@@ -262,37 +242,25 @@ public class OsmMapView extends MapView
 			scaleWidget.change((float) (1./metersToPixels()));
 	}
 
+	private CameraPosition tmpCamPos = new CameraPosition();
+
 	public void zoomIn() {
-		float newZoom = mapController.getZoom() + ZOOM_STEP;
-
-		mapController.setZoomEased(newZoom,ZOOM_EASE_MS);
-		notifyScreenMoved();
-	}
-
-	private void notifyScreenMoved() {
-		//this makes our code that checks for a screen change
-		//we put a delay in there because we often do animated changes,
-		//and if we run our checker too soon, it will compare the last
-		//screen change to the current and determine that we've stopped,
-		//when actually we haven't started moving yet
-		notifyScreenChangeHandler.postDelayed(
-				notifyScreenChangeHandlerRunnable
-				, ZOOM_EASE_MS/2);
+		mapController.getCameraPosition(tmpCamPos);
+		tmpCamPos.zoom += ZOOM_STEP;
+		mapController.flyToCameraPosition(tmpCamPos, CAMERA_FLY_SPEED, null);
 	}
 
 	public void zoomOut() {
-		float newZoom = mapController.getZoom() - ZOOM_STEP;
-
-		mapController.setZoomEased(newZoom,ZOOM_EASE_MS);
-		notifyScreenMoved();
+		mapController.getCameraPosition(tmpCamPos);
+		tmpCamPos.zoom -= ZOOM_STEP;
+		mapController.flyToCameraPosition(tmpCamPos, CAMERA_FLY_SPEED, null);
 	}
 
 	/**
-	 * Redraws the map for a change of points displayed or screen
+	 * Redraws the map for a change of points displayed or screen (such as a timeline movement)
 	 */
 	public void redrawMap() {
-		if(mapController != null)
-			mapController.queueEvent(notifyScreenChangeRunnable);
+		notifyOverlayScreenChanged();
 	}
 
 	public LngLat getScreenTopLeft() {
@@ -307,8 +275,61 @@ public class OsmMapView extends MapView
 		return mapController;
 	}
 
+	@Override
+	public void onMapReady(@Nullable MapController mapController) {
+		loadSceneFileIfNecessary();
+	}
+
+	private void loadSceneFileIfNecessary() {
+		if(lastLoadedSceneFile != prefs.mapStyle) {
+			mapController.loadSceneFile(prefs.mapStyle.fn);
+			lastLoadedSceneFile = prefs.mapStyle;
+		}
+	}
+
 	public static class Preferences implements AndroidPreferences
 	{
+		public static enum MapStyle {
+			BUBBLE_WRAP (R.string.BUBBLE_WRAP_MAP_STYLE_DESC, "bubble_wrap_style.yaml"),
+			CINNABAR (R.string.CINNABAR_MAP_STYLE_DESC, "cinnabar_style.yaml"),
+			REFILL (R.string.REFILL_MAP_STYLE_DESC, "refill_style.yaml"),
+			//SDK_DEFAULT (R.string.SDK_DEFAULT_MAP_STYLE_DESC, "sdk_default_style.yaml"),
+			TRON (R.string.TRON_MAP_STYLE_DESC, "tron_style.yaml"),
+			WALKABOUT (R.string.WALKABOUT_MAP_STYLE_DESC, "walkabout_style.yaml");
+
+			private final int r;
+			public String fn;
+
+			private MapStyle(int r, String fn)
+			{
+				this.r = r;
+				this.fn = fn;
+			}
+
+			public static String [] entryNames(Context c) {
+				MapStyle [] ms = MapStyle.values();
+				String[] res = new String[ms.length];
+				for(int i = 0; i < ms.length; i++)
+				{
+					res[i] = c.getResources().getString(ms[i].r);
+				}
+
+				return res;
+			}
+
+			public static String [] entryValues(Context c) {
+				MapStyle [] ms = MapStyle.values();
+				String[] entryNames = new String[ms.length];
+				for(int i = 0; i < ms.length; i++)
+				{
+					entryNames[i] = ms[i].toString();
+				}
+
+				return entryNames;
+			}
+		}
+
+		public MapStyle mapStyle = MapStyle.CINNABAR;
 	}
 
 	public void setScaleWidget(MapScaleWidget scaleWidget) {
@@ -349,7 +370,7 @@ public class OsmMapView extends MapView
 	 * that the given bottom will be placed above the time view and the zoom buttons.
      */
 	public void panAndZoom(int minX, int minY, int maxX, int maxY) {
-		float currZoom = mapController.getZoom();
+		mapController.getCameraPosition(tmpCamPos);
 
 		LngLat tl = Util.normalizeLngLat(mapController.screenPositionToLngLat(new PointF(0,0)));
 		LngLat br = Util.normalizeLngLat(mapController.screenPositionToLngLat(new PointF(windowWidth,windowHeight)));
@@ -370,33 +391,32 @@ public class OsmMapView extends MapView
 		);
 
 		//mapzen uses 2**(zoom) for zoom level, so we have to convert to it
-		float newZoom = (float) (currZoom + Math.log(zoomMultiplier)/Math.log(2));
+		tmpCamPos.zoom = (float) (tmpCamPos.zoom + Math.log(zoomMultiplier)/Math.log(2));
 
-		LngLat newPos = new LngLat(
-				AreaPanel.convertXToLon((maxX-minX)/2+minX),
-				AreaPanel.convertYToLat((maxY-minY)/2+minY)
-		);
+		tmpCamPos.longitude = AreaPanel.convertXToLon((maxX-minX)/2+minX);
+		tmpCamPos.latitude = AreaPanel.convertYToLat((maxY-minY)/2+minY);
 
-		mapController.setPositionEased(newPos,AUTOZOOM_PAN_EASE_MS);
-		mapController.setZoomEased(newZoom,AUTOZOOM_ZOOM_EASE_MS);
-
-		notifyScreenMoved();
+		mapController.flyToCameraPosition(tmpCamPos, CAMERA_FLY_SPEED, null);
 	}
 
 	public void panAndZoom2(double lon, double lat, float zoom) {
 		if(mapController == null)
 			return;
 
-		LngLat newPos = new LngLat(lon, lat);
+		mapController.getCameraPosition(tmpCamPos);
+		tmpCamPos.longitude = lon;
+		tmpCamPos.latitude = lat;
+		tmpCamPos.zoom = zoom;
 
-		mapController.setPositionEased(newPos,AUTOZOOM_PAN_EASE_MS);
-		mapController.setZoomEased(zoom,AUTOZOOM_ZOOM_EASE_MS);
-
-		notifyScreenMoved();
+		mapController.flyToCameraPosition(tmpCamPos, CAMERA_FLY_SPEED, null);
 	}
 
 	public void panTo(LngLat loc) {
-		mapController.setPositionEased(loc,AUTOZOOM_PAN_EASE_MS);
+		mapController.getCameraPosition(tmpCamPos);
+		tmpCamPos.longitude = loc.longitude;
+		tmpCamPos.latitude = loc.latitude;
+
+		mapController.flyToCameraPosition(tmpCamPos, CAMERA_FLY_SPEED, null);
 	}
 
 
@@ -420,6 +440,11 @@ public class OsmMapView extends MapView
 
 	public void onResume() {
 		super.onResume();
+
+		//if the user changed the map style in settings, we want to reflect it right away
+		//even if the osmmapview wasn't destroyed
+		if(mapController != null)
+			loadSceneFileIfNecessary();
 		for(GpsOverlay o : overlays)
 			o.onResume();
 	}
@@ -434,98 +459,25 @@ public class OsmMapView extends MapView
 	public void setZoomCenter(int x, int y) {
 		centerX = x;
 		centerY = y;
-		//TODO 2 FIXME
-//		activity.gpsTrailerOverlay.setZoomCenter(x,y);
 	}
 
-//	@Override
-//	public OsmMapView getDraggableObjectAtPoint(PointInfo touchPoint) {
-//		return this;
-//	}
-//
-//	@Override
-//	public boolean pointInObjectGrabArea(PointInfo touchPoint, OsmMapView obj) {
-//		return false;
-//	}
-//
-//	@Override
-//	public void getPositionAndScale(OsmMapView obj,
-//			PositionAndScale objPosAndScaleOut) {
-//		objPosAndScaleOut.set(-(float)x, -(float)y, true, zoom8bitPrec,
-//				false, 1,1,false,0);
-//
-//	}
-//
-//	@Override
-//	public boolean setPositionAndScale(OsmMapView obj,
-//			PositionAndScale newObjPosAndScale, PointInfo touchPoint) {
-//		long newZoom8BitPrec = (int) newObjPosAndScale.getScale();
-//
-//		if(newZoom8BitPrec != zoom8bitPrec)
-//		{
-//			if(newZoom8BitPrec < OsmMapGpsTrailerReviewerMapActivity.prefs.maxZoom &&
-//					newZoom8BitPrec > OsmMapGpsTrailerReviewerMapActivity.prefs.minZoom)
-//			{
-//				x = (-newObjPosAndScale.getXOff() + centerX) *(newZoom8BitPrec)/(zoom8bitPrec) - centerX;
-//				y = (-newObjPosAndScale.getYOff() + centerY) *(newZoom8BitPrec)/(zoom8bitPrec) - centerY;
-//
-//				zoom8bitPrec = newZoom8BitPrec;
-//
-////				Log.d("GTG", "xxxxxxx = "
-////						+ newZoom8BitPrec + " , "
-////						+ zoom8bitPrec + " : "
-////						+ newObjPosAndScale.getXOff() + " - " + newObjPosAndScale.getYOff());
-//
-//			}
-//
-//			activity.toolTip.setAction(UserAction.MAP_VIEW_PINCH_ZOOM);
-//		}
-//		else
-//		{
-//			x = -newObjPosAndScale.getXOff();
-//			y = -newObjPosAndScale.getYOff();
-//
-//			activity.toolTip.setAction(UserAction.MAP_VIEW_MOVE);
-//		}
-//
-//		invalidate();
-//
-//		updateScaleWidget();
-//		activity.updatePlusMinusButtonsForNewZoom();
-//		return false;
-//	}
-//
-//	@Override
-//	public void selectObject(OsmMapView obj, PointInfo touchPoint) {
-//
-//	}
 
 	public void initAfterLayout() {
 		windowWidth = getWidth();
 		this.pointAreaHeight = activity.findViewById(R.id.main_window_area).getBottom();
 		windowHeight = getHeight();
-
 //		memoryCache.setWidthAndHeight(getWidth(), getHeight());
 	}
 
-		private MapController.SceneLoadListener mySceneLoadListener = new MapController.SceneLoadListener() {
+	@Override
+	protected void	onMapInitOnUIThread(MapController controller, HttpHandler handler, GLViewHolderFactory viewHolderFactory, MapView.MapReadyCallback callback) {
+		super.onMapInitOnUIThread(controller,handler,viewHolderFactory,callback);
+		mapController.setMapChangeListener(mapChangeListener);
+		((MyMapController)mapController).setupTouchListener();
 
-			public boolean calledBefore;
+		File cacheDir = new File(GTG.getExternalStorageDirectory().toString()+"/tile_cache2");
 
-			@Override
-			public void onSceneReady(int sceneId, SceneError sceneError) {
-				if(calledBefore) return; //TODO 2: this is a hack
-				calledBefore = true;
-				Log.e(GTG.TAG, "HOW OFTEN DO YOU CALL ME, HMM???");
-
-				//delete the old cache if it exists
-				//TODO 3: eventually remove this
-				File oldCache = new File(GTG.getExternalStorageDirectory().toString()+"/tile_cache");
-				if(oldCache.exists())
-					Util.deleteRecursive(new File(GTG.getExternalStorageDirectory().toString()+"/tile_cache"));
-				File cacheDir = new File(GTG.getExternalStorageDirectory().toString()+"/tile_cache2");
-
-				cacheDir.mkdirs();
+		cacheDir.mkdirs();
 
 //				Log.d(GTG.TAG, "cacheDir is "+cacheDir);
 
@@ -534,118 +486,119 @@ public class OsmMapView extends MapView
 //
 //				mapController.setHttpHandler(mapHandler);
 
-				mapController.setShoveResponder(new TouchInput.ShoveResponder() {
-					@Override
-					public boolean onShove(float distance) {
-						//this rotates the screen downwards for more 3d look. We don't allow it currently
-						//because it would mess up our calculations as to what points to
-						//display
-						//TODO 3 allow shoving
-						return true;
-					}
-				});
+		TouchInput touchInput = mapController.getTouchInput();
 
-				mapController.setRotateResponder(new TouchInput.RotateResponder() {
-					@Override
-					public boolean onRotate(float x, float y, float rotation) {
-						//this rotates the screen to change the northern direction. We don't allow it currently
-						//because it would mess up our calculations as to what points to
-						//display
-						//TODO 3 allow rotation
-						return true;
-					}
-				});
-
-				mapController.setPanResponder(new TouchInput.PanResponder() {
-					@Override
-					public boolean onPan(float startX, float startY, float endX, float endY) {
-//						if(duringLongPress)
-//						{
-//							sasRectangleManager.updateRectangleEndPoint(endX, endY);
-//						}
-						Log.d(GTG.TAG,String.format("panning sx %f sy %f ex %f ey %f",startX, startY,
-								endX, endY));
-						mapController.queueEvent(notifyScreenChangeRunnable);
-						return false;
-					}
-
-					@Override
-					public boolean onFling(float posX, float posY, float velocityX, float velocityY) {
-						Log.d(GTG.TAG,String.format("flinging px %f py %f vx %f vy %f",
-								posX, posY, velocityX, velocityY));
-
-						mapController.queueEvent(notifyScreenChangeRunnable);
-						return false;
-					}
-				});
-
-				mapController.setScaleResponder(new TouchInput.ScaleResponder() {
-					@Override
-					public boolean onScale(float x, float y, float scale, float velocity) {
-						Log.d(GTG.TAG,String.format("scaling x %f y %f sx %f sy %f",
-								x, y, scale, velocity));
-						mapController.queueEvent(notifyScreenChangeRunnable);
-						return false;
-					}
-				});
-
-				mapController.setTapResponder(new TouchInput.TapResponder() {
-					@Override
-					public boolean onSingleTapUp(float x, float y) {
-						return false;
-					}
-
-					@Override
-					public boolean onSingleTapConfirmed(float x, float y) {
-						for(GpsOverlay overlay : overlays)
-						{
-							overlay.onTap(x,y);
-						}
-						return false;
-					}
-				});
-
-				((MyMapController)mapController).setLongPressResponderExt(new MyTouchInput.LongPressResponder() {
-					public float startX;
-					public float startY;
-
-					public void onLongPress(float x, float y) {
-						// Get instance of Vibrator from current Context
-						Vibrator v = (Vibrator) activity.getSystemService(Context.VIBRATOR_SERVICE);
-
-						// Vibrate for a short time
-						v.vibrate(50);
-
-						startX = x;
-						startY = y;
-					}
-
-					@Override
-					public void onLongPressUp(float x, float y) {
-						for(GpsOverlay overlay : overlays)
-						{
-							overlay.onLongPressEnd(startX, startY, x,y);
-						}
-					}
-
-					@Override
-					public boolean onLongPressPan(float movementStartX, float movementStartY, float endX, float endY) {
-						for(GpsOverlay overlay : overlays)
-						{
-							overlay.onLongPressMove(startX, startY, endX,endY);
-						}
-						return false;
-					}
-				});
-
-				for(GpsOverlay o : overlays)
-					o.startTask(mapController);
-
-				panAndZoom2(OsmMapGpsTrailerReviewerMapActivity.prefs.lastLon,
-						OsmMapGpsTrailerReviewerMapActivity.prefs.lastLat,
-						OsmMapGpsTrailerReviewerMapActivity.prefs.lastZoom);
+		//this rotates the screen downwards for more 3d look. We don't allow it currently
+		//because it would mess up our calculations as to what points to
+		//display
+		//TODO 3 allow shoving
+		touchInput.setShoveResponder(new TouchInput.ShoveResponder() {
+			@Override
+			public boolean onShoveBegin() {
+				return true;
 			}
-		};
+
+			@Override
+			public boolean onShove(float distance) {
+				return true;
+			}
+
+			@Override
+			public boolean onShoveEnd() {
+				return true;
+			}
+		});
+
+		touchInput.setRotateResponder(new TouchInput.RotateResponder() {
+			@Override
+			public boolean onRotateBegin() {
+				return true;
+			}
+
+			@Override
+			public boolean onRotate(float x, float y, float rotation) {
+				return true;
+			}
+
+			@Override
+			public boolean onRotateEnd() {
+				return true;
+			}
+		});
+
+		touchInput.setTapResponder(new TouchInput.TapResponder() {
+			@Override
+			public boolean onSingleTapUp(float x, float y) {
+				return false;
+			}
+
+			@Override
+			public boolean onSingleTapConfirmed(float x, float y) {
+				for(GpsOverlay overlay : overlays)
+				{
+					overlay.onTap(x,y);
+				}
+				return false;
+			}
+		});
+
+		touchInput.setDoubleTapResponder(new TouchInput.DoubleTapResponder() {
+			@Override
+			public boolean onDoubleTap(float x, float y) {
+				Log.d(GTG.TAG, "onDoubleTap "+x+" "+y);
+				return true;
+			}
+		});
+
+
+		((MyMapController)mapController).setLongPressResponderExt(new MyTouchInput.LongPressResponder() {
+			public float startX;
+			public float startY;
+
+			public void onLongPress(float x, float y) {
+				// Get instance of Vibrator from current Context
+				Vibrator v = (Vibrator) activity.getSystemService(Context.VIBRATOR_SERVICE);
+
+				// Vibrate for a short time
+				v.vibrate(50);
+
+				startX = x;
+				startY = y;
+			}
+
+			@Override
+			public void onLongPressUp(float x, float y) {
+				for(GpsOverlay overlay : overlays)
+				{
+					overlay.onLongPressEnd(startX, startY, x,y);
+				}
+			}
+
+			@Override
+			public boolean onLongPressPan(float movementStartX, float movementStartY, float endX, float endY) {
+				for(GpsOverlay overlay : overlays)
+				{
+					overlay.onLongPressMove(startX, startY, endX,endY);
+				}
+				return false;
+			}
+		});
+
+		for(GpsOverlay o : overlays)
+			o.startTask(mapController);
+
+		panAndZoom2(OsmMapGpsTrailerReviewerMapActivity.prefs.lastLon,
+				OsmMapGpsTrailerReviewerMapActivity.prefs.lastLat,
+				OsmMapGpsTrailerReviewerMapActivity.prefs.lastZoom);
+
+	}
+
+	@Override
+	protected MapController getMapInstance() {
+		//We do this because we want to use our own TouchInput (MyTouchInput) which can handle long
+		// press pans correctly
+		return new MyMapController(this.getContext());
+	}
 
 
 }

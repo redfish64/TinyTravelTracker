@@ -1,0 +1,733 @@
+layers:
+    places:
+        data: { source: mapzen, layer: places }
+        filter:
+            name: true
+        draw:
+            mapzen_icon_library:
+                visible: false
+                text:
+                    text_source: global.ux_language_text_source
+                    visible: false
+                    buffer: 3px
+                    font:
+                        family: Play
+                        fill: white
+            # NOTE: This is a hack for localities because of an icon & text bug, see note below
+            text-blend-order:
+                text_source: global.ux_language_text_source
+                visible: false    # labels are enabled by each layer below
+                buffer: 3px
+                font:
+                    family: Play
+                    fill: white
+            # END NOTE
+
+        country:
+            filter:
+                kind: country
+                $zoom: { min: 3, max: 9 }
+            draw:
+                text-blend-order:
+                    priority: 3
+                    visible: global.text_visible_admin
+                    text_source: global.ux_language_text_source
+                    font:
+                        family: Orbitron
+                        fill: [0.594,0.990,0.944]
+            country-z2-3:
+                filter:
+                    $zoom: [2,3]
+                draw:
+                    text-blend-order:
+                        priority: 10
+                        buffer: 10px
+                        font:
+                            size: 11px
+                early-ones-z2:
+                    filter:
+                        $zoom: [2]
+                        not: { name: [United States of America,Brasil,中华人民共和国,Россия,Canada,Kalaallit Nunaat,Ísland,Australia,India,日本,Guam,Indonesia,South Africa,مصر,Nigeria,Kenya] }
+                    draw:
+                        text-blend-order:
+                            visible: false
+                early-ones-z3:
+                    filter:
+                        $zoom: [3]
+                        name: [Nederland,Luxembourg,Liechtenstein,San Marino,Civitatis Vaticanæ,Crna Gora,Македонија,The Gambia,Burundi,Swaziland,الإمارات العربية المتحدة,العراق,Singapore,El Salvador,Belize,Trinidad and Tobago, Saint Lucia, Montserrat,Anguilla,República Dominicana,Bahamas,British Virgin Islands,Antigua and Barbuda,Grenada,Sint Maarten,Saint Kitts and Nevis,Cayman Islands,België - Belgique - Belgien,Deutschland,España]
+                    draw:
+                        text-blend-order:
+                            visible: false
+            country-z4:
+                filter:
+                    $zoom: [4]
+                draw:
+                    text-blend-order:
+                        buffer: 10px
+                        priority: 8
+                        font:
+                            size: 14px
+                early-ones-z4:
+                    filter:
+                        name: [Nederland,Luxembourg,Liechtenstein,San Marino,Civitatis Vaticanæ,Crna Gora,Македонија,The Gambia,Burundi,Swaziland,الإمارات العربية المتحدة,العراق,Singapore,El Salvador,Belize,Trinidad and Tobago, Saint Lucia, Montserrat,Anguilla,República Dominicana,Bahamas,British Virgin Islands,Antigua and Barbuda,Grenada,Sint Maarten,Saint Kitts and Nevis,Cayman Islands,België - Belgique - Belgien,Deutschland,España,Magyarország,Österreich,Polska,Хуссар Ирыстон,Аҧсны - Абхазия]
+                    draw:
+                        text-blend-order:
+                            visible: false
+            country-z5:
+                filter:
+                    $zoom: [5]
+                draw:
+                    text-blend-order:
+                        priority: 8
+                        font:
+                            size: 16px
+                early-ones-z5:
+                    filter:
+                        # South Ossetia and Abkhazia aren't countries (they are disputed areas)
+                        - name: [Luxembourg,Liechtenstein,San Marino,Civitatis Vaticanæ,El Salvador,Belize,België - Belgique - Belgien,"Хуссар Ирыстон - Южная Осетия","Хуссар Ирыстон","Аҧсны - Абхазия","Լեռնային Ղարաբաղի Հանրապետությու (Nagorno-Karabakh Republic)"]
+                        - population: { max: 5000000 }
+                    draw:
+                        text-blend-order:
+                            visible: false
+            country-z6:
+                filter:
+                    $zoom: [6]
+                draw:
+                    text-blend-order:
+                        priority: 8
+                        font:
+                            size: 19px
+                small-ones-z6:
+                    filter:
+                        # South Ossetia and Abkhazia aren't countries (they are disputed areas)
+                        - name: [Luxembourg,Liechtenstein,San Marino,Civitatis Vaticanæ,België - Belgique - Belgien,"Хуссар Ирыстон - Южная Осетия","Хуссар Ирыстон","Аҧсны - Абхазия","Լեռնային Ղարաբաղի Հանրապետությու (Nagorno-Karabakh Republic)"]
+                        - population: { max: 5000000 }
+                    draw:
+                        text-blend-order:
+                            visible: false
+            country-z7:
+                filter:
+                    $zoom: { min: 7, max: 9 }
+                draw:
+                    text-blend-order:
+                        font:
+                            size: 19px
+                small-ones-z7:
+                    filter:
+                        $zoom: [7]
+                        # South Ossetia and Abkhazia aren't countries (they are disputed areas)
+                        name: [Liechtenstein,San Marino,Civitatis Vaticanæ,"Хуссар Ирыстон - Южная Осетия","Хуссар Ирыстон","Аҧсны - Абхазия","Լեռնային Ղարաբաղի Հանրապետությու (Nagorno-Karabakh Republic)"]
+                    draw:
+                        text-blend-order:
+                            visible: false
+                small-pop:
+                    filter:
+                        - population: { max: 5000000 }
+                    draw:
+                        text-blend-order:
+                            priority: 30
+                            font:
+                                size: 12px
+
+        region:
+            filter:
+                kind: region
+                $zoom: { min: 5, max: 9 }
+            draw:
+                text-blend-order:
+                    priority: 14
+                    visible: false
+                    text_source: global.ux_language_text_source_short
+                    font:
+                        family: Orbitron
+                        fill: [0.570,0.632,0.740]
+            region-z5:
+                filter:
+                    $zoom: [5]
+                    not: { name: [Western Cape,Eastern Cape,Northern Cape,North West,Limpopo,KwaZulu-Natal,Hamburg,Freie und Hansestadt Hamburg,Neuchâtel,Nordrhein-Westfalen,Haute-Normandie,Baden-Württemberg,Bayern,Sachsen-Anhalt,Berlin,Mecklenburg-Vorpommern,Schleswig-Holstein,Brandenburg,Niedersachsen,Saarland,Thüringen,Hessen,Sachsen] }
+                draw:
+                    text-blend-order:
+                        visible: global.text_visible_admin
+                        font:
+                            size: 15px
+            region-z6:
+                filter:
+                    $zoom: [6]
+                    not: { name: [Western Cape,Eastern Cape,Northern Cape,North West,Limpopo,KwaZulu-Natal,Hamburg,Freie und Hansestadt Hamburg,Neuchâtel,Nordrhein-Westfalen,Haute-Normandie,Baden-Württemberg,Bayern,Sachsen-Anhalt,Berlin,Mecklenburg-Vorpommern,Schleswig-Holstein,Brandenburg,Niedersachsen,Saarland,Thüringen,Hessen,Sachsen] }
+                draw:
+                    text-blend-order:
+                        visible: global.text_visible_admin
+                        font:
+                            size: 16px
+                            transform: uppercase
+            region-z7-z8:
+                filter: { $zoom: [7,8] }
+                draw:
+                    text-blend-order:
+                        visible: global.text_visible_admin
+                        text_source: global.ux_language_text_source_short_proxy_name
+                        font:
+                            size: 18px
+                            transform: uppercase
+                pesky-z7:
+                    filter:
+                        $zoom: [7]
+                        name: [Western Cape,Eastern Cape,Northern Cape,North West,Limpopo,KwaZulu-Natal,Hamburg,Freie und Hansestadt Hamburg,Neuchâtel,Nordrhein-Westfalen,Haute-Normandie,Baden-Württemberg,Bayern,Sachsen-Anhalt,Berlin,Mecklenburg-Vorpommern,Schleswig-Holstein,Brandenburg,Niedersachsen,Saarland,Thüringen,Hessen,Sachsen]
+                    draw:
+                        text-blend-order:
+                            visible: false
+                abbrev-small-ones-z7:
+                    filter:
+                        $zoom: [7]
+                        name: [Delaware,New Jersey,Connecticut,Rhode Island,Massachusetts,New Hampshire,Vermont]
+                    draw:
+                        text-blend-order:
+                            text_source: global.ux_language_text_source_abbreviation
+                region-z8:
+                    filter:
+                        $zoom: [8]
+                    draw:
+                        text-blend-order:
+                            text_source: global.ux_language_text_source
+                    no-pop:
+                        filter:
+                            any:
+                                - population: false
+                                - population: { max: 1000000 }
+                        draw:
+                            text-blend-order:
+                                font:
+                                    size: 12px
+
+        populated-places:
+            filter:
+                kind: locality
+            draw:
+                mapzen_icon_library:
+                    visible: global.icon_visible_populated_places
+                    size: [[10,4px],[11,0px]]
+                    sprite: townspot-xs-rev
+                    buffer: 8px
+                    priority: 30
+                    text:
+                        visible: global.text_visible_populated_places
+                        buffer: 3px
+                        font:
+                            family: Play
+                            size: [[5,9px],[8,10px],[12,11px]]
+                text-blend-order:
+                    visible: global.text_visible_populated_places
+                    buffer: 10px
+                    font:
+                        family: Play
+                        size: [[5,9px],[8,10px],[12,11px]]
+
+            #
+            # NOTE: you'd think no-townspot would be the way to go, but icons with size 0px seems to have a bug to also hide the text :(
+            #
+            # no-townspot:
+            #     filter: { $zoom: { min: 11 } }
+            #     draw:
+            #         mapzen_icon_library:
+            #             size: 0px
+            #             text:
+            #                 anchor: center
+            #
+            # NOTE: So instead we play a shell game with symbolizers per zoom
+            #
+            _icons_later:
+                filter: { $zoom: { min: 11 } }
+                draw:
+                    mapzen_icon_library:
+                        visible: false
+                    text-blend-order:
+                        visible: global.text_visible_populated_places
+
+            _text_early:
+                filter: { $zoom: { max: 11 } }
+                draw:
+                    text-blend-order:
+                        visible: false
+            # END HACK
+
+            z8-50k-below:
+                filter: { $zoom: [8,9], population: { min: 10000, max: 50000 } }
+                draw:
+                    mapzen_icon_library:
+                        buffer: 25px
+                        #color: red
+                        #visible: false
+            z9-10k-below:
+                filter: { $zoom: [8,9], population: { max: 10000 } }
+                draw:
+                    mapzen_icon_library:
+                        buffer: 18px
+                        #color: blue
+                        #visible: false
+            z9-no-population:
+                filter: { $zoom: [8,9], population: false }
+                draw:
+                    mapzen_icon_library:
+                        buffer: 10px
+                        #color: yellow
+                        #visible: false
+
+            sorry-denver:
+                filter:
+                    $zoom: [3]
+                    name: [Denver]
+                draw:
+                    mapzen_icon_library:
+                        visible: false
+
+            # HACK
+            # NOTE: These should use icon: buffer instead of going visible: false, but there are problems using icon here :(
+            # This fixes Paris area, but causes problems for small places in the USA eg Table Bluff near Eureka, California.
+            funky-village:
+                filter: { $zoom: [11], population: { max: 1000 }, kind_detail: [village] }
+                draw:
+                    text-blend-order:
+                        visible: false
+            funky-isolated_dwelling:
+                filter: { $zoom: [13], kind_detail: [isolated_dwelling] }
+                draw:
+                    text-blend-order:
+                        visible: false
+            hamlet:
+                filter: { $zoom: [13], kind_detail: hamlet }
+                draw:
+                    text-blend-order:
+                        visible: false
+            # END HACK
+
+            # someone in London and Salt Lake City thought neighbourhoods should be tagged place: locality
+            # They were wrong
+            funky-fake-neighbourhoods:
+                filter: { $zoom: { min: 13 }, kind_detail: [locality] }
+                draw:
+                    text-blend-order:
+                        visible: false
+
+
+            population-10m-up:
+                filter:
+                    population: { min: 10000000 }
+                draw:
+                    mapzen_icon_library:
+                        size: [[4,5px],[8,6px],[9,0px]]
+                        sprite: townspot-m-rev
+                        priority: 6
+                        text:
+                            font:
+                                size: [[2,11px],[6,17px],[8,21px],[12,24px],[13,0px]]
+                    text-blend-order:
+                        priority: 6
+                        font:
+                            size: [[2,11px],[6,17px],[8,21px],[12,24px],[13,0px]]
+                capital:
+                    filter: { country_capital: true, $zoom: { min: 5 } }
+                    draw:
+                        mapzen_icon_library:
+                            size: [[10,8px],[11,0px]]
+                            sprite: capital-l
+                            priority: 5
+                        text-blend-order:
+                            priority: 5
+            population-5m-10m:
+                filter:
+                    population: { min: 5000000, max: 10000000 }
+                draw:
+                    mapzen_icon_library:
+                        size: [[4,5px],[8,6px],[9,0px]]
+                        sprite: townspot-m-rev
+                        priority: 7
+                        text:
+                            font:
+                                size: [[4,10px],[6,16px],[8,19px],[12,22px],[13,0px]]
+                    text-blend-order:
+                        priority: 7
+                        font:
+                            size: [[4,10px],[6,16px],[8,19px],[12,22px],[13,0px]]
+                capital:
+                    filter: { country_capital: true, $zoom: { min: 5 } }
+                    draw:
+                        mapzen_icon_library:
+                            size: [[10,8px],[11,0px]]
+                            sprite: capital-l
+                            priority: 6
+                        text-blend-order:
+                            priority: 6
+            population-1m-5m:
+                filter:
+                    population: { min: 1000000, max: 5000000 }
+                draw:
+                    mapzen_icon_library:
+                        size: [[4,5px],[8,6px],[9,0px]]
+                        sprite: townspot-m-rev
+                        priority: 9
+                        text:
+                            font:
+                                size: [[4,10px],[6,14px],[8,17px],[12,20px],[13,0px]]
+                    text-blend-order:
+                        priority: 9
+                        font:
+                            size: [[4,10px],[6,14px],[8,17px],[12,20px],[13,0px]]
+                capital:
+                    filter: { country_capital: true, $zoom: { min: 5 } }
+                    draw:
+                        mapzen_icon_library:
+                            size: [[10,8px],[11,0px]]
+                            sprite: capital-l
+                            priority: 8
+                        text-blend-order:
+                            priority: 8
+            population-500k-1m:
+                filter:
+                    population: { min: 500000, max: 1000000 }
+                draw:
+                    mapzen_icon_library:
+                        size: [[8,6px],[9,0px]]
+                        sprite: townspot-m-rev
+                        priority: 11
+                        text:
+                            font:
+                                size: [[5,10px],[8,13px],[10,16px],[12,18px],[13,0px]]
+                    text-blend-order:
+                        priority: 11
+                        font:
+                            size: [[5,10px],[8,13px],[10,16px],[12,18px],[13,0px]]
+                capital:
+                    filter: { country_capital: true, $zoom: { min: 5 } }
+                    draw:
+                        mapzen_icon_library:
+                            size: [[10,6px],[11,0px]]
+                            sprite: capital-m
+                            priority: 10
+                        text-blend-order:
+                            priority: 10
+            population-200k-500k:
+                filter:
+                    population: { min: 200000, max: 500000 }
+                draw:
+                    mapzen_icon_library:
+                        size: [[8,6px],[9,6px],[10,6px],[11,0px]]
+                        sprite: townspot-m-rev
+                        priority: 13
+                        text:
+                            font:
+                                size: [[6,10px],[8,13px],[10,15px],[12,17px],[13,0px]]
+                    text-blend-order:
+                        priority: 13
+                        font:
+                            size: [[6,10px],[8,13px],[10,15px],[12,17px],[13,0px]]
+                capital:
+                    filter: { country_capital: true, $zoom: { min: 5 } }
+                    draw:
+                        mapzen_icon_library:
+                            size: [[10,6px],[11,0px]]
+                            sprite: capital-m
+                            priority: 12
+                        text-blend-order:
+                            priority: 12
+            population-100k-200k:
+                filter:
+                    population: { min: 100000, max: 200000 }
+                draw:
+                    mapzen_icon_library:
+                        size: [[8,6px],[9,6px],[10,6px],[11,0px]]
+                        sprite: townspot-m-rev
+                        priority: 15
+                        text:
+                            font:
+                                size: [[6,10px],[8,12px],[14,14px],[15,0px]]
+                    text-blend-order:
+                        priority: 15
+                        font:
+                            size: [[6,10px],[8,12px],[14,14px],[15,0px]]
+                capital:
+                    filter: { country_capital: true, $zoom: { min: 5 } }
+                    draw:
+                        mapzen_icon_library:
+                            size: [[10,6px],[11,0px]]
+                            sprite: capital-m
+                            priority: 14
+                        text-blend-order:
+                            priority: 14
+            population-50k-100k:
+                filter:
+                    population: { min: 50000, max: 100000 }
+                draw:
+                    mapzen_icon_library:
+                        size: [[8,5px],[9,5px],[10,6px],[11,0px]]
+                        sprite: townspot-s-rev
+                        priority: 17
+                        text:
+                            font:
+                                size: [[6,10px],[8,12px],[14,14px],[15,0px]]
+                    text-blend-order:
+                        priority: 17
+                        font:
+                            size: [[6,10px],[8,12px],[14,14px],[15,0px]]
+                capital:
+                    filter: { country_capital: true, $zoom: { min: 5 } }
+                    draw:
+                        mapzen_icon_library:
+                            size: [[10,5px],[11,0px]]
+                            sprite: capital-m
+                            priority: 16
+                        text-blend-order:
+                            priority: 16
+            population-20k-50k:
+                filter:
+                    population: { min: 20000, max: 50000 }
+                draw:
+                    mapzen_icon_library:
+                        size: [[8,5px],[9,5px],[10,5px],[11,0px]]
+                        sprite: townspot-s-rev
+                        priority: 19
+                        text:
+                            font:
+                                size: [[9,10px],[14,12px],[15,0px]]
+                    text-blend-order:
+                        priority: 19
+                        font:
+                            size: [[9,10px],[14,12px],[15,0px]]
+                capital:
+                    filter: { country_capital: true, $zoom: { min: 5 } }
+                    draw:
+                        mapzen_icon_library:
+                            size: [[10,5px],[11,0px]]
+                            sprite: capital-s
+                            priority: 18
+                        text-blend-order:
+                            priority: 18
+            population-10k-20k:
+                filter:
+                    population: { min: 10000, max: 20000 }
+                draw:
+                    mapzen_icon_library:
+                        size: [[8,4px],[9,4px],[10,4px],[11,0px]]
+                        sprite: townspot-xs-rev
+                        priority: 21
+                        text:
+                            font:
+                                size: [[9,10px],[14,12px],[15,0px]]
+                    text-blend-order:
+                        priority: 21
+                        font:
+                            size: [[9,10px],[14,12px],[15,0px]]
+                capital:
+                    filter: { country_capital: true, $zoom: { min: 5 } }
+                    draw:
+                        mapzen_icon_library:
+                            size: [[10,5px],[11,0px]]
+                            sprite: capital-s
+                            priority: 20
+                        text-blend-order:
+                            priority: 20
+            population-5k-10k:
+                filter:
+                    population: { min: 5000, max: 10000 }
+                draw:
+                    mapzen_icon_library:
+                        size: [[8,4px],[9,4px],[10,4px],[11,0px]]
+                        sprite: townspot-xs-rev
+                        priority: 23
+                        text:
+                            font:
+                                size: [[9,10px],[14,12px],[15,0px]]
+                    text-blend-order:
+                        priority: 23
+                        font:
+                            size: [[9,10px],[14,12px],[15,0px]]
+                capital:
+                    filter: { country_capital: true, $zoom: { min: 5 } }
+                    draw:
+                        mapzen_icon_library:
+                            size: [[10,5px],[11,0px]]
+                            sprite: capital-s
+                            priority: 22
+                        text-blend-order:
+                            priority: 22
+            population-2k-5k:
+                filter:
+                    population: { min: 2000, max: 5000 }
+                draw:
+                    mapzen_icon_library:
+                        size: [[8,4px],[9,4px],[10,4px],[11,0px]]
+                        sprite: townspot-xs-rev
+                        priority: 25
+                        text:
+                            font:
+                                size: [[9,10px],[14,12px],[15,0px]]
+                    text-blend-order:
+                        priority: 25
+                        font:
+                            size: [[9,10px],[14,12px],[15,0px]]
+                capital:
+                    filter: { country_capital: true, $zoom: { min: 5 } }
+                    draw:
+                        mapzen_icon_library:
+                            size: [[10,5px],[11,0px]]
+                            sprite: capital-s
+                            priority: 24
+                        text-blend-order:
+                            priority: 24
+            population-1k-2k:
+                filter:
+                    population: { min: 1000, max: 2000 }
+                draw:
+                    mapzen_icon_library:
+                        size: [[8,4px],[9,4px],[10,4px],[11,0px]]
+                        sprite: townspot-xs-rev
+                        priority: 27
+                        text:
+                            font:
+                                size: [[9,10px],[14,12px],[15,0px]]
+                    text-blend-order:
+                        priority: 27
+                        font:
+                            size: [[9,10px],[14,12px],[15,0px]]
+                capital:
+                    filter: { country_capital: true, $zoom: { min: 5 } }
+                    draw:
+                        mapzen_icon_library:
+                            size: [[10,5px],[11,0px]]
+                            sprite: capital-s
+                            priority: 26
+                        text-blend-order:
+                            priority: 26
+            population-200-1k:
+                filter:
+                    population: { min: 200, max: 1000 }
+                draw:
+                    mapzen_icon_library:
+                        size: [[8,4px],[9,4px],[10,4px],[11,0px]]
+                        sprite: townspot-xs-rev
+                        priority: 28
+                        text:
+                            font:
+                                size: [[9,10px],[14,11px],[15,0px]]
+                    text-blend-order:
+                        priority: 28
+                        font:
+                            size: [[9,10px],[14,11px],[15,0px]]
+                capital:
+                    filter: { country_capital: true, $zoom: { min: 5 } }
+                    draw:
+                        mapzen_icon_library:
+                            size: [[10,5px],[11,0px]]
+                            sprite: capital-s
+                            priority: 27
+                        text-blend-order:
+                            priority: 27
+
+
+        neighbourhoods:
+            filter:
+                kind:
+                    - macrohood
+                    - neighbourhood
+                    - borough
+                $zoom: { min: 10 }
+                is_landuse_aoi: false
+            draw:
+                text-blend-order:
+                    visible: false
+                    priority: 29
+                    buffer: 8px
+                    text_wrap: 10
+                    max_lines: 2
+                    font:
+                        family: Audiowide
+                        # fill: [1.00,1.00,1.00]
+                        transform: uppercase
+                        fill: [0.896,0.912,0.935]
+            neighborhood-z11:
+                filter:
+                    $zoom: [11]
+                    min_zoom: [11]
+                    max_zoom: { min: 12 }
+                    #kind_tile_rank: { max: 6 }
+                draw:
+                    text-blend-order:
+                        visible: global.text_visible_neighbourhoods_e
+                        font:
+                            size: 9px
+                            fill: [0.796,0.812,0.835]
+            neighborhood-z12:
+                filter:
+                    $zoom: [12]
+                    min_zoom: [11,12]
+                    max_zoom: { min: 13 }
+                    #kind_tile_rank: { max: 8 }
+                draw:
+                    text-blend-order:
+                        visible: global.text_visible_neighbourhoods_e
+                        font:
+                            size: 9px
+                            fill: [0.846,0.862,0.885]
+            neighborhood-z13:
+                filter:
+                    $zoom: [13]
+                    min_zoom: [11,12,13]
+                    max_zoom: { min: 14 }
+                    kind_tile_rank: { max: 8 }
+                draw:
+                    text-blend-order:
+                        visible: global.text_visible_neighbourhoods_e
+                        font:
+                            size: 10px
+            neighborhood-z14:
+                filter:
+                    $zoom: [14]
+                    min_zoom: [11,12,13,14]
+                    max_zoom: { min: 15 }
+                    kind_tile_rank: { max: 8 }
+                draw:
+                    text-blend-order:
+                        text_wrap: 12
+                        max_lines: 3
+                        visible: global.text_visible_neighbourhoods
+                        font:
+                            size: 11px
+            neighborhood-z15:
+                filter:
+                    $zoom: [15]
+                    min_zoom: [11,12,13,14,15]
+                    max_zoom: { min: 16 }
+                    kind_tile_rank: { max: 8 }
+                draw:
+                    text-blend-order:
+                        text_wrap: 12
+                        max_lines: 4
+                        visible: global.text_visible_neighbourhoods
+                        font:
+                            size: 13px
+                z15-new:
+                    filter:
+                        all:
+                            - min_zoom: 15
+                    draw:
+                        text-blend-order:
+                            priority: 19
+                            font:
+                                size: 10px
+            neighborhood-z16:
+                filter:
+                    $zoom: [16]
+                    min_zoom: [11,12,13,14,15,16]
+                    max_zoom: { min: 17 }
+                    kind_tile_rank: { max: 8 }
+                draw:
+                    text-blend-order:
+                        text_wrap: 12
+                        max_lines: 4
+                        visible: global.text_visible_neighbourhoods
+                        font:
+                            size: 14px
+
+styles:
+    text-blend-order:
+        base: text
+        blend_order: 1

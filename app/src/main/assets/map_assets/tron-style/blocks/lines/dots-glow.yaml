@@ -1,0 +1,51 @@
+
+styles:
+    lines-dots-glow:
+        base: lines
+        doc:
+            author: 
+                name: Patricio Gonzalez Vivo
+                twitter: patriciogv
+            version: 0.0.1
+            tangram-version: 0.0.7
+            licence: MIT
+            description: |
+                Apply a dot pattern to a line with some glow
+        ui:
+            shaders:
+                defines:
+                    DOTS_SIZE:
+                        type: number
+                        label: Size
+                        range: 
+                            min: 0.
+                            max: 1.
+                            step: 0.01
+                    DOTS_GLOW:
+                        type: number
+                        label: Glow amount
+                        range: 
+                            min: 0.
+                            max: 1.
+                            step: 0.01
+                    DOTS_SCALE:
+                        type: number
+                        label: Scale
+                        range: 
+                            min: 0.
+                            max: 2.
+                            step: 0.1
+        texcoords: true
+        blend: overlay
+        animated: true
+        shaders:
+            defines:
+                DOTS_SCALE: 2.
+                DOTS_SIZE: 0.15
+                DOTS_GLOW: .5
+            blocks:
+                color: |
+                    vec2 st = (fract(v_texcoord.xy)-.5)*DOTS_SCALE;
+                    float df = dot(st,st);
+                    color.a = 1.-step(DOTS_SIZE, df);
+                    color.a += smoothstep(1.,0.,df)*(DOTS_GLOW);

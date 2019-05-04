@@ -4,7 +4,8 @@ import android.os.Handler;
 import android.provider.MediaStore;
 import android.util.Log;
 
-import com.mapzen.tangram.HttpHandler;
+import com.mapzen.tangram.networking.DefaultHttpHandler;
+import com.mapzen.tangram.networking.HttpHandler;
 import com.rareventure.android.SuperThread;
 import com.rareventure.gps2.GTG;
 import okhttp3.Cache;
@@ -53,7 +54,7 @@ import okio.BufferedSource;
  *     may not be the freshest copy.
  * </p>
  */
-public class GpsTrailerMapzenHttpHandler extends HttpHandler
+public class GpsTrailerMapzenHttpHandler extends DefaultHttpHandler
 {
 /*
     private static final long MAX_TILE_LENGTH = 1024*1024*10;
