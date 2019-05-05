@@ -20,7 +20,7 @@
                 android:id="@+id/totalTimeLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Total Time:"
+                android:text="@string/total_time"
                 android:textColor="@android:color/white" />
 
             <TextView
@@ -41,7 +41,7 @@
                 android:id="@+id/totalDistLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Total Dist:"
+                android:text="@string/total_dist"
                 android:textColor="@android:color/white" />
 
             <TextView
@@ -62,7 +62,7 @@
                 android:id="@+id/timesInAreaLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Times in area:"
+                android:text="@string/times_in_area"
                 android:textColor="@android:color/white" />
 
             <TextView

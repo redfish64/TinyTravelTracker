@@ -42,11 +42,15 @@ import java.util.Calendar;
 import java.util.TimeZone;
 
 public class TimeView extends View {
+	/*
 	private static final String[] MONTHS = new String[] { "Jan", "Feb", "Mar",
 			"Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
 
 	private static final String[] DAYS_OF_WEEK = new String[] { "Sun", "Mon",
 			"Tue", "Wed", "Thu", "Fri", "Sat" };
+	*/
+	private static String[] MONTHS;
+	private static String[] DAYS_OF_WEEK;
 
 	private static String nowText;
 	private static String startText;
@@ -55,6 +59,14 @@ public class TimeView extends View {
 	private static String toText;
 	private static String noDataText;
 	private static String allDataText;
+	private static String monthsAgo;
+	private static String weeksAgo;
+	private static String daysAgo;
+	private static String hoursAgo;
+	private static String hour1Ago;
+	private static String minutesAgo;
+	private static String minute1Ago;
+	private static String minute0Ago;
 
 	private static final float Y_TO_SCREEN = 2f;
 
@@ -642,9 +654,7 @@ public class TimeView extends View {
 		}
 
 		if (months >= 2) {
-
-			// TODO 3 internationalize
-			out.append(months).append(" months ago");
+			out.append(months).append(monthsAgo);
 			return out;
 		}
 
@@ -652,12 +662,12 @@ public class TimeView extends View {
 		int weeks = days / 7;
 
 		if (weeks >= 2) {
-			out.append(weeks).append(" weeks ago");
+			out.append(weeks).append(weeksAgo);
 			return out;
 		}
 
 		if (days >= 2) {
-			out.append(days).append(" days ago");
+			out.append(days).append(daysAgo);
 			return out;
 		}
 
@@ -666,25 +676,25 @@ public class TimeView extends View {
 		int minutes = 0;
 
 		if (hours >= 2) {
-			out.append(hours).append(" hours ago");
+			out.append(hours).append(hoursAgo);
 			return out;
 		} else if (hours == 1) {
-			out.append("1 hour, ");
+			out.append(hour1Ago);
 			minutes = -60;
 		}
 
 		minutes += Util.calcDiff(thenCalendar, nowMs, Calendar.MINUTE);
 
 		if (minutes > 1) {
-			out.append(minutes).append(" minutes ago");
+			out.append(minutes).append(minutesAgo);
 			return out;
 		} else if (minutes == 1) {
-			out.append("1 minutes ago");
+			out.append(minute1Ago);
 			return out;
 		}
 
 		if (hours == 1) {
-			out.append("0 minutes ago");
+			out.append(minute0Ago);
 		} else
 			out.append(nowText);
 		return out;
@@ -1260,5 +1270,15 @@ public class TimeView extends View {
 		toText = context.getResources().getString(R.string.to_text);
 		noDataText = context.getResources().getString(R.string.nodata);
 		allDataText = context.getResources().getString(R.string.alldata);
+		monthsAgo = context.getResources().getString(R.string.months_ago);
+		weeksAgo = context.getResources().getString(R.string.weeks_ago);
+		daysAgo = context.getResources().getString(R.string.days_ago);
+		hoursAgo = context.getResources().getString(R.string.hours_ago);
+		hour1Ago = context.getResources().getString(R.string.hour1_ago);
+		minutesAgo = context.getResources().getString(R.string.minutes_ago);
+		minute1Ago = context.getResources().getString(R.string.minute1_ago);
+		minute0Ago = context.getResources().getString(R.string.minute0_ago);
+		MONTHS = context.getResources().getStringArray(R.array.months);
+		DAYS_OF_WEEK = context.getResources().getStringArray(R.array.days);
 	}
 }

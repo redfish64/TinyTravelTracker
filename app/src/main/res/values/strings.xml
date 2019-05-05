@@ -106,7 +106,7 @@
     <string name="drawing_points">Drawing Points</string>
     <string name="pan_to_location_button_tooltip">This button centers the display on your current location.</string>
     <string name="autozoom_button_tooltip">This button centers the display on all visible data points for selected time range.</string>
-    <string name="timeview_tooltip">Sliding left to right in the bottom panel adjusts the time range forwards and backwards. Sliding up and down adjusts the amount of time covered</string>
+    <string name="timeview_tooltip">Sliding left to right in the bottom panel adjusts the time range forwards and backwards. Sliding up and down adjusts the amount of time covered.</string>
     <string name="enable_tooltips">Enable Tool Tips</string>
     <string name="no_points_yet">There aren\'t any GPS points recorded yet, so there is nothing to view</string>
     <string name="free_version_before_expiry">The trial period will expire in %d days. Touch here to buy the full version.</string>
@@ -181,8 +181,6 @@
     <string name="gps_wake_lock_filename">/sdcard/ttt_wake_lock_debug.txt</string>
     <string name="conclusion_help_menu_tip"><![CDATA[If you would like to view the manual, on the following screen, press <img src="1"/> (or <img src="2"/> on older phones) and select "Help".]]></string>
     <string name="service_gps_must_grant_permission">Permission to use GPS has not been granted.</string>
-
-    <!-- new string resources below -->
     <string name="button_prev">Prev</string>
     <string name="button_next">Next</string>
     <string name="report_problem_question">If a problem occurs, Tiny Travel Tracker may optionally send an anonymous report about the issue to the developer. Would you like to enable this?</string>
@@ -239,4 +237,72 @@
         <item>@string/password_timeout_1hour</item>
     </string-array>
 
+    <!-- new string resources below -->
+    <string name="months_ago">\ months ago</string>
+    <string name="weeks_ago">\ weeks ago</string>
+    <string name="days_ago">\ days ago</string>
+    <string name="hours_ago">\ hours ago</string>
+    <string name="hour1_ago">1 hour,&#160;</string>
+    <string name="minutes_ago">\ minutes ago</string>
+    <string name="minute1_ago">1 minutes ago</string>
+    <string name="minute0_ago">0 minutes ago</string>
+    <string name="jan">Jan</string>
+    <string name="feb">Feb</string>
+    <string name="mar">Mar</string>
+    <string name="apr">Apr</string>
+    <string name="may">May</string>
+    <string name="jun">Jun</string>
+    <string name="jul">Jul</string>
+    <string name="aug">Aug</string>
+    <string name="sep">Sep</string>
+    <string name="oct">Oct</string>
+    <string name="nov">Nov</string>
+    <string name="dec">Dec</string>
+    <string name="sun">Sun</string>
+    <string name="mon">Mon</string>
+    <string name="tue">Tue</string>
+    <string name="wed">Wed</string>
+    <string name="thu">Thu</string>
+    <string name="fri">Fri</string>
+    <string name="sat">Sat</string>
+    <string name="total_time">Total Time:</string>
+    <string name="total_dist">Total Dist:</string>
+    <string name="times_in_area">Times in area:</string>
+    <string name="year">year</string>
+    <string name="year_plural">years</string>
+    <string name="month">month</string>
+    <string name="month_plural">months</string>
+    <string name="week">week</string>
+    <string name="week_plural">weeks</string>
+    <string name="day">day</string>
+    <string name="day_plural">days</string>
+    <string name="hour">hour</string>
+    <string name="hour_plural">hours</string>
+    <string name="minute">minute</string>
+    <string name="minute_plural">minutes</string>
+    <string name="second">second</string>
+    <string name="second_plural">seconds</string>
+    <string-array name="months">
+        <item>@string/jan</item>
+        <item>@string/feb</item>
+        <item>@string/mar</item>
+        <item>@string/apr</item>
+        <item>@string/may</item>
+        <item>@string/jun</item>
+        <item>@string/jul</item>
+        <item>@string/aug</item>
+        <item>@string/sep</item>
+        <item>@string/oct</item>
+        <item>@string/nov</item>
+        <item>@string/dec</item>
+    </string-array>
+    <string-array name="days">
+        <item>@string/sun</item>
+        <item>@string/mon</item>
+        <item>@string/tue</item>
+        <item>@string/wed</item>
+        <item>@string/thu</item>
+        <item>@string/fri</item>
+        <item>@string/sat</item>
+    </string-array>
 </resources>

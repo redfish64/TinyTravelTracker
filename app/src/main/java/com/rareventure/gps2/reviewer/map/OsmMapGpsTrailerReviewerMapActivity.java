@@ -19,10 +19,6 @@
 */
 package com.rareventure.gps2.reviewer.map;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.TimeZone;
-
 import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -61,7 +57,6 @@ import android.widget.Toast;
 import android.widget.ZoomControls;
 
 import com.mapzen.tangram.CameraPosition;
-import com.mapzen.tangram.LngLat;
 import com.rareventure.android.AndroidPreferenceSet.AndroidPreferences;
 import com.rareventure.android.DbUtil;
 import com.rareventure.android.FatalErrorActivity;
@@ -74,10 +69,10 @@ import com.rareventure.android.widget.OngoingProcessStatusFragment;
 import com.rareventure.android.widget.ToolTipFragment;
 import com.rareventure.android.widget.ToolTipFragment.UserAction;
 import com.rareventure.gps2.GTG;
-import com.rareventure.gps2.GpsTrailerService;
 import com.rareventure.gps2.GTG.GTGEvent;
 import com.rareventure.gps2.GTG.GTGEventListener;
 import com.rareventure.gps2.GTG.Requirement;
+import com.rareventure.gps2.GpsTrailerService;
 import com.rareventure.gps2.R;
 import com.rareventure.gps2.database.TimeZoneTimeRow;
 import com.rareventure.gps2.database.cache.AreaPanelSpaceTimeBox;
@@ -88,6 +83,10 @@ import com.rareventure.gps2.reviewer.TrialExpiredActivity;
 import com.rareventure.gps2.reviewer.map.sas.TimeRange;
 import com.rareventure.gps2.reviewer.timeview.TimeView;
 import com.rareventure.gps2.reviewer.timeview.TimeView.Listener;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
 
 //TODO 4: Satellite, street view??, traffic
 public class OsmMapGpsTrailerReviewerMapActivity extends ProgressDialogActivity implements OnClickListener,  Listener,
@@ -624,7 +623,7 @@ GTGEventListener
 
 				if(position == 0)
 				{
-					((TextView)convertView.findViewById(R.id.totalTime)).setText(Util.convertMsToText(gpsTrailerOverlay.sas.getTotalTimeSecs()*1000l));
+					((TextView)convertView.findViewById(R.id.totalTime)).setText(Util.convertMsToText(getApplicationContext(), gpsTrailerOverlay.sas.getTotalTimeSecs()*1000l));
 					((TextView)convertView.findViewById(R.id.totalDist)).setText(MapScaleWidget.calcLabelForLength(gpsTrailerOverlay.sas.getTotalDistM(),
 							GTG.prefs.useMetric));
 					((TextView)convertView.findViewById(R.id.timesInArea)).setText(String.valueOf(gpsTrailerOverlay.sas.getTimesInArea()));

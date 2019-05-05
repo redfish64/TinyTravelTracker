@@ -24,7 +24,7 @@
     <string name="enter_new_password">Inserire nuova password</string>
     <string name="reenter_new_password">Reinserire nuova password</string>
     <string name="enter_backup_password">Inserire password del backup</string>
-    <string name="reenter_backup_password"><Rei></Rei>nserire password del backup</string>
+    <string name="reenter_backup_password">Reinserire password del backup</string>
     <string name="password_too_short">Password must be at least ${min_chars} characters</string>
     <string name="password_set_title">Password has been set</string>
     <string name="error_db_not_present">Couldn\'t find data file for storing GPS coordinates</string>
@@ -76,13 +76,13 @@
     <string name="title_password_timeout">Intervallo password</string>
     <string name="desc_password_timeout">Intervallo di tempo prima del quale la password non viene chiesta nuovamente se la app è chiusa, o il telefono viene spento. (Nota: se il telefono viene utilizzato molto, la password potrebbe essere chiesta di nuovo prima della scadenza)</string>
     <string name="title_map_font_size">Dimensioni carattere mappa</string>
-    <string name="desc_map_font_size">Imposta la dimensione delle etichette di strade, città, ecc... nella mappa</string>
+    <string name="desc_map_font_size">Imposta la dimensione delle etichette di strade, città, ecc… nella mappa</string>
     <string name="error_password_cant_be_empty">Prego inserire una password</string>
     <string name="rollforward_timmy_database">Rerunning database journal…</string>
     <string name="wait_autozoom">Calcolo Autozoom…</string>
     <string name="location_service_gps_provider_disabled">Il GPS deve essere attivato per visualizzare la posizione attuale</string>
     <string name="pan_to_gps_loc">Find GPS location</string>
-    <string name="timmy_corrupt">The app has encountered corruption in the database cache used to display points. The cache will be deleted and regenerated. While this is happening, your GPS points will disappear and slowly reappear over time and the app will be less responsive.</string>
+    <string name="timmy_corrupt">Cache database dei punti corrotta. La cache verrà cancellata e rigenerata. Mentre ciò è in corso, i punti GPS scompariranno e riappariranno lentamente e la app sarà meno responsiva.</string>
     <string name="timmy_needs_upgrade">The cache database has been upgraded and must be regenerated. While this is happening, your GPS points will disappear and slowly reappear over time and the app will be less responsive.</string>
     <string name="x_of_x_items_format">%1$d of %2$d</string>
     <string name="media_gallery_strip_time_with_timezone">%1$s, %2$s</string>
@@ -105,19 +105,19 @@
     <string name="drawing_points">Drawing Points</string>
     <string name="pan_to_location_button_tooltip">This button centers the display on your current location.</string>
     <string name="autozoom_button_tooltip">This button centers the display on all visible data points for selected time range.</string>
-    <string name="timeview_tooltip">Sliding left to right in the bottom panel adjusts the time range forwards and backwards. Sliding up and down adjusts the amount of time covered</string>
+    <string name="timeview_tooltip">Scorrere da destra a sinistra nella barra inferiore per regolare l\'intervallo di tempo. Scorrere su è giù per regolare l\'intervallo di tempo rappresentato.</string>
     <string name="enable_tooltips">Attiva consigli</string>
     <string name="no_points_yet">There aren\'t any GPS points recorded yet, so there is nothing to view</string>
     <string name="free_version_before_expiry">The trial period will expire in %d days. Touch here to buy the full version.</string>
     <string name="free_version_before_expiry_1_day">The trial period will expire in %d day. Touch here to buy the full version.</string>
     <string name="free_version_after_expiry">The trial period has expired. GPS points will no longer be recorded. Touch here to buy the full version.</string>
     <string name="location_unknown">The current GPS location cannot be determined</string>
-    <string name="start_time">Start Time</string>
-    <string name="end_time">End Time</string>
+    <string name="start_time">Ora inizio</string>
+    <string name="end_time">Ora fine</string>
     <string name="duration">Duration</string>
     <string name="select_multiple_areas">Select multiple areas</string>
     <string name="error_trying_purchase">There was an error contacting the purchasing server. Please try again later</string>
-    <string name="no_points_no_collect">There are no GPS points in the database. In order to add GPS points, you need to turn on "Collect GPS Data" in the Settings menu</string>
+    <string name="no_points_no_collect">Non ci sono punti GPS nel database. Affinché vengano aggiunti, è necessario attivare  "Raccogli dati GPS" nelle impostazioni</string>
     <string name="no_points_with_collect">There are no GPS points in the database, yet. Check back later for some GPS data points to be collected</string>
     <string name="exit">Exit</string>
     <string name="purchase_thank_you">Thank you for purchasing Tiny Travel Tracker. Enjoy!</string>
@@ -166,7 +166,7 @@
     <string name="info_notice_cant_verify_license">There was a problem verifying your license. GPS points will no longer be recorded.</string> 
     <string name="delete">Delete</string> 
     <string name="view_image_delete_file_query">Delete this file?</string> 
-    <string name="dist">Dist</string> 
+    <string name="dist">Dist.</string>
     <string name="enter_from_date_to_to_date_title">Imposta date di inizio e fine</string>
     <string name="process_gps_points">Aggiornamento cache</string>
     <string name="process_gps_points_fmt">Aggiornamento cache. Fino a %s</string>
@@ -180,8 +180,6 @@
     <string name="gps_wake_lock_filename">/sdcard/ttt_wake_lock_debug.txt</string>
     <string name="conclusion_help_menu_tip"><![CDATA[Se si vuole visualizzare il manuale, nella prossima schermata, toccare <img src="1"/> (o <img src="2"/> nei telefoni più datati) e selezionare "Aiuto".]]></string>
     <string name="service_gps_must_grant_permission">Permission to use GPS has not been granted.</string>
-
-    <!-- new string resources below -->
     <string name="button_prev">Prec</string>
     <string name="button_next">Succ</string>
     <string name="report_problem_question">Se si verifica un problema, Tiny Travel Tracker potrebbe facoltativamente inviare report anonimi del problema allo sviluppatore. Attivare la funzione?</string>
@@ -218,4 +216,58 @@
     <string name="password_timeout_1hour">1 ora</string>
     <string name="fromText">Da&#160;</string>
     <string name="toText">A&#160;</string>
+    <string name="WALKABOUT_MAP_STYLE_DESC">Walkabout</string>
+    <string name="TRON_MAP_STYLE_DESC">Tron</string>
+    <string name="SDK_DEFAULT_MAP_STYLE_DESC">SDK Default</string>
+    <string name="REFILL_MAP_STYLE_DESC">Refill</string>
+    <string name="CINNABAR_MAP_STYLE_DESC">Cinnabar</string>
+    <string name="BUBBLE_WRAP_MAP_STYLE_DESC">Bubble Wrap</string>
+    <string name="title_map_style">Stile mappa</string>
+    <string name="desc_map_style">Seleziona lo stile della mappa</string>
+
+    <!-- new string resources below -->
+    <string name="months_ago">\ mesi fa</string>
+    <string name="weeks_ago">\ settimane fa</string>
+    <string name="days_ago">\ giorni fa</string>
+    <string name="hours_ago">\ ore fa</string>
+    <string name="hour1_ago">1 ora,&#160;</string>
+    <string name="minutes_ago">\ minuti fa</string>
+    <string name="minute1_ago">1 minuto fa</string>
+    <string name="minute0_ago">0 minuti fa</string>
+    <string name="jan">Gen</string>
+    <string name="feb">Feb</string>
+    <string name="mar">Mar</string>
+    <string name="apr">Apr</string>
+    <string name="may">Mag</string>
+    <string name="jun">Giu</string>
+    <string name="jul">Lug</string>
+    <string name="aug">Ago</string>
+    <string name="sep">Set</string>
+    <string name="oct">Ott</string>
+    <string name="nov">Nov</string>
+    <string name="dec">Dic</string>
+    <string name="sun">Dom</string>
+    <string name="mon">Lun</string>
+    <string name="tue">Mar</string>
+    <string name="wed">Mer</string>
+    <string name="thu">Gio</string>
+    <string name="fri">Ven</string>
+    <string name="sat">Sab</string>
+    <string name="total_time">Tempo totale:</string>
+    <string name="total_dist">Dist. totale:</string>
+    <string name="times_in_area">Volte in area:</string>
+    <string name="year">anno</string>
+    <string name="year_plural">anni</string>
+    <string name="month">mese</string>
+    <string name="month_plural">mesi</string>
+    <string name="week">settimana</string>
+    <string name="week_plural">settimane</string>
+    <string name="day">giorno</string>
+    <string name="day_plural">giorni</string>
+    <string name="hour">ora</string>
+    <string name="hour_plural">ore</string>
+    <string name="minute">minuto</string>
+    <string name="minute_plural">minuti</string>
+    <string name="second">secondo</string>
+    <string name="second_plural">secondi</string>
 </resources>
