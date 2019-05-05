@@ -627,7 +627,8 @@ GTGEventListener
 					((TextView)convertView.findViewById(R.id.totalDist)).setText(MapScaleWidget.calcLabelForLength(gpsTrailerOverlay.sas.getTotalDistM(),
 							GTG.prefs.useMetric));
 					((TextView)convertView.findViewById(R.id.timesInArea)).setText(String.valueOf(gpsTrailerOverlay.sas.getTimesInArea()));
-					((TextView)convertView.findViewById(R.id.timesInArea)).setText(String.valueOf(gpsTrailerOverlay.sas.getTimesInArea())); // line executed twice
+					//((TextView)convertView.findViewById(R.id.timesInArea)).setText(String.valueOf(gpsTrailerOverlay.sas.getTimesInArea()));
+					// line executed twice
 					
 					TimeZone tz = gpsTrailerOverlay.sas.timeZone;
 					
