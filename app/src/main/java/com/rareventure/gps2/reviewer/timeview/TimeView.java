@@ -42,13 +42,6 @@ import java.util.Calendar;
 import java.util.TimeZone;
 
 public class TimeView extends View {
-	/*
-	private static final String[] MONTHS = new String[] { "Jan", "Feb", "Mar",
-			"Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
-
-	private static final String[] DAYS_OF_WEEK = new String[] { "Sun", "Mon",
-			"Tue", "Wed", "Thu", "Fri", "Sat" };
-	*/
 	private static String[] MONTHS;
 	private static String[] DAYS_OF_WEEK;
 
