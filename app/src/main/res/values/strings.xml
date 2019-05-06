@@ -224,7 +224,7 @@
     <string name="CINNABAR_MAP_STYLE_DESC">Cinnabar</string>
     <string name="BUBBLE_WRAP_MAP_STYLE_DESC">Bubble Wrap</string>
     <string name="title_map_style">Map Style</string>
-    <string name="desc_map_style">Choose a display style of the map</string>
+    <string name="desc_map_style">Choose a display style of the map. Includes LARGE TEXT style.</string>
     <string-array name="passwordTimeoutStrings">
         <item>@string/password_timeout_off</item>
         <item>@string/password_timeout_30sec</item>
@@ -282,6 +282,7 @@
     <string name="minute_plural">minutes</string>
     <string name="second">second</string>
     <string name="second_plural">seconds</string>
+    <string name="CINNABAR_LARGE_MAP_STYLE_DESC">Cinnabar Large Font</string>
     <string-array name="months">
         <item>@string/jan</item>
         <item>@string/feb</item>

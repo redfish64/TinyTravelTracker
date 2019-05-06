@@ -317,52 +317,6 @@ public class OsmMapView extends MapView implements MapView.MapReadyCallback {
 		mapController.loadSceneYaml(data.toString(),"map_assets",null);
 	}
 
-	public static class Preferences implements AndroidPreferences
-	{
-		public static enum MapStyle {
-			BUBBLE_WRAP (R.string.BUBBLE_WRAP_MAP_STYLE_DESC, "bubble_wrap_style.yaml"),
-			CINNABAR (R.string.CINNABAR_MAP_STYLE_DESC, "cinnabar_style.yaml"),
-			REFILL (R.string.REFILL_MAP_STYLE_DESC, "refill_style.yaml"),
-			//co: SDK_DEFAULT doesn't work
-			//SDK_DEFAULT (R.string.SDK_DEFAULT_MAP_STYLE_DESC, "sdk_default_style.yaml"),
-			TRON (R.string.TRON_MAP_STYLE_DESC, "tron_style.yaml"),
-			WALKABOUT (R.string.WALKABOUT_MAP_STYLE_DESC, "walkabout_style.yaml");
-
-			private final int r;
-			public String fn;
-
-			private MapStyle(int r, String fn)
-			{
-				this.r = r;
-				this.fn = fn;
-			}
-
-			public static String [] entryNames(Context c) {
-				MapStyle [] ms = MapStyle.values();
-				String[] res = new String[ms.length];
-				for(int i = 0; i < ms.length; i++)
-				{
-					res[i] = c.getResources().getString(ms[i].r);
-				}
-
-				return res;
-			}
-
-			public static String [] entryValues(Context c) {
-				MapStyle [] ms = MapStyle.values();
-				String[] entryNames = new String[ms.length];
-				for(int i = 0; i < ms.length; i++)
-				{
-					entryNames[i] = ms[i].toString();
-				}
-
-				return entryNames;
-			}
-		}
-
-		public MapStyle mapStyle = MapStyle.CINNABAR;
-	}
-
 	public void setScaleWidget(MapScaleWidget scaleWidget) {
 		this.scaleWidget = scaleWidget;
 	}
@@ -624,12 +578,59 @@ public class OsmMapView extends MapView implements MapView.MapReadyCallback {
 
 	}
 
-	@Override
+    @Override
 	protected MapController getMapInstance() {
 		//We do this because we want to use our own TouchInput (MyTouchInput) which can handle long
 		// press pans correctly
 		return new MyMapController(this.getContext());
 	}
 
+
+	public static class Preferences implements AndroidPreferences
+	{
+		public static enum MapStyle {
+			BUBBLE_WRAP (R.string.BUBBLE_WRAP_MAP_STYLE_DESC, "bubble_wrap_style.yaml"),
+			CINNABAR (R.string.CINNABAR_MAP_STYLE_DESC, "cinnabar_style.yaml"),
+			CINNABAR_LARGE (R.string.CINNABAR_LARGE_MAP_STYLE_DESC, "cinnabar_large_style.yaml"),
+			REFILL (R.string.REFILL_MAP_STYLE_DESC, "refill_style.yaml"),
+			//co: SDK_DEFAULT doesn't work
+			//SDK_DEFAULT (R.string.SDK_DEFAULT_MAP_STYLE_DESC, "sdk_default_style.yaml"),
+			TRON (R.string.TRON_MAP_STYLE_DESC, "tron_style.yaml"),
+			WALKABOUT (R.string.WALKABOUT_MAP_STYLE_DESC, "walkabout_style.yaml");
+
+			private final int r;
+			public String fn;
+
+			private MapStyle(int r, String fn)
+			{
+				this.r = r;
+				this.fn = fn;
+			}
+
+			public static String [] entryNames(Context c) {
+				MapStyle [] ms = MapStyle.values();
+				String[] res = new String[ms.length];
+				for(int i = 0; i < ms.length; i++)
+				{
+					res[i] = c.getResources().getString(ms[i].r);
+				}
+
+				return res;
+			}
+
+			public static String [] entryValues(Context c) {
+				MapStyle [] ms = MapStyle.values();
+				String[] entryNames = new String[ms.length];
+				for(int i = 0; i < ms.length; i++)
+				{
+					entryNames[i] = ms[i].toString();
+				}
+
+				return entryNames;
+			}
+		}
+
+		public MapStyle mapStyle = MapStyle.CINNABAR;
+	}
 
 }
