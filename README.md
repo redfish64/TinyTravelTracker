@@ -28,7 +28,7 @@ Changelog: (you can monitor the latest build here: https://f-droid.org/wiki/inde
 
 V 1.1.44 (build 87) - 2019 May 6
 
-Added large map style.
+Added map style with large fonts.
 
 V 1.1.43 (build 86) - 2019 May 2
 
