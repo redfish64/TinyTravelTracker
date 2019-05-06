@@ -26,6 +26,10 @@ _Note to users: If you have an issue you would like to see fixed, please click o
 
 Changelog: (you can monitor the latest build here: https://f-droid.org/wiki/index.php?title=com.rareventure.gps2/lastbuild&redirect=no)
 
+V 1.1.44 (build 87) - 2019 May 6
+
+Added large map style.
+
 V 1.1.43 (build 86) - 2019 May 2
 Found nextzen.org which has the original mapzen maps. This allows me to retire my poorly custom made map that ran against tilehosting.
 
@@ -33,7 +37,7 @@ Added the ability to choose from some different map styles.
 
 Upgraded to Tangram 10.1 which fixes some chinese fonts not showing up.
 
-Itegrated igor-cali's italian language translation.
+Integrated igor-cali's italian language translation.
 
 V 1.1.38
 
