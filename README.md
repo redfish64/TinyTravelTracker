@@ -31,6 +31,7 @@ V 1.1.44 (build 87) - 2019 May 6
 Added large map style.
 
 V 1.1.43 (build 86) - 2019 May 2
+
 Found nextzen.org which has the original mapzen maps. This allows me to retire my poorly custom made map that ran against tilehosting.
 
 Added the ability to choose from some different map styles.
