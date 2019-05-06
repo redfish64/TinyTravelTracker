@@ -19,11 +19,20 @@
 */
 package com.rareventure.gps2.reviewer.map;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import android.content.Context;
+import android.content.res.AssetManager;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.os.Bundle;
@@ -34,6 +43,7 @@ import android.util.Log;
 
 import com.mapzen.tangram.CameraPosition;
 import com.mapzen.tangram.MapChangeListener;
+import com.mapzen.tangram.SceneUpdate;
 import com.mapzen.tangram.networking.HttpHandler;
 import com.mapzen.tangram.LngLat;
 import com.mapzen.tangram.MapController;
@@ -287,12 +297,33 @@ public class OsmMapView extends MapView implements MapView.MapReadyCallback {
 		}
 	}
 
+	private void loadSceneFiles(String ... files) {
+		StringBuilder data = new StringBuilder();
+
+		AssetManager am = getContext().getAssets();
+
+		for(String file : files) {
+			try {
+				BufferedReader r = new BufferedReader(new InputStreamReader(am.open("map_assets/"+file)));
+				Util.readReaderIntoStringBuilder(r,data);
+				r.close();
+			} catch (IOException e) {
+				throw new IllegalStateException("can't find yaml: "+file);
+			}
+
+			data.append('\n');
+		}
+
+		mapController.loadSceneYaml(data.toString(),"map_assets",null);
+	}
+
 	public static class Preferences implements AndroidPreferences
 	{
 		public static enum MapStyle {
 			BUBBLE_WRAP (R.string.BUBBLE_WRAP_MAP_STYLE_DESC, "bubble_wrap_style.yaml"),
 			CINNABAR (R.string.CINNABAR_MAP_STYLE_DESC, "cinnabar_style.yaml"),
 			REFILL (R.string.REFILL_MAP_STYLE_DESC, "refill_style.yaml"),
+			//co: SDK_DEFAULT doesn't work
 			//SDK_DEFAULT (R.string.SDK_DEFAULT_MAP_STYLE_DESC, "sdk_default_style.yaml"),
 			TRON (R.string.TRON_MAP_STYLE_DESC, "tron_style.yaml"),
 			WALKABOUT (R.string.WALKABOUT_MAP_STYLE_DESC, "walkabout_style.yaml");

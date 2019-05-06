@@ -1418,6 +1418,13 @@ public class Util {
 		return p1;
 	}
 
+	public static String readReaderIntoStringWithMatchReplace(BufferedReader reader, Pattern[] patterns, String[] replacements) throws IOException {
+		StringBuilder sb = new StringBuilder();
+		readReaderIntoStringBuilderWithMatchReplace(reader,patterns,replacements,sb);
+
+		return sb.toString();
+	}
+
 	public static interface LongComparator<T>
 	{
 		public int compare(T obj, long key);
@@ -1549,32 +1556,39 @@ public class Util {
 		}
 	}
 
-	/**
-	 * Reads a reader line by line into an output string, applying all patterns and replacing
-	 * with given replacements.
-	 * @throws IOException 
-	 */
-	public static String readReaderIntoStringWithMatchReplace(BufferedReader reader, Pattern [] patterns, String [] replacements) throws IOException
-	{
-		if(patterns.length != replacements.length)
-			TAssert.fail();
-		
-		String line = null;
-		
-		StringBuilder sb = new StringBuilder();
+    /**
+     * Reads a reader line by line into an output string, applying all patterns and replacing
+     * with given replacements.
+     * @throws IOException
+     */
+    public static StringBuilder readReaderIntoStringBuilderWithMatchReplace(BufferedReader reader, Pattern[] patterns, String[] replacements, StringBuilder sb) throws IOException
+    {
+        if(patterns.length != replacements.length)
+            TAssert.fail();
 
-		while ((line = reader.readLine()) != null) {
-			for(int i = 0; i < patterns.length; i++)
-			{
-				line = patterns[i].matcher(line).replaceAll(replacements[i]);
-			}
-			sb.append(line).append('\n');
-		}
-		
-		return sb.toString();
-	}
+        String line = null;
 
-	public static void deleteRecursive(File fileOrDirectory) {
+        while ((line = reader.readLine()) != null) {
+            for(int i = 0; i < patterns.length; i++)
+            {
+                line = patterns[i].matcher(line).replaceAll(replacements[i]);
+            }
+            sb.append(line).append('\n');
+        }
+
+        return sb;
+    }
+
+    /**
+     * Reads a reader line by line into an output stringbuilder
+     * @throws IOException
+     */
+    public static StringBuilder readReaderIntoStringBuilder(BufferedReader reader, StringBuilder data) throws IOException
+    {
+        return readReaderIntoStringBuilderWithMatchReplace(reader,new Pattern [0], new String [0], data);
+    }
+
+    public static void deleteRecursive(File fileOrDirectory) {
 		if (fileOrDirectory.isDirectory())
 			for (File child : fileOrDirectory.listFiles())
 				deleteRecursive(child);
