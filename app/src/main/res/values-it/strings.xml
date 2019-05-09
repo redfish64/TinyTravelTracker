@@ -221,9 +221,10 @@
     <string name="SDK_DEFAULT_MAP_STYLE_DESC">SDK Default</string>
     <string name="REFILL_MAP_STYLE_DESC">Refill</string>
     <string name="CINNABAR_MAP_STYLE_DESC">Cinnabar</string>
+    <string name="CINNABAR_LARGE_MAP_STYLE_DESC">Cinnabar Caratteri Grandi</string>
     <string name="BUBBLE_WRAP_MAP_STYLE_DESC">Bubble Wrap</string>
     <string name="title_map_style">Stile mappa</string>
-    <string name="desc_map_style">Seleziona lo stile della mappa</string>
+    <string name="desc_map_style">Seleziona lo stile della mappa. Include lo stile di CARATTERI GRANDI</string>
 
     <!-- new string resources below -->
     <string name="months_ago">\ mesi fa</string>

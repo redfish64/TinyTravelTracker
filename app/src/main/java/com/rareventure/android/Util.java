@@ -1418,6 +1418,13 @@ public class Util {
 		return p1;
 	}
 
+	public static String readReaderIntoStringWithMatchReplace(BufferedReader reader, Pattern[] patterns, String[] replacements) throws IOException {
+		StringBuilder sb = new StringBuilder();
+		readReaderIntoStringBuilderWithMatchReplace(reader,patterns,replacements,sb);
+
+		return sb.toString();
+	}
+
 	public static interface LongComparator<T>
 	{
 		public int compare(T obj, long key);
@@ -1450,13 +1457,13 @@ public class Util {
 	private static class TimeLabel
 	{
 		long timeInMillis;
-		String label, pluralLabel;
+		int labelId, pluralLabelId;
 		
-		public TimeLabel(long timeInMillis, String label, String pluralLabel) {
+		public TimeLabel(long timeInMillis, int labelId, int pluralLabelId) {
 			super();
 			this.timeInMillis = timeInMillis;
-			this.label = label;
-			this.pluralLabel = pluralLabel;
+			this.labelId = labelId;
+			this.pluralLabelId = pluralLabelId;
 		}
 
 		public long getValue(long l) {
@@ -1467,44 +1474,32 @@ public class Util {
 			return l%timeInMillis;
 		}
 
-		public void appendText(StringBuffer res, long v) {
+		public void appendText(Context c, StringBuffer res, long v) {
 			if(res.length() != 0)
 				res.append(", ");
 			
 			res.append(v).append(" ");
 			if(v != 1)
-				res.append(pluralLabel);
+				res.append(c.getString(pluralLabelId));
 			else
-				res.append(label);
+				res.append(c.getString(labelId));
 		}
 		
 		
 	}
 
-	/*
 	private static TimeLabel[] timeLabels =
 	{
-		new TimeLabel(MILLIS_IN_YEAR, "year", "years"),
-		new TimeLabel(MILLIS_IN_MONTH, "month", "months"),
-		new TimeLabel(MILLIS_IN_DAY * 7, "week", "weeks"),
-		new TimeLabel(MILLIS_IN_DAY, "day", "days"),
-		new TimeLabel(MILLIS_IN_HOUR, "hour", "hours"),
-		new TimeLabel(MILLIS_IN_MINUTE, "minute", "minutes"),
-		new TimeLabel(1000, "second", "seconds")
+			new TimeLabel(MILLIS_IN_YEAR, R.string.year, R.string.year_plural),
+			new TimeLabel(MILLIS_IN_MONTH, R.string.month, R.string.month_plural),
+			new TimeLabel(MILLIS_IN_DAY * 7, R.string.week, R.string.week_plural),
+			new TimeLabel(MILLIS_IN_DAY, R.string.day, R.string.day_plural),
+			new TimeLabel(MILLIS_IN_HOUR, R.string.hour, R.string.hour_plural),
+			new TimeLabel(MILLIS_IN_MINUTE, R.string.minute, R.string.minute_plural),
+			new TimeLabel(1000, R.string.second, R.string.second_plural),
 	};
-	*/
 
 	public static String convertMsToText(Context context, long l) {
-		TimeLabel[] timeLabels =
-		{
-			new TimeLabel(MILLIS_IN_YEAR, context.getString(R.string.year), context.getString(R.string.year_plural)),
-			new TimeLabel(MILLIS_IN_MONTH, context.getString(R.string.month), context.getString(R.string.month_plural)),
-			new TimeLabel(MILLIS_IN_DAY * 7, context.getString(R.string.week), context.getString(R.string.week_plural)),
-			new TimeLabel(MILLIS_IN_DAY, context.getString(R.string.day), context.getString(R.string.day_plural)),
-			new TimeLabel(MILLIS_IN_HOUR, context.getString(R.string.hour), context.getString(R.string.hour_plural)),
-			new TimeLabel(MILLIS_IN_MINUTE, context.getString(R.string.minute), context.getString(R.string.minute_plural)),
-			new TimeLabel(1000, context.getString(R.string.second), context.getString(R.string.second_plural)),
-		};
 
 		int mentionedItems = 0;
 		
@@ -1518,7 +1513,7 @@ public class Util {
 
 			if(v != 0)
 			{
-				tl.appendText(res, v);
+				tl.appendText(context, res, v);
 				
 				if(++mentionedItems >= MAX_MENTIONED_ITEMS)
 					break;
@@ -1561,32 +1556,39 @@ public class Util {
 		}
 	}
 
-	/**
-	 * Reads a reader line by line into an output string, applying all patterns and replacing
-	 * with given replacements.
-	 * @throws IOException 
-	 */
-	public static String readReaderIntoStringWithMatchReplace(BufferedReader reader, Pattern [] patterns, String [] replacements) throws IOException
-	{
-		if(patterns.length != replacements.length)
-			TAssert.fail();
-		
-		String line = null;
-		
-		StringBuilder sb = new StringBuilder();
+    /**
+     * Reads a reader line by line into an output string, applying all patterns and replacing
+     * with given replacements.
+     * @throws IOException
+     */
+    public static StringBuilder readReaderIntoStringBuilderWithMatchReplace(BufferedReader reader, Pattern[] patterns, String[] replacements, StringBuilder sb) throws IOException
+    {
+        if(patterns.length != replacements.length)
+            TAssert.fail();
 
-		while ((line = reader.readLine()) != null) {
-			for(int i = 0; i < patterns.length; i++)
-			{
-				line = patterns[i].matcher(line).replaceAll(replacements[i]);
-			}
-			sb.append(line).append('\n');
-		}
-		
-		return sb.toString();
-	}
+        String line = null;
 
-	public static void deleteRecursive(File fileOrDirectory) {
+        while ((line = reader.readLine()) != null) {
+            for(int i = 0; i < patterns.length; i++)
+            {
+                line = patterns[i].matcher(line).replaceAll(replacements[i]);
+            }
+            sb.append(line).append('\n');
+        }
+
+        return sb;
+    }
+
+    /**
+     * Reads a reader line by line into an output stringbuilder
+     * @throws IOException
+     */
+    public static StringBuilder readReaderIntoStringBuilder(BufferedReader reader, StringBuilder data) throws IOException
+    {
+        return readReaderIntoStringBuilderWithMatchReplace(reader,new Pattern [0], new String [0], data);
+    }
+
+    public static void deleteRecursive(File fileOrDirectory) {
 		if (fileOrDirectory.isDirectory())
 			for (File child : fileOrDirectory.listFiles())
 				deleteRecursive(child);

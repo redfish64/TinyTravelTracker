@@ -19,11 +19,20 @@
 */
 package com.rareventure.gps2.reviewer.map;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import android.content.Context;
+import android.content.res.AssetManager;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.os.Bundle;
@@ -34,6 +43,7 @@ import android.util.Log;
 
 import com.mapzen.tangram.CameraPosition;
 import com.mapzen.tangram.MapChangeListener;
+import com.mapzen.tangram.SceneUpdate;
 import com.mapzen.tangram.networking.HttpHandler;
 import com.mapzen.tangram.LngLat;
 import com.mapzen.tangram.MapController;
@@ -287,49 +297,24 @@ public class OsmMapView extends MapView implements MapView.MapReadyCallback {
 		}
 	}
 
-	public static class Preferences implements AndroidPreferences
-	{
-		public static enum MapStyle {
-			BUBBLE_WRAP (R.string.BUBBLE_WRAP_MAP_STYLE_DESC, "bubble_wrap_style.yaml"),
-			CINNABAR (R.string.CINNABAR_MAP_STYLE_DESC, "cinnabar_style.yaml"),
-			REFILL (R.string.REFILL_MAP_STYLE_DESC, "refill_style.yaml"),
-			//SDK_DEFAULT (R.string.SDK_DEFAULT_MAP_STYLE_DESC, "sdk_default_style.yaml"),
-			TRON (R.string.TRON_MAP_STYLE_DESC, "tron_style.yaml"),
-			WALKABOUT (R.string.WALKABOUT_MAP_STYLE_DESC, "walkabout_style.yaml");
+	private void loadSceneFiles(String ... files) {
+		StringBuilder data = new StringBuilder();
 
-			private final int r;
-			public String fn;
+		AssetManager am = getContext().getAssets();
 
-			private MapStyle(int r, String fn)
-			{
-				this.r = r;
-				this.fn = fn;
+		for(String file : files) {
+			try {
+				BufferedReader r = new BufferedReader(new InputStreamReader(am.open("map_assets/"+file)));
+				Util.readReaderIntoStringBuilder(r,data);
+				r.close();
+			} catch (IOException e) {
+				throw new IllegalStateException("can't find yaml: "+file);
 			}
 
-			public static String [] entryNames(Context c) {
-				MapStyle [] ms = MapStyle.values();
-				String[] res = new String[ms.length];
-				for(int i = 0; i < ms.length; i++)
-				{
-					res[i] = c.getResources().getString(ms[i].r);
-				}
-
-				return res;
-			}
-
-			public static String [] entryValues(Context c) {
-				MapStyle [] ms = MapStyle.values();
-				String[] entryNames = new String[ms.length];
-				for(int i = 0; i < ms.length; i++)
-				{
-					entryNames[i] = ms[i].toString();
-				}
-
-				return entryNames;
-			}
+			data.append('\n');
 		}
 
-		public MapStyle mapStyle = MapStyle.CINNABAR;
+		mapController.loadSceneYaml(data.toString(),"map_assets",null);
 	}
 
 	public void setScaleWidget(MapScaleWidget scaleWidget) {
@@ -593,12 +578,59 @@ public class OsmMapView extends MapView implements MapView.MapReadyCallback {
 
 	}
 
-	@Override
+    @Override
 	protected MapController getMapInstance() {
 		//We do this because we want to use our own TouchInput (MyTouchInput) which can handle long
 		// press pans correctly
 		return new MyMapController(this.getContext());
 	}
 
+
+	public static class Preferences implements AndroidPreferences
+	{
+		public static enum MapStyle {
+			BUBBLE_WRAP (R.string.BUBBLE_WRAP_MAP_STYLE_DESC, "bubble_wrap_style.yaml"),
+			CINNABAR (R.string.CINNABAR_MAP_STYLE_DESC, "cinnabar_style.yaml"),
+			CINNABAR_LARGE (R.string.CINNABAR_LARGE_MAP_STYLE_DESC, "cinnabar_large_style.yaml"),
+			REFILL (R.string.REFILL_MAP_STYLE_DESC, "refill_style.yaml"),
+			//co: SDK_DEFAULT doesn't work
+			//SDK_DEFAULT (R.string.SDK_DEFAULT_MAP_STYLE_DESC, "sdk_default_style.yaml"),
+			TRON (R.string.TRON_MAP_STYLE_DESC, "tron_style.yaml"),
+			WALKABOUT (R.string.WALKABOUT_MAP_STYLE_DESC, "walkabout_style.yaml");
+
+			private final int r;
+			public String fn;
+
+			private MapStyle(int r, String fn)
+			{
+				this.r = r;
+				this.fn = fn;
+			}
+
+			public static String [] entryNames(Context c) {
+				MapStyle [] ms = MapStyle.values();
+				String[] res = new String[ms.length];
+				for(int i = 0; i < ms.length; i++)
+				{
+					res[i] = c.getResources().getString(ms[i].r);
+				}
+
+				return res;
+			}
+
+			public static String [] entryValues(Context c) {
+				MapStyle [] ms = MapStyle.values();
+				String[] entryNames = new String[ms.length];
+				for(int i = 0; i < ms.length; i++)
+				{
+					entryNames[i] = ms[i].toString();
+				}
+
+				return entryNames;
+			}
+		}
+
+		public MapStyle mapStyle = MapStyle.CINNABAR;
+	}
 
 }
