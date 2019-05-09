@@ -105,7 +105,7 @@
     <string name="drawing_points">Drawing Points</string>
     <string name="pan_to_location_button_tooltip">This button centers the display on your current location.</string>
     <string name="autozoom_button_tooltip">This button centers the display on all visible data points for selected time range.</string>
-    <string name="timeview_tooltip">Scorrere da destra a sinistra nella barra inferiore per regolare l\'intervallo di tempo. Scorrere su è giù per regolare l\'intervallo di tempo rappresentato.</string>
+    <string name="timeview_tooltip">Scorrere da destra a sinistra nella barra inferiore per regolare l\'intervallo di tempo. Scorrere su e giù per regolare l\'intervallo di tempo rappresentato.</string>
     <string name="enable_tooltips">Attiva consigli</string>
     <string name="no_points_yet">There aren\'t any GPS points recorded yet, so there is nothing to view</string>
     <string name="free_version_before_expiry">The trial period will expire in %d days. Touch here to buy the full version.</string>
@@ -203,7 +203,7 @@
     <string name="gpx_restore_title">Ripristina da backup GPX</string>
     <string name="gpx_restore_warning">ATTENZIONE: Questo sostituirà TUTTI gli attuali punti GPS!</string>
     <string name="gpx_restore_filename">Nome file (*.gpx, *.zip)</string>
-    <string name="gpx_restore_format">Il file deve essere in formato GPX 1.0 o 1.1. Esso può essere compressoe opzionalmente protetto con password AES 256.</string>
+    <string name="gpx_restore_format">Il file deve essere in formato GPX 1.0 o 1.1. Esso può essere compresso e opzionalmente protetto con password AES 256.</string>
     <string name="gpx_restore_action">Ripristina</string>
     <string name="password_timeout_off">Spento</string>
     <string name="password_timeout_30sec">30 secondi</string>
