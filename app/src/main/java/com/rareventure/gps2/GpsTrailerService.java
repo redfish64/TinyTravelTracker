@@ -44,6 +44,7 @@ import android.os.PowerManager.WakeLock;
 import android.os.RemoteCallbackList;
 import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import com.rareventure.gps2.GTG.Requirement;
@@ -589,4 +590,11 @@ public class GpsTrailerService extends Service {
 
 	}
 
+	@Override
+	public void onTaskRemoved(Intent rootIntent) {
+		Log.i(GTG.TAG,"Help! Save me, Friar Tuck!");
+		ContextCompat.startForegroundService(this,new Intent(this,
+				GpsTrailerService.class));
+		Log.i(GTG.TAG,"I'll save you, Robin Hood!");
+	}
 }
