@@ -281,7 +281,12 @@ public class GpsTrailerGpsStrategy {
 						desireManager.updateDesiresForUnsuccessfulReading(gpsTimeAvailable);
 
 					nextSignificantEvent = desireManager.waitTimeMs + timeFromPhoneBootMs;
-					
+
+					if (prefs.batteryGpsOnTimePercentage == 1.0f) {
+						// don't disable gps if want to use it 100% of time
+						return true;
+					}
+
 					return false;
 				}
 				else //we want to keep gps on
