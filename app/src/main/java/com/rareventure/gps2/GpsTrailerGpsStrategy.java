@@ -421,10 +421,7 @@ public class GpsTrailerGpsStrategy {
 						/* ttt_installer:remove_line */intentTimer.writeDebug("About to update gpsReader to "+wantGps);
 						
 						//we don't want deadlocks, so we keep this outside of the synchronized loop
-						if(wantGps)
-							gpsReader.turnOn();
-						else
-							gpsReader.turnOff();
+						gpsReader.turn(wantGps);
 						
 						/* ttt_installer:remove_line */intentTimer.writeDebug("About to set gpsOn and writeUpdateStatus");
 						synchronized(GpsTrailerGpsStrategy.this)
