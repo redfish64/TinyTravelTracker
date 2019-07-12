@@ -62,6 +62,7 @@ import com.rareventure.gps2.database.GpsLocationRow;
 import com.rareventure.gps2.database.TAssert;
 import com.rareventure.gps2.reviewer.SettingsActivity;
 import com.rareventure.gps2.reviewer.wizard.WelcomePage;
+import com.rareventure.util.DebugLogFile;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -592,9 +593,9 @@ public class GpsTrailerService extends Service {
 
 	@Override
 	public void onTaskRemoved(Intent rootIntent) {
-		Log.i(GTG.TAG,"Help! Save me, Friar Tuck!");
+		DebugLogFile.log("onTaskRemoved called, trying to restart");
 		ContextCompat.startForegroundService(this,new Intent(this,
 				GpsTrailerService.class));
-		Log.i(GTG.TAG,"I'll save you, Robin Hood!");
+		DebugLogFile.log("onTaskRemoved called, restart finished");
 	}
 }
