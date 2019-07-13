@@ -23,7 +23,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import android.os.SystemClock;
-import android.util.Log;
 
 import com.rareventure.android.GpsReader;
 import com.rareventure.android.IntentTimer;
@@ -238,7 +237,7 @@ public class GpsTrailerGpsStrategy {
 		 */
 		protected boolean updateFromStrategyThreadOnly(long deltaTimeMs) {
 			DebugLogFile.log("deltaTimeMs "+deltaTimeMs);
-			long timeFromPhoneBootMs = SystemClock.elapsedRealtime();
+			final long timeFromPhoneBootMs = SystemClock.elapsedRealtime();
 
 			//first lets update the stats so far
 			if(gpsOn)
@@ -265,7 +264,7 @@ public class GpsTrailerGpsStrategy {
 			
 			if(gpsOn)
 			{
-				long currentTimeGpsRunning = timeFromPhoneBootMs - gpsAttemptStartedFromPhoneBootMs;
+				final long currentTimeGpsRunning = timeFromPhoneBootMs - gpsAttemptStartedFromPhoneBootMs;
 
 				//if the desiremanager is satisfied, we successfully read a gps point, or
 				//the absolute time left to perform a gps reading is used up,
@@ -281,9 +280,14 @@ public class GpsTrailerGpsStrategy {
 					}
 					else
 						desireManager.updateDesiresForUnsuccessfulReading(gpsTimeAvailable);
-					
+
 					nextSignificantEvent = desireManager.waitTimeMs + timeFromPhoneBootMs;
-					
+
+					if (prefs.batteryGpsOnTimePercentage == 1.0f) {
+						// don't disable gps if want to use it 100% of time
+						return true;
+					}
+
 					return false;
 				}
 				else //we want to keep gps on
@@ -422,10 +426,7 @@ public class GpsTrailerGpsStrategy {
 						/* ttt_installer:remove_line */DebugLogFile.log("About to update gpsReader to "+wantGps);
 						
 						//we don't want deadlocks, so we keep this outside of the synchronized loop
-						if(wantGps)
-							gpsReader.turnOn();
-						else
-							gpsReader.turnOff();
+						gpsReader.turn(wantGps);
 						
 						/* ttt_installer:remove_line */DebugLogFile.log("About to set gpsOn and writeUpdateStatus");
 						synchronized(GpsTrailerGpsStrategy.this)
@@ -665,8 +666,8 @@ public class GpsTrailerGpsStrategy {
 
 			//reset long time wanted back to the minimum whenever we get a reading
 			longTimeWanted = (long) (prefs.minLongTimeOfShortTimeMultiplier * shortTimeWanted) + 1;
-			
-			waitTimeMs = calculateAbsTimeNeeded((long) (shortTimeWanted * prefs.extraWaitTimeShortTimeMultiplier + shortTimeWanted)+1);
+
+			waitTimeMs = calculateAbsTimeNeeded(getTotalWantedGpsTimeMs());
 			currTimeWanted = shortTimeWanted;
 		}
 	
@@ -684,7 +685,7 @@ public class GpsTrailerGpsStrategy {
 			//we need to budget our time for gps so we can run short runs periodically, and
 			//if enough time has passed, then do a long run
 
-			long totalWantedGpsTimeMs = (long) (shortTimeWanted * prefs.extraWaitTimeShortTimeMultiplier + shortTimeWanted)+1;
+			final long totalWantedGpsTimeMs = getTotalWantedGpsTimeMs();
 			waitTimeMs = calculateAbsTimeNeeded(totalWantedGpsTimeMs);
 			
 			//if there is enough time to do a long run
@@ -708,6 +709,10 @@ public class GpsTrailerGpsStrategy {
 				
 			}
 			
+		}
+
+		private long getTotalWantedGpsTimeMs() {
+			return (long) (shortTimeWanted * prefs.extraWaitTimeShortTimeMultiplier + shortTimeWanted)+1;
 		}
 
 		/**

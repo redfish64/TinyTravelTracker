@@ -26,6 +26,10 @@ _Note to users: If you have an issue you would like to see fixed, please click o
 
 Changelog: (you can monitor the latest build here: https://f-droid.org/wiki/index.php?title=com.rareventure.gps2/lastbuild&redirect=no)
 
+V 1.1.46 (build 89) - 2019 July 13
+
+Fix so that the gps doesn't turn on and off constantly when at 100%. Thanks Kright!
+
 V 1.1.45 (build 88) - 2019 June 22
 
 Small tweak to hopefully prevent TTT service from being randomly shutdown by the OS in Oreo.

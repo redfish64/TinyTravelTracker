@@ -166,6 +166,13 @@ public class GpsReader implements DataReader
 		}        
 	}
 
+	public void turn(boolean on) {
+		if (on) {
+			turnOn();
+		} else {
+			turnOff();
+		}
+	}
 
 	public void turnOn() {
     	synchronized(lock)

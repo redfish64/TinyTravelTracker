@@ -19,6 +19,9 @@ public class DebugLogFile {
 
     public static void log(String msg)
     {
+
+        Log.e(GTG.TAG, "Debug log file: " + msg);
+
         if(!openIfNeeded()) return;
 
         try {
@@ -33,12 +36,12 @@ public class DebugLogFile {
     }
 
     private static boolean openIfNeeded() {
-        Log.e(GTG.TAG, "Open If Needed OIN");
         if(!GTG.prefs.writeFileLogDebug) return false;
-        if (triedOpeningAlready) return false;
 
         if(debugOut == null)
         {
+            Log.e(GTG.TAG, "Open If Needed OIN");
+            if (triedOpeningAlready) return false;
             triedOpeningAlready = true;
             try {
                 debugOut = new BufferedWriter(new FileWriter(Environment.getExternalStorageDirectory()+"/ttt_debug_log.txt", true));
