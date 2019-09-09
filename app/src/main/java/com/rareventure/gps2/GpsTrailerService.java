@@ -57,6 +57,7 @@ import com.rareventure.android.database.DbDatastoreAccessor;
 import com.rareventure.gps2.GTG.GTGEvent;
 import com.rareventure.gps2.GTG.GTGEventListener;
 import com.rareventure.gps2.GTG.SetupState;
+import com.rareventure.gps2.bootup.GpsTrailerReceiver;
 import com.rareventure.gps2.database.GpsLocationCache;
 import com.rareventure.gps2.database.GpsLocationRow;
 import com.rareventure.gps2.database.TAssert;
@@ -547,6 +548,7 @@ public class GpsTrailerService extends Service {
 
 	@Override
 	public void onDestroy() {
+		super.onDestroy();
 		Log.d(TAG, "GPS Service Shutdown");
 
 		GTG.removeGTGEventListener(gtgEventListener);
@@ -563,6 +565,15 @@ public class GpsTrailerService extends Service {
 
 		if (batteryReceiver != null)
 			unregisterReceiver(batteryReceiver);
+
+		if (GTG.prefs.isCollectData ) //|| GTGEvent.ERROR_UNLICENSED.isOn)
+		{
+			Log.i("EXIT", "ondestroy!");
+			//hack to restart the service if the os decides to kill us.
+			Intent broadcastIntent = new Intent(this, GpsTrailerReceiver.class);
+			sendBroadcast(broadcastIntent);
+		}
+		DebugLogFile.log("onDestroy called, restart finished");
 	}
 
 	@Override
@@ -574,7 +585,6 @@ public class GpsTrailerService extends Service {
 	{
 		NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 		nm.cancel(GTG.FROG_NOTIFICATION_ID);
-		
 	}
 
 	public void shutdown() {

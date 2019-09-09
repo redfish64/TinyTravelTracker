@@ -95,7 +95,10 @@
             </intent-filter>
         </service>
 
-       <receiver android:name="com.rareventure.gps2.bootup.GpsTrailerReceiver" >
+       <receiver android:name="com.rareventure.gps2.bootup.GpsTrailerReceiver"
+           android:enabled = "true"
+           android:exported = "true"
+           android:label="RestartWhenStopped">
 
             <!--
             screen on and screen off intents will not fire from the manifest,
