@@ -27,7 +27,10 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -457,6 +460,15 @@ public class GpsTrailerService extends Service {
 
 			gpsManager.start();
 
+			//hack to try and keep our service from shutting down and never restarting
+			JobScheduler jobScheduler = (JobScheduler)getApplicationContext()
+					.getSystemService(JOB_SCHEDULER_SERVICE);
+			ComponentName componentName = new ComponentName(this,
+					JobSchedulerRestarterService.class);
+
+			JobInfo jobInfoObj = new JobInfo.Builder(1, componentName)
+					.setPeriodic(600*1000).setPersisted(true).build();
+			jobScheduler.schedule(jobInfoObj);
 		}
 		catch (Exception e) {
 			shutdownWithException(e);
