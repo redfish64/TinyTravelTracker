@@ -21,7 +21,6 @@ package com.rareventure.gps2.reviewer;
 
 import android.Manifest;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
@@ -121,7 +120,7 @@ public class SettingsActivity extends GTGPreferenceActivity implements OnPrefere
 					15 * 60 * 1000,
 					30 * 60 * 1000,
 					60 * 60 * 1000};
-	private CheckBoxPreference writeGpsWakeLockDebugFile;
+	private CheckBoxPreference writeDebugLogFile;
 
 
 	@Override
@@ -267,15 +266,15 @@ public class SettingsActivity extends GTGPreferenceActivity implements OnPrefere
 		advancedCategory.setTitle(getString(R.string.advanced));
 		root.addPreference(advancedCategory);
 
-		writeGpsWakeLockDebugFile = new CheckBoxPreference(this);
-		writeGpsWakeLockDebugFile.setTitle(R.string.write_to_gps_wake_lock_log);
-		writeGpsWakeLockDebugFile.setSummary(
+		writeDebugLogFile = new CheckBoxPreference(this);
+		writeDebugLogFile.setTitle(R.string.write_to_debug_log_file);
+		writeDebugLogFile.setSummary(
 				String.format(getString(R.string.write_to_gps_wake_lock_log_summary),
 						getString(R.string.gps_wake_lock_filename)));
-		writeGpsWakeLockDebugFile.setChecked(GTG.prefs.writeGpsWakeLockDebug);
-		writeGpsWakeLockDebugFile.setOnPreferenceClickListener(this);
+		writeDebugLogFile.setChecked(GTG.prefs.writeFileLogDebug);
+		writeDebugLogFile.setOnPreferenceClickListener(this);
 
-		advancedCategory.addPreference(writeGpsWakeLockDebugFile);
+		advancedCategory.addPreference(writeDebugLogFile);
     }
     
 
@@ -467,9 +466,9 @@ public class SettingsActivity extends GTGPreferenceActivity implements OnPrefere
 			GTG.prefs.isCollectData = isCollectData.isChecked();
 			GTG.runBackgroundTask(SAVE_PREFS_AND_RESTART_COLLECTOR);
 		}
-		else if(preference == writeGpsWakeLockDebugFile)
+		else if(preference == writeDebugLogFile)
 		{
-			GTG.prefs.writeGpsWakeLockDebug = writeGpsWakeLockDebugFile.isChecked();
+			GTG.prefs.writeFileLogDebug = writeDebugLogFile.isChecked();
 			GTG.runBackgroundTask(SAVE_PREFS_AND_RESTART_COLLECTOR);
 		}
 		else if(preference == createBackupFilePref)

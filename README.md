@@ -26,6 +26,19 @@ _Note to users: If you have an issue you would like to see fixed, please click o
 
 Changelog: (you can monitor the latest build here: https://f-droid.org/wiki/index.php?title=com.rareventure.gps2/lastbuild&redirect=no)
 
+V 1.1.48 (build 91) - 2019 Sep 10
+
+Attempt to fix #83, where Oreo and later Android versions kill the gps recording service.
+Now schedules a job which will run every 10 min or so to try and restart the service if stopped.
+
+V 1.1.46 (build 89) - 2019 July 13
+
+Fix so that the gps doesn't turn on and off constantly when at 100%. Thanks Kright!
+
+V 1.1.45 (build 88) - 2019 June 22
+
+Small tweak to hopefully prevent TTT service from being randomly shutdown by the OS in Oreo.
+
 V 1.1.44 (build 87) - 2019 May 6
 
 Added map style with large fonts.

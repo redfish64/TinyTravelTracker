@@ -176,7 +176,7 @@
     <string name="sdcard_not_present">External storage not mounted</string>
     <string name="allow_error_reporting">Allow Error Reporting</string>
     <string name="allow_error_reporting_summary">Allow an anonymous error report to be sent to the developer if an error occurs</string>
-    <string name="write_to_gps_wake_lock_log">Enable wake lock log</string>
+    <string name="write_to_debug_log_file">Enable debug log file to /sdcard/ttt_debug_log.txt</string>
     <string name="write_to_gps_wake_lock_log_summary">Write wake lock calls to \"%s\" for debugging purposes</string>
     <string name="gps_wake_lock_filename">/sdcard/ttt_wake_lock_debug.txt</string>
     <string name="conclusion_help_menu_tip"><![CDATA[If you would like to view the manual, on the following screen, press <img src="1"/> (or <img src="2"/> on older phones) and select "Help".]]></string>

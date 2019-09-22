@@ -27,7 +27,10 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -44,6 +47,7 @@ import android.os.PowerManager.WakeLock;
 import android.os.RemoteCallbackList;
 import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import com.rareventure.gps2.GTG.Requirement;
@@ -56,11 +60,13 @@ import com.rareventure.android.database.DbDatastoreAccessor;
 import com.rareventure.gps2.GTG.GTGEvent;
 import com.rareventure.gps2.GTG.GTGEventListener;
 import com.rareventure.gps2.GTG.SetupState;
+import com.rareventure.gps2.bootup.GpsTrailerReceiver;
 import com.rareventure.gps2.database.GpsLocationCache;
 import com.rareventure.gps2.database.GpsLocationRow;
 import com.rareventure.gps2.database.TAssert;
 import com.rareventure.gps2.reviewer.SettingsActivity;
 import com.rareventure.gps2.reviewer.wizard.WelcomePage;
+import com.rareventure.util.DebugLogFile;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -454,6 +460,15 @@ public class GpsTrailerService extends Service {
 
 			gpsManager.start();
 
+			//hack to try and keep our service from shutting down and never restarting
+			JobScheduler jobScheduler = (JobScheduler)getApplicationContext()
+					.getSystemService(JOB_SCHEDULER_SERVICE);
+			ComponentName componentName = new ComponentName(this,
+					JobSchedulerRestarterService.class);
+
+			JobInfo jobInfoObj = new JobInfo.Builder(1, componentName)
+					.setPeriodic(600*1000).setPersisted(true).build();
+			jobScheduler.schedule(jobInfoObj);
 		}
 		catch (Exception e) {
 			shutdownWithException(e);
@@ -545,6 +560,7 @@ public class GpsTrailerService extends Service {
 
 	@Override
 	public void onDestroy() {
+		super.onDestroy();
 		Log.d(TAG, "GPS Service Shutdown");
 
 		GTG.removeGTGEventListener(gtgEventListener);
@@ -561,6 +577,15 @@ public class GpsTrailerService extends Service {
 
 		if (batteryReceiver != null)
 			unregisterReceiver(batteryReceiver);
+
+		if (GTG.prefs.isCollectData ) //|| GTGEvent.ERROR_UNLICENSED.isOn)
+		{
+			Log.i("EXIT", "ondestroy!");
+			//hack to restart the service if the os decides to kill us.
+			Intent broadcastIntent = new Intent(this, GpsTrailerReceiver.class);
+			sendBroadcast(broadcastIntent);
+		}
+		DebugLogFile.log("onDestroy called, restart finished");
 	}
 
 	@Override
@@ -572,7 +597,6 @@ public class GpsTrailerService extends Service {
 	{
 		NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 		nm.cancel(GTG.FROG_NOTIFICATION_ID);
-		
 	}
 
 	public void shutdown() {
@@ -589,4 +613,11 @@ public class GpsTrailerService extends Service {
 
 	}
 
+	@Override
+	public void onTaskRemoved(Intent rootIntent) {
+		DebugLogFile.log("onTaskRemoved called, trying to restart");
+		ContextCompat.startForegroundService(this,new Intent(this,
+				GpsTrailerService.class));
+		DebugLogFile.log("onTaskRemoved called, restart finished");
+	}
 }

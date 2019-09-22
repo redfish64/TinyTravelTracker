@@ -23,13 +23,13 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import android.os.SystemClock;
-import android.util.Log;
 
 import com.rareventure.android.GpsReader;
 import com.rareventure.android.IntentTimer;
 import com.rareventure.android.TestUtil;
 import com.rareventure.android.WriteConstants;
 import com.rareventure.android.AndroidPreferenceSet.AndroidPreferences;
+import com.rareventure.util.DebugLogFile;
 
 /**
  * Decides when to turn on gps and when not to, and the locations to store, etc.
@@ -151,7 +151,7 @@ public class GpsTrailerGpsStrategy {
 			gpsBatteryManager.lastReadingSuccessful = true;
 			this.notify();
 			successfulGpsAttempts++;
-			intentTimer.writeDebug("Got reading");
+			DebugLogFile.log("Got reading");
 		}
 	}
 	
@@ -176,7 +176,7 @@ public class GpsTrailerGpsStrategy {
 				TestUtil.writeLong("totalGpsTries", os, gpsAttempts);
 				TestUtil.writeLong("longTimeWanted", os, this.desireManager.longTimeWanted);
 				TestUtil.writeLong("shortTimeWanted", os, this.desireManager.shortTimeWanted);
-				intentTimer.writeDebug( "gps use perc is "+prefs.batteryGpsOnTimePercentage );
+				DebugLogFile.log( "gps use perc is "+prefs.batteryGpsOnTimePercentage );
 			} catch (IOException e) {
 				e.printStackTrace();
 //				throw new IllegalStateException(e);
@@ -236,8 +236,8 @@ public class GpsTrailerGpsStrategy {
 		 *  a non synchronized block
 		 */
 		protected boolean updateFromStrategyThreadOnly(long deltaTimeMs) {
-			intentTimer.writeDebug("deltaTimeMs "+deltaTimeMs);
-			long timeFromPhoneBootMs = SystemClock.elapsedRealtime();
+			DebugLogFile.log("deltaTimeMs "+deltaTimeMs);
+			final long timeFromPhoneBootMs = SystemClock.elapsedRealtime();
 
 			//first lets update the stats so far
 			if(gpsOn)
@@ -264,7 +264,7 @@ public class GpsTrailerGpsStrategy {
 			
 			if(gpsOn)
 			{
-				long currentTimeGpsRunning = timeFromPhoneBootMs - gpsAttemptStartedFromPhoneBootMs;
+				final long currentTimeGpsRunning = timeFromPhoneBootMs - gpsAttemptStartedFromPhoneBootMs;
 
 				//if the desiremanager is satisfied, we successfully read a gps point, or
 				//the absolute time left to perform a gps reading is used up,
@@ -280,9 +280,14 @@ public class GpsTrailerGpsStrategy {
 					}
 					else
 						desireManager.updateDesiresForUnsuccessfulReading(gpsTimeAvailable);
-					
+
 					nextSignificantEvent = desireManager.waitTimeMs + timeFromPhoneBootMs;
-					
+
+					if (prefs.batteryGpsOnTimePercentage == 1.0f) {
+						// don't disable gps if want to use it 100% of time
+						return true;
+					}
+
 					return false;
 				}
 				else //we want to keep gps on
@@ -307,7 +312,7 @@ public class GpsTrailerGpsStrategy {
 					{
 						//TODO 3 this is a hack to print a warning out to the wake lock debug file
 						// I should probably have just a general file for extended log messages
-						intentTimer.writeDebug("gps desire manager has asked for more than allowed time,"
+						DebugLogFile.log("gps desire manager has asked for more than allowed time,"
 								+" gpsTimeAvailable: "+gpsTimeAvailable
 								+", desireManager.currTimeWanted: "+desireManager.currTimeWanted);
 						timeToLeaveGpsOn = gpsTimeAvailable;
@@ -337,7 +342,7 @@ public class GpsTrailerGpsStrategy {
          * @return
          */
 		public long calcFreeGpsTimeMs(long currTimeMs) {
-			intentTimer.writeDebug("currTimeMs "+currTimeMs+" startTimeFromPhoneBoot "+startTimeFromPhoneBootMs
+			DebugLogFile.log("currTimeMs "+currTimeMs+" startTimeFromPhoneBoot "+startTimeFromPhoneBootMs
 			+"totalTimeGpsRunning "+totalTimeGpsRunningMs);
 			return (long) ((currTimeMs - startTimeFromPhoneBootMs) * prefs.batteryGpsOnTimePercentage -
 					totalTimeGpsRunningMs);
@@ -364,7 +369,7 @@ public class GpsTrailerGpsStrategy {
 					
 					while(!isShutdownRequested)
 					{
-						/* ttt_installer:remove_line */intentTimer.writeDebug("About to enter synchronization block");
+						/* ttt_installer:remove_line */DebugLogFile.log("About to enter synchronization block");
 						//this thread is responsible for turning on and off gpsreader
 						//as well as updating nextsignificantevent and calling the desireManager
 						//to determine how long to wait and how much time to use for each gps reading
@@ -385,7 +390,7 @@ public class GpsTrailerGpsStrategy {
 							if(nextSignificantEvent > timeFromPhoneBootMs)
 							{
 								
-								/* ttt_installer:remove_line */intentTimer.writeDebug("About to wait for "+(nextSignificantEvent - timeFromPhoneBootMs));
+								/* ttt_installer:remove_line */DebugLogFile.log("About to wait for "+(nextSignificantEvent - timeFromPhoneBootMs));
 								
 								//we only turn off our wake lock if we aren't running gps
 								//note, not sure if this is necessary, but even if it works for my
@@ -395,7 +400,7 @@ public class GpsTrailerGpsStrategy {
 								if(!wantGps)
 								{
 									intentTimer.sleepUntil(nextSignificantEvent);
-									/* ttt_installer:remove_line */intentTimer.writeDebug("Turned off wake lock");
+									/* ttt_installer:remove_line */DebugLogFile.log("Turned off wake lock");
 								}
 
 								if(isShutdownRequested)
@@ -408,35 +413,32 @@ public class GpsTrailerGpsStrategy {
 
 								intentTimer.acquireWakeLock();
 
-								/* ttt_installer:remove_line */intentTimer.writeDebug("Acquired wake lock, done waiting for "+(nextSignificantEvent - timeFromPhoneBootMs));
+								/* ttt_installer:remove_line */DebugLogFile.log("Acquired wake lock, done waiting for "+(nextSignificantEvent - timeFromPhoneBootMs));
 								timeFromPhoneBootMs = SystemClock.elapsedRealtime();
 							}
 							
 							if(isShutdownRequested)
 								break;
-							/* ttt_installer:remove_line */intentTimer.writeDebug("About to update strategy");
+							/* ttt_installer:remove_line */DebugLogFile.log("About to update strategy");
 							wantGps = updateFromStrategyThreadOnly(waitTimeMs);
 							lastGpsStatsUpdateFromPhoneBootMs = timeFromPhoneBootMs;
 						}
-						/* ttt_installer:remove_line */intentTimer.writeDebug("About to update gpsReader to "+wantGps);
+						/* ttt_installer:remove_line */DebugLogFile.log("About to update gpsReader to "+wantGps);
 						
 						//we don't want deadlocks, so we keep this outside of the synchronized loop
-						if(wantGps)
-							gpsReader.turnOn();
-						else
-							gpsReader.turnOff();
+						gpsReader.turn(wantGps);
 						
-						/* ttt_installer:remove_line */intentTimer.writeDebug("About to set gpsOn and writeUpdateStatus");
+						/* ttt_installer:remove_line */DebugLogFile.log("About to set gpsOn and writeUpdateStatus");
 						synchronized(GpsTrailerGpsStrategy.this)
 						{
 							gpsOn = wantGps;
 							writeUpdateStatus();
 						}
-						/* ttt_installer:remove_line */intentTimer.writeDebug("Looping while not shutdown");
+						/* ttt_installer:remove_line */DebugLogFile.log("Looping while not shutdown");
 						
 					} //while running
 					
-					/* ttt_installer:remove_line */intentTimer.writeDebug("Gps Strategy is shutdown");
+					/* ttt_installer:remove_line */DebugLogFile.log("Gps Strategy is shutdown");
 				} catch (Exception e)
 				{
 					e.printStackTrace();
@@ -664,8 +666,8 @@ public class GpsTrailerGpsStrategy {
 
 			//reset long time wanted back to the minimum whenever we get a reading
 			longTimeWanted = (long) (prefs.minLongTimeOfShortTimeMultiplier * shortTimeWanted) + 1;
-			
-			waitTimeMs = calculateAbsTimeNeeded((long) (shortTimeWanted * prefs.extraWaitTimeShortTimeMultiplier + shortTimeWanted)+1);
+
+			waitTimeMs = calculateAbsTimeNeeded(getTotalWantedGpsTimeMs());
 			currTimeWanted = shortTimeWanted;
 		}
 	
@@ -683,7 +685,7 @@ public class GpsTrailerGpsStrategy {
 			//we need to budget our time for gps so we can run short runs periodically, and
 			//if enough time has passed, then do a long run
 
-			long totalWantedGpsTimeMs = (long) (shortTimeWanted * prefs.extraWaitTimeShortTimeMultiplier + shortTimeWanted)+1;
+			final long totalWantedGpsTimeMs = getTotalWantedGpsTimeMs();
 			waitTimeMs = calculateAbsTimeNeeded(totalWantedGpsTimeMs);
 			
 			//if there is enough time to do a long run
@@ -709,6 +711,10 @@ public class GpsTrailerGpsStrategy {
 			
 		}
 
+		private long getTotalWantedGpsTimeMs() {
+			return (long) (shortTimeWanted * prefs.extraWaitTimeShortTimeMultiplier + shortTimeWanted)+1;
+		}
+
 		/**
 		 * Simply calculates the total time needed to wait for a 
 		 * certain amount of gps time, ignoring any current data.
@@ -725,7 +731,7 @@ public class GpsTrailerGpsStrategy {
 
 	public void notifyWoken() {
 		//make sure we stay awake until we want to sleep again
-//		intentTimer.writeDebug("gps manager notify woken");
+//		DebugLogFile.log("gps manager notify woken");
 		intentTimer.acquireWakeLock();
 		synchronized(this)
 		{

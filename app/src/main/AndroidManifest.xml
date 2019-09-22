@@ -87,15 +87,14 @@
             </intent-filter>
         </service>
 
-        <service
-            android:exported="false"
-            android:name="com.rareventure.gps2.TrialService">
-            <intent-filter>
-                <action android:name="com.rareventure.gps2.ITrialService" />
-            </intent-filter>
-        </service>
+        <service android:name="com.rareventure.gps2.JobSchedulerRestarterService"
+            android:permission="android.permission.BIND_JOB_SERVICE" ></service>
 
-       <receiver android:name="com.rareventure.gps2.bootup.GpsTrailerReceiver" >
+
+       <receiver android:name="com.rareventure.gps2.bootup.GpsTrailerReceiver"
+           android:enabled = "true"
+           android:exported = "true"
+           android:label="RestartWhenStopped">
 
             <!--
             screen on and screen off intents will not fire from the manifest,
