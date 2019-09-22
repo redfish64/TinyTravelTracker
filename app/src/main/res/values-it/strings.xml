@@ -130,8 +130,8 @@
     <string name="accept">Accetta</string>
     <string name="decline">Rifiuta</string>
     <string name="moving_trial_data_to_premium_long_task">Transferring points from trial application...</string>
-    <string name="create_gpx_backup_progress_title">Creating backup file</string>
-    <string name="create_gpx_backup_progress_msg">Please wait…</string>
+    <string name="create_gpx_backup_progress_title">Creazione backup file</string>
+    <string name="create_gpx_backup_progress_msg">Attendere prego…</string>
     <string name="create_gpx_backup_error_cant_write_backup">There was an error attempting to write to backup file. Make sure you have an SD Card inserted and are not mounting it on your computer</string>
     <string name="create_backup_pref">Backup/Esporta come GPX</string>
     <string name="create_restore_pref">Ripristina da GPX</string>
