@@ -51,6 +51,9 @@ public class SpeechBubbleWidget extends ViewGroup {
 				a.getDimensionPixelOffset(R.styleable.SpeechBubbleWidget_speechBubbleTriWidth, 5),
 				a.getDimensionPixelOffset(R.styleable.SpeechBubbleWidget_speechBubbleTriHeight, 5),
 				a.getDimensionPixelOffset(R.styleable.SpeechBubbleWidget_speechBubbleInnerPad, 5));
+		if (a != null) {
+			a.recycle();
+		}
 	} 
 
 	/**

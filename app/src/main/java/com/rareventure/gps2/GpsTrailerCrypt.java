@@ -472,6 +472,9 @@ public class GpsTrailerCrypt {
 								+ "udk.app_id != ? and udk._id != "
 								+ "(select max(_id) from user_data_key udk2 where udk2.app_id = udk.app_id)",
 						new String[] { String.valueOf(GTG.MASTER_APP_ID) });
+		if (c != null) {
+			c.close();
+		}
 
 		Cursor c2 = null;
 
