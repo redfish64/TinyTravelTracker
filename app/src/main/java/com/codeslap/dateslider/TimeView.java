@@ -24,8 +24,8 @@ import android.view.Gravity;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.rareventure.gps2.reviewer.EnterFromDateToToDateActivity;
-import com.rareventure.gps2.reviewer.EnterFromDateToToDateActivity.TimeObject;
+import com.igisw.openlocationtracker.EnterFromDateToToDateActivity;
+import com.igisw.openlocationtracker.EnterFromDateToToDateActivity.TimeObject;
 
 import java.util.Calendar;
 

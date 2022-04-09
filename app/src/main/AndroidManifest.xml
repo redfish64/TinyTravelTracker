@@ -3,8 +3,8 @@
 
     <!-- NOTE, below, sharedUserId enables the premium installation to tell the trial installation to give it its preferences -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.rareventure.gps2"
-    android:sharedUserId="com.rareventure.gps2"
+    package="com.igisw.openlocationtracker"
+    android:sharedUserId="com.igisw.openlocationtracker"
     >
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -45,13 +45,15 @@
         android:smallScreens="true" />
 
     <application
-        android:name="com.rareventure.gps2.GpsTrailerReviewerApplication"
+        android:name="com.igisw.openlocationtracker.GpsTrailerReviewerApplication"
         android:icon="@drawable/icon_trial"
         android:theme="@android:style/Theme.NoTitleBar"
         android:label="@string/app_name" >
 
 	    <!-- <activity android:name="com.google.ads.AdActivity"
               android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"/> -->
+
+        <!--
 	    <activity
 	        android:name="com.rareventure.gps2.reviewer.map.OsmMapGpsTrailerReviewerMapActivity"
             android:label="@string/reviewer_app_name"
@@ -63,6 +65,20 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        -->
+
+        <activity
+            android:name="com.igisw.openlocationtracker.OsmMapGpsTrailerReviewerMapActivity"
+            android:label="@string/reviewer_app_name"
+            android:configChanges="orientation|keyboardHidden"
+            android:screenOrientation="portrait" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
 	    <activity android:name="org.acra.CrashReportDialog"
 	        android:theme="@android:style/Theme.Dialog"
 	        android:launchMode="singleInstance"
@@ -77,22 +93,22 @@
         -->
         <service
             android:exported="false"
-            android:name="com.rareventure.gps2.GpsTrailerService">
+            android:name="com.igisw.openlocationtracker.GpsTrailerService">
             <intent-filter>
-                <action android:name="com.rareventure.gps2.IGpsTrailerService" />
+                <action android:name="com.igisw.openlocationtracker.IGpsTrailerService" />
                 <!--
                      This is an action code you can use to select the service
                      without explicitly supplying the implementation class.
                 -->
-                <action android:name="com.rareventure.gps2.GPS_TRAILER" />
+                <action android:name="com.igisw.openlocationtracker.GPS_TRAILER" />
             </intent-filter>
         </service>
 
-        <service android:name="com.rareventure.gps2.JobSchedulerRestarterService"
+        <service android:name="com.igisw.openlocationtracker.JobSchedulerRestarterService"
             android:permission="android.permission.BIND_JOB_SERVICE" ></service>
 
 
-       <receiver android:name="com.rareventure.gps2.bootup.GpsTrailerReceiver"
+       <receiver android:name="com.igisw.openlocationtracker.GpsTrailerReceiver"
            android:enabled = "true"
            android:exported = "true"
            android:label="RestartWhenStopped">
@@ -125,72 +141,77 @@
                 <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
             </intent-filter>
             <intent-filter>
-                <action android:name="com.rareventure.gps2.bootup.GpsTrailerReceiver" />
+                <action android:name="com.igisw.openlocationtracker.GpsTrailerReceiver" />
             </intent-filter>
             </receiver>
 
-        <activity android:name="com.rareventure.gps2.reviewer.wizard.WelcomePage" 
+        <activity android:name="com.igisw.openlocationtracker.WelcomePage"
             android:screenOrientation="portrait" >
         </activity>
        <!-- TODO 3 portrait because the progress dialog screws up when switching orientations -->
-        <activity android:name="com.rareventure.gps2.reviewer.wizard.ShouldHavePasswordPage" android:screenOrientation="portrait" >
+        <activity android:name="com.igisw.openlocationtracker.ShouldHavePasswordPage" android:screenOrientation="portrait" >
         </activity>
-        <activity android:name="com.rareventure.gps2.reviewer.wizard.BatteryLifePage" android:screenOrientation="portrait"  >
+        <activity android:name="com.igisw.openlocationtracker.BatteryLifePage" android:screenOrientation="portrait"  >
         </activity>
-        <activity android:name="com.rareventure.gps2.reviewer.wizard.ConclusionPage" android:screenOrientation="portrait" >
+        <activity android:name="com.igisw.openlocationtracker.ConclusionPage" android:screenOrientation="portrait" >
         </activity>
-        <activity android:name="com.rareventure.gps2.reviewer.wizard.EnterNewPasswordPage" android:screenOrientation="portrait"  android:launchMode="singleTop">
+        <activity android:name="com.igisw.openlocationtracker.EnterNewPasswordPage" android:screenOrientation="portrait"  android:launchMode="singleTop">
         </activity>
-        <activity android:name="com.rareventure.gps2.reviewer.SettingsActivity" android:screenOrientation="portrait"
+        <activity android:name="com.igisw.openlocationtracker.SettingsActivity" android:screenOrientation="portrait"
              android:launchMode="singleTop"
             >
         </activity>
-        <activity android:name="com.rareventure.gps2.reviewer.password.EnterPasswordActivity" 
+        <activity android:name="com.igisw.openlocationtracker.EnterPasswordActivity"
             android:windowSoftInputMode="stateAlwaysVisible"
             android:screenOrientation="portrait" >
         </activity>
-        <activity android:name="com.rareventure.gps2.reviewer.wizard.TurnOnGpsPage" android:screenOrientation="portrait" >
+        <activity android:name="com.igisw.openlocationtracker.TurnOnGpsPage" android:screenOrientation="portrait" >
         </activity>
-        <activity android:name="com.rareventure.gps2.reviewer.wizard.HelpDeveloperPage" android:screenOrientation="portrait" >
+        <activity android:name="com.igisw.openlocationtracker.HelpDeveloperPage" android:screenOrientation="portrait" >
         </activity>
-        <activity android:name="com.rareventure.gps2.reviewer.map.FullMediaGalleryActivity"  android:screenOrientation="portrait">
+        <activity android:name="com.igisw.openlocationtracker.FullMediaGalleryActivity"  android:screenOrientation="portrait">
         </activity>
-        <activity android:name="com.rareventure.gps2.reviewer.DbDoesntExistActivity"  android:screenOrientation="portrait">
+        <activity android:name="com.igisw.openlocationtracker.DbDoesntExistActivity"  android:screenOrientation="portrait">
         </activity>
-        <activity android:name="com.rareventure.gps2.reviewer.TimmyCorruptActivity" android:screenOrientation="portrait" >
+        <activity android:name="com.igisw.openlocationtracker.TimmyCorruptActivity" android:screenOrientation="portrait" >
         </activity>
-        <activity android:name="com.rareventure.gps2.reviewer.TrialExpiredActivity" android:screenOrientation="portrait" >
+        <!--
+        <activity android:name="com.igisw.openlocationtracker.TrialExpiredActivity" android:screenOrientation="portrait" >
         </activity>
-        <activity android:name="com.rareventure.gps2.reviewer.TimmyNeedsUpgradeActivity"  android:screenOrientation="portrait">
+        -->
+        <activity android:name="com.igisw.openlocationtracker.TimmyNeedsUpgradeActivity"  android:screenOrientation="portrait">
         </activity>
-        <activity android:name="com.rareventure.gps2.reviewer.TimmyNeedsProcessingActivity"  android:screenOrientation="portrait">
+        <activity android:name="com.igisw.openlocationtracker.TimmyNeedsProcessingActivity"  android:screenOrientation="portrait">
         </activity>
-        <activity android:name="com.rareventure.android.FatalErrorActivity"  android:screenOrientation="portrait">
+        <activity android:name="com.igisw.openlocationtracker.FatalErrorActivity"  android:screenOrientation="portrait">
         </activity>
-        <activity android:name="com.rareventure.gps2.reviewer.imageviewer.ViewImage" >
+        <activity android:name="com.igisw.openlocationtracker.ViewImage" >
         </activity>
-        <activity android:name="com.rareventure.gps2.reviewer.AboutScreen" >
+        <activity android:name="com.igisw.openlocationtracker.AboutScreen" >
         </activity>
-        <activity android:name="com.rareventure.gps2.reviewer.ShowManual" >
+        <activity android:name="com.igisw.openlocationtracker.ShowManual" >
         </activity>
-        <activity android:name="com.rareventure.gps2.reviewer.ChooseColorsScreen"  android:screenOrientation="portrait">
+        <activity android:name="com.igisw.openlocationtracker.ChooseColorsScreen"  android:screenOrientation="portrait">
         </activity>
-        <activity android:name="com.rareventure.gps2.reviewer.EnterFromDateToToDateActivity"  android:screenOrientation="portrait"  android:launchMode="singleTop">
+        <activity android:name="com.igisw.openlocationtracker.EnterFromDateToToDateActivity"  android:screenOrientation="portrait"  android:launchMode="singleTop">
         </activity>
         <!-- portrait because the progress dialog screws up when switching orientations -->
-        <activity android:name="com.rareventure.gps2.gpx.CreateGpxBackup"
+        <activity android:name="com.igisw.openlocationtracker.CreateGpxBackup"
             android:screenOrientation="portrait"
             android:launchMode="singleTask"
               >
         </activity>
         <!-- portrait because the progress dialog screws up when switching orientations -->
-        <activity android:name="com.rareventure.gps2.gpx.RestoreGpxBackup"
+        <activity android:name="com.igisw.openlocationtracker.RestoreGpxBackup"
             android:screenOrientation="portrait" 
             android:launchMode="singleTask"
              >
         </activity>
+
+        <!--
         <activity android:name="com.lamerman.FileDialog" >
         </activity>
+        -->
         
     </application>
 

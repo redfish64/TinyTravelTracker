@@ -18,15 +18,20 @@
 
 package com.codeslap.dateslider;
 
-import com.rareventure.gps2.GTG;
-import com.rareventure.gps2.reviewer.EnterFromDateToToDateActivity;
-
+//import com.rareventure.gps2.GTG;
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.Log;
-import android.view.*;
+import android.view.Display;
+import android.view.Gravity;
+import android.view.MotionEvent;
+import android.view.VelocityTracker;
+import android.view.View;
+import android.view.ViewConfiguration;
+import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.Scroller;
+
+import com.igisw.openlocationtracker.EnterFromDateToToDateActivity;
 
 
 public class ScrollLayout extends LinearLayout {

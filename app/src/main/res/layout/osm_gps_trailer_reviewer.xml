@@ -5,7 +5,15 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent" >
 
+    <!--
     <com.rareventure.gps2.reviewer.map.OsmMapView
+        android:id="@+id/osmmapview"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:clickable="true" />
+    -->
+    
+    <com.igisw.openlocationtracker.OsmMapView
         android:id="@+id/osmmapview"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
@@ -22,19 +30,19 @@
             android:id="@+id/tooltip"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            class="com.rareventure.android.widget.ToolTipFragment" />
+            class="com.igisw.openlocationtracker.ToolTipFragment" />
 
         <fragment
             android:id="@+id/infoNotice"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            class="com.rareventure.android.widget.InfoNoticeStatusFragment" />
+            class="com.igisw.openlocationtracker.InfoNoticeStatusFragment" />
 
         <fragment
             android:id="@+id/status"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            class="com.rareventure.android.widget.OngoingProcessStatusFragment" />
+            class="com.igisw.openlocationtracker.OngoingProcessStatusFragment" />
 
         <LinearLayout
             android:layout_width="fill_parent"
@@ -144,7 +152,7 @@
             android:layout_height="wrap_content"
             android:paddingLeft="5dp" >
 
-            <com.rareventure.gps2.reviewer.map.MapScaleWidget
+            <com.igisw.openlocationtracker.MapScaleWidget
                 android:id="@+id/scaleWidget"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -161,7 +169,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content" >
 
-            <com.rareventure.gps2.reviewer.timeview.TimeView
+            <com.igisw.openlocationtracker.TimeView
                 android:id="@+id/timeview"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"

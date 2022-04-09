@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 32
     defaultConfig {
-        applicationId "com.rareventure.gps2"
+        applicationId "com.igisw.openlocationtracker"
         minSdkVersion 21
         targetSdkVersion 30
         versionCode 91
@@ -51,5 +51,5 @@ dependencies {
     //this is for asking the user for permissions
     implementation 'joda-time:joda-time:2.10.14'
     //implementation 'de.idyl:winzipaes:1.0.1'
-    implementation 'com.codeslap:android-dateslider:0.0.5'
+    //implementation 'com.codeslap:android-dateslider:0.0.5'
 }

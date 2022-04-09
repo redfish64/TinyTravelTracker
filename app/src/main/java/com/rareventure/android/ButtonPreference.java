@@ -20,19 +20,10 @@
 package com.rareventure.android;
 
 import android.content.Context;
-import android.preference.DialogPreference;
 import android.preference.Preference;
 import android.util.AttributeSet;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import com.rareventure.gps2.R;
-import com.rareventure.gps2.GTG;
-import com.rareventure.gps2.GpsTrailerCrypt;
+//import com.rareventure.gps2.R;
 
 public class ButtonPreference extends Preference 
 {
