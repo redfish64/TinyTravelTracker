@@ -35,8 +35,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
-import android.util.Log;
+import androidx.core.content.ContextCompat;
 
 import pl.tajchert.nammu.Nammu;
 import pl.tajchert.nammu.PermissionCallback;

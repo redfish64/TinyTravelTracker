@@ -951,7 +951,8 @@ public class TimeView extends View {
 		tempRect.right = getWidth();
 		tempRect.bottom = getHeight();
 
-		canvas.clipRect(tempRect, Op.REPLACE);
+		//canvas.clipRect(tempRect, Op.REPLACE); https://stackoverflow.com/a/50247323/1118383
+		canvas.clipRect(tempRect, Op.INTERSECT); // TODO: igor: review
 	}
 
 	private int getStripDataIndex(double currYPos) {

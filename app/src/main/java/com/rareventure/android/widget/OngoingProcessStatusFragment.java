@@ -19,17 +19,6 @@
 */
 package com.rareventure.android.widget;
 
-import java.util.Map;
-import java.util.TreeMap;
-
-import android.app.Activity;
-import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
-
 import com.rareventure.gps2.R;
 
 /**

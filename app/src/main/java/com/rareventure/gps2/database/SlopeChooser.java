@@ -19,13 +19,13 @@
 */
 package com.rareventure.gps2.database;
 
+import com.rareventure.android.Util;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 
-import junit.framework.Assert;
-
-import com.rareventure.android.Util;
+//import junit.framework.Assert;
 
 public class SlopeChooser {
 	private HashSet<Point> pointsHash = new HashSet<SlopeChooser.Point>();

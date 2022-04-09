@@ -21,20 +21,22 @@ package com.rareventure.gps2.gpx;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.lamerman.FileDialog;
-import com.lamerman.SelectionMode;
+import androidx.core.content.ContextCompat;
+
+//import com.lamerman.FileDialog;
 import com.rareventure.android.DbUtil;
 import com.rareventure.android.ProgressDialogActivity;
 import com.rareventure.android.database.DbDatastoreAccessor;
@@ -70,6 +72,8 @@ import de.idyl.winzipaes.impl.AESDecrypterBC;
 import de.idyl.winzipaes.impl.ExtZipEntry;
 
 public class RestoreGpxBackup extends ProgressDialogActivity {
+
+	private static final int PICKFILE_RESULT_CODE = 1;
 
 	public class FileInfo {
 
@@ -353,6 +357,7 @@ public class RestoreGpxBackup extends ProgressDialogActivity {
 	}
 
 	public void onFileBrowserButton(View v) {
+		/*
 		Intent intent = new Intent(getBaseContext(), FileDialog.class);
 		intent.putExtra(FileDialog.START_PATH, Environment
 				.getExternalStorageDirectory().toString());
@@ -366,6 +371,32 @@ public class RestoreGpxBackup extends ProgressDialogActivity {
 		intent.putExtra(FileDialog.SELECTION_MODE, SelectionMode.MODE_OPEN);
 
 		startInternalActivityForResult(intent, REQUEST_BROWSE);
+		*/
+
+		// ACTION_OPEN_DOCUMENT is the intent to choose a file via the system's file
+		// browser.
+		Intent fileintent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+
+		// Filter to only show results that can be "opened", such as a
+		// file (as opposed to a list of contacts or timezones)
+		fileintent.addCategory(Intent.CATEGORY_OPENABLE);
+
+		String[] mimeTypes = {"application/zip","application/gpx"};
+		fileintent.setType(mimeTypes.length == 1 ? mimeTypes[0] : "*/*");
+		if (mimeTypes.length > 0) {
+			fileintent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
+		}
+		//fileintent.setType("*/*");
+		try {
+			startActivityForResult(fileintent, PICKFILE_RESULT_CODE);
+			//Uri uri = fileintent.getData();
+			//FilePath = FileUtils.getPath(this, uri);
+
+		} catch (ActivityNotFoundException e) {
+			//Log.e("tag", "No activity can handle picking a file. Showing alternatives.");
+
+		}
+
 	}
 
 	@Override
@@ -375,8 +406,12 @@ public class RestoreGpxBackup extends ProgressDialogActivity {
 		if (resultCode == Activity.RESULT_OK) {
 
 			if (requestCode == REQUEST_BROWSE) {
-				File chosenFile = new File(data
-				.getStringExtra(FileDialog.RESULT_PATH));
+				String filePath ;
+				Uri uri = data.getData();
+
+				filePath = com.igisw.openmoneybox.RealPathUtil.getRealPath(getApplicationContext(), uri);
+
+				File chosenFile = new File(filePath);
 
 				File sdcardPath = Environment.getExternalStorageDirectory();
 				try {

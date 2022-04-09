@@ -45,7 +45,7 @@ import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.widget.ImageView;
 
-abstract class ImageViewTouchBase extends android.support.v7.widget.AppCompatImageView {
+abstract class ImageViewTouchBase extends androidx.appcompat.widget.AppCompatImageView {
 
     @SuppressWarnings("unused")
     private static final String TAG = "ImageViewTouchBase";

@@ -53,7 +53,7 @@ public interface TimeView {
     /**
      * This is a simple implementation of a TimeView which realised through a TextView.
      */
-    class TimeTextView extends android.support.v7.widget.AppCompatTextView implements TimeView {
+    class TimeTextView extends androidx.appcompat.widget.AppCompatTextView implements TimeView {
         private long endTime, startTime;
 
         /**

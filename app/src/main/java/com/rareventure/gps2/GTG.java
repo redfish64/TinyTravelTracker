@@ -19,15 +19,6 @@
 */
 package com.rareventure.gps2;
 
-import java.io.File;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.WeakHashMap;
-
-import org.acra.ACRA;
-
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -37,8 +28,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.StatFs;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
+
+import androidx.core.content.ContextCompat;
 
 import com.rareventure.android.AndroidPreferenceSet;
 import com.rareventure.android.AndroidPreferenceSet.AndroidPreferences;
@@ -62,6 +54,15 @@ import com.rareventure.gps2.reviewer.map.OsmMapGpsTrailerReviewerMapActivity;
 import com.rareventure.gps2.reviewer.map.OsmMapView;
 import com.rareventure.util.BackgroundRunner;
 import com.rareventure.util.ReadWriteThreadManager;
+
+import org.acra.ACRA;
+
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 /**
  * Gps Trailer Globals... The reason we stick everything

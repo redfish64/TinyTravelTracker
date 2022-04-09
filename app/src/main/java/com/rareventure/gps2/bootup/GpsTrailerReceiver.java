@@ -20,14 +20,11 @@
 package com.rareventure.gps2.bootup;
 
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.support.v4.content.ContextCompat;
+import androidx.core.content.ContextCompat;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.rareventure.gps2.GTG;
 import com.rareventure.gps2.GpsTrailerService;
 
 public class GpsTrailerReceiver extends BroadcastReceiver

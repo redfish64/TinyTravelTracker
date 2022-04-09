@@ -21,7 +21,7 @@ package com.rareventure.android;
 
 import com.rareventure.gps2.database.TAssert;
 
-import junit.framework.Assert;
+//import junit.framework.Assert;
 
 
 

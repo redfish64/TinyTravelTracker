@@ -19,6 +19,26 @@
 */
 package com.rareventure.gps2;
 
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteStatement;
+import android.util.Log;
+
+import com.rareventure.android.AndroidPreferenceSet.AndroidPreferences;
+import com.rareventure.android.Crypt;
+import com.rareventure.android.DbUtil;
+import com.rareventure.android.Util;
+import com.rareventure.gps2.database.GpsLocationRow;
+import com.rareventure.gps2.database.TAssert;
+import com.rareventure.gps2.database.TimeZoneTimeRow;
+import com.rareventure.gps2.database.UserLocationRow;
+import com.rareventure.gps2.database.cache.AreaPanel;
+import com.rareventure.gps2.database.cache.MediaLocTime;
+import com.rareventure.gps2.database.cache.TimeTree;
+
+import org.junit.Assert;
+
 import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
 import java.security.KeyPair;
@@ -27,7 +47,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
-import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
@@ -35,27 +54,7 @@ import java.util.HashMap;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
-import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
-
-import junit.framework.Assert;
-import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteStatement;
-import android.util.Log;
-
-import com.rareventure.android.Crypt;
-import com.rareventure.android.DbUtil;
-import com.rareventure.android.Util;
-import com.rareventure.android.AndroidPreferenceSet.AndroidPreferences;
-import com.rareventure.gps2.database.GpsLocationRow;
-import com.rareventure.gps2.database.TAssert;
-import com.rareventure.gps2.database.TimeZoneTimeRow;
-import com.rareventure.gps2.database.UserLocationRow;
-import com.rareventure.gps2.database.cache.AreaPanel;
-import com.rareventure.gps2.database.cache.MediaLocTime;
-import com.rareventure.gps2.database.cache.TimeTree;
 
 public class GpsTrailerCrypt {
 	private static final int SALT_LENGTH = 32;

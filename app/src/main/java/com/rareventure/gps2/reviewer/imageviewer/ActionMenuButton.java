@@ -36,22 +36,21 @@
 package com.rareventure.gps2.reviewer.imageviewer;
 
 
-import com.rareventure.gps2.R;
-
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.text.Layout;
 import android.util.AttributeSet;
-import android.widget.TextView;
+
+import com.rareventure.gps2.R;
 
 /**
  * TextView that draws a bubble behind the text. We cannot use a
  * LineBackgroundSpan because we want to make the bubble taller than the text
  * and TextView's clip is too aggressive.
  */
-public class ActionMenuButton extends android.support.v7.widget.AppCompatTextView {
+public class ActionMenuButton extends androidx.appcompat.widget.AppCompatTextView {
     private static final int CORNER_RADIUS = 8;
     private static final int PADDING_H = 5;
     private static final int PADDING_V = 1;

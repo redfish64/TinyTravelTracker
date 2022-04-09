@@ -20,41 +20,19 @@
 package com.rareventure.gps2.reviewer.map;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import android.Manifest;
-import android.content.Context;
-import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Matrix;
-import android.graphics.Paint;
-import android.graphics.Point;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
-import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.Toast;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.mapzen.tangram.LngLat;
 import com.mapzen.tangram.MapController;
 import com.mapzen.tangram.MapData;
-import com.rareventure.gps2.R;
-import com.rareventure.android.Util;
 import com.rareventure.android.AndroidPreferenceSet.AndroidPreferences;
 import com.rareventure.gps2.database.cache.AreaPanel;
-import com.rareventure.gps2.database.cache.AreaPanelCache;
 import com.rareventure.gps2.database.cache.AreaPanelSpaceTimeBox;
 
 //TODO 3: make this use gps service to determine the current location

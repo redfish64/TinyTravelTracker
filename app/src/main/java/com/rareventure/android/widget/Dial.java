@@ -19,23 +19,22 @@
 */
 package com.rareventure.android.widget;
 
-import java.util.ArrayList;
-import java.util.TimerTask;
-
-import junit.framework.Assert;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.rareventure.android.AndroidPreferenceSet.AndroidPreferences;
 import com.rareventure.android.HandlerTimer;
 import com.rareventure.android.Util;
-import com.rareventure.android.AndroidPreferenceSet.AndroidPreferences;
 import com.rareventure.android.widget.dial.Strip;
-import com.rareventure.gps2.GTG;
 import com.rareventure.gps2.database.TAssert;
+
+import java.util.ArrayList;
+import java.util.TimerTask;
+
+//import junit.framework.Assert;
 
 //TODO 4: settings window for preferences
 //TODO 4: redo dial movement using Scroller and VelocityTracker

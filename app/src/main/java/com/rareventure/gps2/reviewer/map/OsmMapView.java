@@ -21,15 +21,9 @@ package com.rareventure.gps2.reviewer.map;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Map;
-import java.util.stream.Stream;
 
 import android.content.Context;
 import android.content.res.AssetManager;
@@ -37,13 +31,12 @@ import android.graphics.Paint;
 import android.graphics.PointF;
 import android.os.Bundle;
 import android.os.Vibrator;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.Log;
 
 import com.mapzen.tangram.CameraPosition;
 import com.mapzen.tangram.MapChangeListener;
-import com.mapzen.tangram.SceneUpdate;
 import com.mapzen.tangram.networking.HttpHandler;
 import com.mapzen.tangram.LngLat;
 import com.mapzen.tangram.MapController;
@@ -51,7 +44,6 @@ import com.mapzen.tangram.MapView;
 
 import com.mapzen.tangram.TouchInput;
 import com.mapzen.tangram.viewholder.GLViewHolderFactory;
-import com.rareventure.android.AndroidPreferenceSet;
 import com.rareventure.gps2.R;
 import com.rareventure.android.SuperThread;
 import com.rareventure.android.Util;

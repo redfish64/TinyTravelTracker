@@ -19,9 +19,6 @@
 */
 package com.rareventure.gps2;
 
-import org.acra.ACRA;
-import org.acra.ErrorReporter;
-
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -34,43 +31,29 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.location.LocationManager;
 import android.os.BatteryManager;
 import android.os.Binder;
 import android.os.Build;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
-import android.os.PowerManager;
-import android.os.PowerManager.WakeLock;
 import android.os.RemoteCallbackList;
 import android.provider.Settings;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
-import com.rareventure.gps2.GTG.Requirement;
-import com.rareventure.gps2.IGpsTrailerService;
-import com.rareventure.gps2.IGpsTrailerServiceCallback;
-import com.rareventure.gps2.R;
-import com.rareventure.android.AndroidPreferenceSet;
+import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
+
 import com.rareventure.android.Util;
-import com.rareventure.android.database.DbDatastoreAccessor;
 import com.rareventure.gps2.GTG.GTGEvent;
 import com.rareventure.gps2.GTG.GTGEventListener;
-import com.rareventure.gps2.GTG.SetupState;
+import com.rareventure.gps2.GTG.Requirement;
 import com.rareventure.gps2.bootup.GpsTrailerReceiver;
-import com.rareventure.gps2.database.GpsLocationCache;
-import com.rareventure.gps2.database.GpsLocationRow;
-import com.rareventure.gps2.database.TAssert;
 import com.rareventure.gps2.reviewer.SettingsActivity;
-import com.rareventure.gps2.reviewer.wizard.WelcomePage;
 import com.rareventure.util.DebugLogFile;
 
+import org.acra.ACRA;
+
 import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import pl.tajchert.nammu.Nammu;
 

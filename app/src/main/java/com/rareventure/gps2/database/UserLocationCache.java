@@ -19,19 +19,11 @@
 */
 package com.rareventure.gps2.database;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-
-import junit.framework.Assert;
-import android.database.Cursor;
-
-import com.rareventure.android.DbUtil;
-import com.rareventure.android.Util;
 import com.rareventure.android.database.Cache;
 import com.rareventure.android.database.DbDatastoreAccessor;
-import com.rareventure.gps2.GTG;
 import com.rareventure.gps2.GpsTrailerCrypt;
+
+//import junit.framework.Assert;
 
 //TODO 2.5: PERF: Make this class not load all user locations into memory
 public class UserLocationCache extends Cache<UserLocationRow>{

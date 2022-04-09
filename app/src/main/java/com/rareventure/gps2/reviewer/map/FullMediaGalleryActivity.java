@@ -21,26 +21,20 @@ package com.rareventure.gps2.reviewer.map;
 
 import java.util.ArrayList;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.util.Log;
-import android.view.LayoutInflater;
+
+import androidx.fragment.app.FragmentActivity;
+
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.BaseAdapter;
 import android.widget.Gallery;
 import android.widget.Gallery.LayoutParams;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.rareventure.gps2.GTGActivity;
 import com.rareventure.gps2.R;
