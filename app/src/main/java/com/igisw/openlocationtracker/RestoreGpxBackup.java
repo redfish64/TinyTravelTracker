@@ -72,7 +72,7 @@ import de.idyl.winzipaes.impl.ExtZipEntry;
 
 public class RestoreGpxBackup extends ProgressDialogActivity {
 
-	private static final int PICKFILE_RESULT_CODE = 1;
+	private static final int PICKFILE_RESULT_CODE = 13;
 
 	public class FileInfo {
 
