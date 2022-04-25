@@ -45,13 +45,6 @@ import androidx.core.content.ContextCompat;
 
 import com.igisw.openlocationtracker.GTG.GTGEvent;
 import com.igisw.openlocationtracker.GTG.GTGEventListener;
-import com.igisw.openlocationtracker.GTG.Requirement;
-import com.igisw.openlocationtracker.GpsTrailerManager;
-import com.igisw.openlocationtracker.IGpsTrailerService;
-import com.igisw.openlocationtracker.IGpsTrailerServiceCallback;
-import com.igisw.openlocationtracker.GpsTrailerReceiver;
-import com.igisw.openlocationtracker.SettingsActivity;
-import com.igisw.openlocationtracker.DebugLogFile;
 
 import org.acra.ACRA;
 
@@ -250,37 +243,37 @@ public class GpsTrailerService extends Service {
 			new NotificationSetting(-1, -1, false, FLAG_TRIAL_EXPIRED, 0, null,
 											false),
 			*/
-			new NotificationSetting(R.drawable.red_error,
+			new NotificationSetting(android.R.drawable.ic_dialog_alert,
 					R.string.service_error_internal_error, true,
 					FLAG_ERROR_INTERNAL, 0, null, false),
 
-			new NotificationSetting(R.drawable.red_error,
+			new NotificationSetting(android.R.drawable.ic_dialog_alert,
 					R.string.service_error_sdcard_not_mounted, true,
 					FLAG_ERROR_SDCARD_NOT_MOUNTED, 0, null, false),
 
-			new NotificationSetting(R.drawable.red_error,
+			new NotificationSetting(android.R.drawable.ic_dialog_alert,
 					R.string.service_error_db_problem, true,
 					FLAG_ERROR_DB_PROBLEM, 0, null, false),
 
-			new NotificationSetting(R.drawable.red_error,
+			new NotificationSetting(android.R.drawable.ic_dialog_alert,
 					R.string.service_error_low_free_space, true,
 					FLAG_ERROR_LOW_FREE_SPACE, 0, null, false),
 
 			new NotificationSetting(-1, -1, false, FLAG_BATTERY_LOW, 0, null,
 							false),
 
-			new NotificationSetting(R.drawable.red_error,
+			new NotificationSetting(android.R.drawable.ic_dialog_alert,
 					R.string.service_gps_must_grant_permission, true, FLAG_ERROR_NO_GPS_PERMISSION,
 					0,null
 					, true),
 
-			new NotificationSetting(R.drawable.red_error,
+			new NotificationSetting(android.R.drawable.ic_dialog_alert,
 					R.string.service_gps_not_enabled, true, 0,
                                        FLAG_GPS_ENABLED, new Intent(
                                                        Settings.ACTION_LOCATION_SOURCE_SETTINGS)
 					, true),
 
-			new NotificationSetting(R.drawable.green, R.string.service_active,
+			new NotificationSetting(R.mipmap.ic_launcher_foreground, R.string.service_active,
 					false, FLAG_GPS_ENABLED | FLAG_FINISHED_STARTUP
 							| FLAG_COLLECT_ENABLED, 0, null, true) };
 
