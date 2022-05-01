@@ -46,7 +46,7 @@ import androidx.core.content.ContextCompat;
 import com.igisw.openlocationtracker.GTG.GTGEvent;
 import com.igisw.openlocationtracker.GTG.GTGEventListener;
 
-import org.acra.ACRA;
+//import org.acra.ACRA;
 
 import java.io.File;
 
@@ -458,7 +458,7 @@ public class GpsTrailerService extends Service {
 		}
 		catch (Exception e) {
 			shutdownWithException(e);
-			ACRA.getErrorReporter().handleException(e);
+			//ACRA.getErrorReporter().handleException(e);
 		}
 	}
 

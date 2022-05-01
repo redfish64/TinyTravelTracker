@@ -250,11 +250,13 @@ public class SettingsActivity extends GTGPreferenceActivity implements OnPrefere
         root.addPreference(restoreBackupFilePref);
         restoreBackupFilePref.setOnPreferenceClickListener(this);
 
+        /*
         allowErrorReporting = new CheckBoxPreference(this);
         allowErrorReporting.setTitle(R.string.allow_error_reporting);
         allowErrorReporting.setSummary(R.string.allow_error_reporting_summary);
         allowErrorReporting.setChecked(GTG.isAcraEnabled(this));
         root.addPreference(allowErrorReporting);
+		*/
 
         aboutPref = getPreferenceManager().createPreferenceScreen(this);
         aboutPref.setOnPreferenceClickListener(this);
@@ -366,12 +368,14 @@ public class SettingsActivity extends GTGPreferenceActivity implements OnPrefere
 	private void savePrefs()
 	{
 		//note, everything else (passwords, is collect gps) is saved immediately
-		
+
+		/*
 		if(allowErrorReporting.isChecked() != GTG.isAcraEnabled(this))
 		{
 			GTG.enableAcra(this, allowErrorReporting.isChecked());
 		}
-		
+		*/
+
 		if(percTimeGpsOn.getValue() != GpsTrailerGpsStrategy.prefs.batteryGpsOnTimePercentage*100
 			|| minBatteryLife.getValue() != GTG.prefs.minBatteryPerc*100)
 		{

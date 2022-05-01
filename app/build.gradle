@@ -5,9 +5,9 @@ android {
     defaultConfig {
         applicationId "com.igisw.openlocationtracker"
         minSdkVersion 21
-        targetSdkVersion 30
-        versionCode 91
-        versionName "1.1.48"
+        targetSdkVersion 32
+        versionCode 1
+        versionName "0.0.0.1"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
     buildTypes {
@@ -31,7 +31,7 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'androidx.appcompat:appcompat:1.4.1'
     implementation 'androidx.core:core:1.7.0'
-    implementation 'ch.acra:acra:4.11.1'
+    //implementation 'ch.acra:acra:4.11.1'
     implementation files('libs/bcprov-jdk18on-171.jar')
     testImplementation 'junit:junit:4.13.2'
     implementation 'junit:junit:4.13.2'

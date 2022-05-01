@@ -22,8 +22,6 @@ package com.igisw.openlocationtracker;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
 import android.os.StatFs;
@@ -32,11 +30,8 @@ import android.util.Log;
 import androidx.core.content.ContextCompat;
 
 import com.igisw.openlocationtracker.AndroidPreferenceSet.AndroidPreferences;
-import com.rareventure.gps2.database.TAssert;
 import com.rareventure.util.BackgroundRunner;
 import com.rareventure.util.ReadWriteThreadManager;
-
-import org.acra.ACRA;
 
 import java.io.File;
 import java.io.IOException;
@@ -44,6 +39,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.WeakHashMap;
+
+//import org.acra.ACRA;
 
 /**
  * Gps Trailer Globals... The reason we stick everything
@@ -1558,6 +1555,7 @@ public class GTG {
 	/**
 	 * Sets whether to enable acra or not. Changes and saves to storedpreferences
 	 */
+	/*
 	public static void enableAcra(Context context, boolean checked) {
 	    //co: for use with ACRA 5+ (If I use it, it causes a problem acquiring wake locks)
 		//SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
@@ -1571,8 +1569,9 @@ public class GTG {
 			TAssert.fail("failed storing to shared prefs");
 		
 	}
+	*/
 
-
+	/*
 	public static boolean isAcraEnabled(Context context) {
         //co: for use with ACRA 5+ (If I use it, it causes a problem acquiring wake locks)
 		//SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
@@ -1580,7 +1579,7 @@ public class GTG {
 
 		return !sp.getBoolean(ACRA.PREF_DISABLE_ACRA, false);
 	}
-
+	*/
 
 	public static void setIsInRestore(boolean b) {
 		Requirement.NOT_IN_RESTORE.reset();

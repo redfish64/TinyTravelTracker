@@ -27,7 +27,7 @@ import android.content.Context;
 import com.igisw.openlocationtracker.GTG.GTGEvent;
 import com.rareventure.android.WorkerThread;
 
-import org.acra.ACRA;
+//import org.acra.ACRA;
 
 import java.util.ArrayList;
 
@@ -117,7 +117,7 @@ public class ProcessThread extends WorkerThread
 		{
 			e.printStackTrace();
 			GTG.alert(GTGEvent.ERROR_SERVICE_INTERNAL_ERROR);
-			ACRA.getErrorReporter().handleException(e);
+			//ACRA.getErrorReporter().handleException(e);
 
 			synchronized(lock)
 	        {

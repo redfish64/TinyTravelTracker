@@ -19,13 +19,6 @@
 */
 package com.igisw.openlocationtracker;
 
-import com.igisw.openlocationtracker.SeekBarWithText;
-import com.igisw.openlocationtracker.GTG;
-import com.igisw.openlocationtracker.GTGActivity;
-import com.igisw.openlocationtracker.GpsTrailerGpsStrategy;
-import com.igisw.openlocationtracker.GTG.Requirement;
-
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -74,7 +67,7 @@ public class BatteryLifePage extends GTGActivity {
 
 		GTG.savePreferences(this);
 		
-		startInternalActivity(new Intent(this, HelpDeveloperPage.class));		
+		startInternalActivity(new Intent(this, ConclusionPage.class));
 	}
 
 	@Override

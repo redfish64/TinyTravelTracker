@@ -19,18 +19,10 @@
 */
 package com.igisw.openlocationtracker;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.CheckBox;
 import android.widget.RadioButton;
-
-import com.igisw.openlocationtracker.GTGActivity;
-import com.igisw.openlocationtracker.GTG;
-import com.igisw.openlocationtracker.GpsTrailerDbProvider;
-import com.igisw.openlocationtracker.GpsTrailerService;
-import com.igisw.openlocationtracker.GTG.Requirement;
 
 public class TurnOnGpsPage extends GTGActivity {
 	
@@ -66,7 +58,7 @@ public class TurnOnGpsPage extends GTGActivity {
 		}
 		else
 		{
-			startInternalActivity(new Intent(this, HelpDeveloperPage.class));
+			startInternalActivity(new Intent(this, /*HelpDeveloperPage*/ConclusionPage.class));
 		}
 		
 	}

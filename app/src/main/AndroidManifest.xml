@@ -3,6 +3,7 @@
 
     <!-- NOTE, below, sharedUserId enables the premium installation to tell the trial installation to give it its preferences -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.igisw.openlocationtracker"
     android:sharedUserId="com.igisw.openlocationtracker"
     >
@@ -75,7 +76,9 @@
             android:icon="@mipmap/ic_launcher"
             android:label="@string/reviewer_app_name"
             android:configChanges="orientation|keyboardHidden"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait"
+            android:exported="true"
+            tools:ignore="LockedOrientationActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -83,17 +86,12 @@
             </intent-filter>
         </activity>
 
-	    <activity android:name="org.acra.CrashReportDialog"
+	    <!--
+        <activity android:name="org.acra.CrashReportDialog"
 	        android:theme="@android:style/Theme.Dialog"
 	        android:launchMode="singleInstance"
 	        android:excludeFromRecents="true"
 	        android:finishOnTaskLaunch="true" />
-        <!--
-            co: a local service might actually save memory, really
-        <service
-            android:name="com.rareventure.gps2.GpsTrailerService"
-            android:exported="false"
-            android:process=":remote" >
         -->
         <service
             android:exported="false"
@@ -150,44 +148,58 @@
             </receiver>
 
         <activity android:name="com.igisw.openlocationtracker.WelcomePage"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity">
         </activity>
        <!-- TODO 3 portrait because the progress dialog screws up when switching orientations -->
-        <activity android:name="com.igisw.openlocationtracker.ShouldHavePasswordPage" android:screenOrientation="portrait" >
+        <activity android:name="com.igisw.openlocationtracker.ShouldHavePasswordPage" android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity">
         </activity>
-        <activity android:name="com.igisw.openlocationtracker.BatteryLifePage" android:screenOrientation="portrait"  >
+        <activity android:name="com.igisw.openlocationtracker.BatteryLifePage" android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity">
         </activity>
-        <activity android:name="com.igisw.openlocationtracker.ConclusionPage" android:screenOrientation="portrait" >
+        <activity android:name="com.igisw.openlocationtracker.ConclusionPage" android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity">
         </activity>
-        <activity android:name="com.igisw.openlocationtracker.EnterNewPasswordPage" android:screenOrientation="portrait"  android:launchMode="singleTop">
+        <activity android:name="com.igisw.openlocationtracker.EnterNewPasswordPage" android:screenOrientation="portrait"  android:launchMode="singleTop"
+            tools:ignore="LockedOrientationActivity">
         </activity>
         <activity android:name="com.igisw.openlocationtracker.SettingsActivity" android:screenOrientation="portrait"
              android:launchMode="singleTop"
-            >
+            tools:ignore="LockedOrientationActivity">
         </activity>
         <activity android:name="com.igisw.openlocationtracker.EnterPasswordActivity"
             android:windowSoftInputMode="stateAlwaysVisible"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity">
         </activity>
-        <activity android:name="com.igisw.openlocationtracker.TurnOnGpsPage" android:screenOrientation="portrait" >
+        <activity android:name="com.igisw.openlocationtracker.TurnOnGpsPage" android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity">
         </activity>
-        <activity android:name="com.igisw.openlocationtracker.HelpDeveloperPage" android:screenOrientation="portrait" >
+        <activity android:name="com.igisw.openlocationtracker.HelpDeveloperPage" android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity">
         </activity>
-        <activity android:name="com.igisw.openlocationtracker.FullMediaGalleryActivity"  android:screenOrientation="portrait">
+        <activity android:name="com.igisw.openlocationtracker.FullMediaGalleryActivity"  android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity">
         </activity>
-        <activity android:name="com.igisw.openlocationtracker.DbDoesntExistActivity"  android:screenOrientation="portrait">
+        <activity android:name="com.igisw.openlocationtracker.DbDoesntExistActivity"  android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity">
         </activity>
-        <activity android:name="com.igisw.openlocationtracker.TimmyCorruptActivity" android:screenOrientation="portrait" >
+        <activity android:name="com.igisw.openlocationtracker.TimmyCorruptActivity" android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity">
         </activity>
         <!--
         <activity android:name="com.igisw.openlocationtracker.TrialExpiredActivity" android:screenOrientation="portrait" >
         </activity>
         -->
-        <activity android:name="com.igisw.openlocationtracker.TimmyNeedsUpgradeActivity"  android:screenOrientation="portrait">
+        <activity android:name="com.igisw.openlocationtracker.TimmyNeedsUpgradeActivity"  android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity">
         </activity>
-        <activity android:name="com.igisw.openlocationtracker.TimmyNeedsProcessingActivity"  android:screenOrientation="portrait">
+        <activity android:name="com.igisw.openlocationtracker.TimmyNeedsProcessingActivity"  android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity">
         </activity>
-        <activity android:name="com.igisw.openlocationtracker.FatalErrorActivity"  android:screenOrientation="portrait">
+        <activity android:name="com.igisw.openlocationtracker.FatalErrorActivity"  android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity">
         </activity>
         <activity android:name="com.igisw.openlocationtracker.ViewImage" >
         </activity>
@@ -195,21 +207,23 @@
         </activity>
         <activity android:name="com.igisw.openlocationtracker.ShowManual" >
         </activity>
-        <activity android:name="com.igisw.openlocationtracker.ChooseColorsScreen"  android:screenOrientation="portrait">
+        <activity android:name="com.igisw.openlocationtracker.ChooseColorsScreen"  android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity">
         </activity>
-        <activity android:name="com.igisw.openlocationtracker.EnterFromDateToToDateActivity"  android:screenOrientation="portrait"  android:launchMode="singleTop">
+        <activity android:name="com.igisw.openlocationtracker.EnterFromDateToToDateActivity"  android:screenOrientation="portrait"  android:launchMode="singleTop"
+            tools:ignore="LockedOrientationActivity">
         </activity>
         <!-- portrait because the progress dialog screws up when switching orientations -->
         <activity android:name="com.igisw.openlocationtracker.CreateGpxBackup"
             android:screenOrientation="portrait"
             android:launchMode="singleTask"
-              >
+            tools:ignore="LockedOrientationActivity"  >
         </activity>
         <!-- portrait because the progress dialog screws up when switching orientations -->
         <activity android:name="com.igisw.openlocationtracker.RestoreGpxBackup"
             android:screenOrientation="portrait" 
             android:launchMode="singleTask"
-             >
+            tools:ignore="LockedOrientationActivity" >
         </activity>
 
         <!--

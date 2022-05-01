@@ -22,17 +22,18 @@ package com.igisw.openlocationtracker;
 import android.app.Application;
 import android.content.Context;
 
-//import com.rareventure.gps2.R;
-
+/*
 import org.acra.ACRA;
 import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
+*/
 
 import pl.tajchert.nammu.Nammu;
 
 /**
  * Does stuff that is common to all gps trailer reviewer type things
  */
+/*
 @ReportsCrashes(
 //             formKey="dFp0X2pTTTV1am5kNHczbk1lTE5rYVE6MQ",
 //             formKey="",
@@ -61,6 +62,8 @@ import pl.tajchert.nammu.Nammu;
 //@AcraMailSender(
 //        mailTo="engler@gmail.com"
 //)
+*/
+
 public class GpsTrailerReviewerApplication extends Application
 {
     @Override
@@ -68,7 +71,7 @@ public class GpsTrailerReviewerApplication extends Application
         super.attachBaseContext(base);
 
         // The following line triggers the initialization of ACRA
-        ACRA.init(this);
+        //ACRA.init(this);
     }
 
     @Override
