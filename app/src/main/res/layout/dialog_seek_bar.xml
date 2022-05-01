@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"        
         />
 
-    <com.rareventure.android.widget.SeekBarWithText
+    <com.igisw.openlocationtracker.SeekBarWithText
         android:id="@+id/seekBarWithText"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"

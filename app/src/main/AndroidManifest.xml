@@ -176,9 +176,6 @@
         <activity android:name="com.igisw.openlocationtracker.TurnOnGpsPage" android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity">
         </activity>
-        <activity android:name="com.igisw.openlocationtracker.HelpDeveloperPage" android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity">
-        </activity>
         <activity android:name="com.igisw.openlocationtracker.FullMediaGalleryActivity"  android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity">
         </activity>
