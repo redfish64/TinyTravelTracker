@@ -33,7 +33,7 @@ public class MyTouchInput implements OnTouchListener {
      * This is used to detect long presses. It is the same as panTapGestureDetector, but with
      * setIsLongpressEnabled() set to true. The problem is that after a longpress, GestureDetector
      * will mute onScroll messages until the long press is finished. This doesn't work well for
-     * applications that use long press and onScroll events together (such as Tiny Travel Tracker).
+     * applications that use long press and onScroll events together (such as Open Travel Tracker).
      * <p>
      *     So by detecting long presses with this gesture detector, we are able to shutoff long
      *     press detection in the panTapGestureDetector, so it will still report onScroll messages

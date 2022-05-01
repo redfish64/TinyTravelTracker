@@ -1,20 +1,20 @@
 /** 
-    Copyright 2015 Tim Engler, Rareventure LLC
+    Copyright 2022 Igor Calì <igor.cali0@gmail.com>
 
-    This file is part of Tiny Travel Tracker.
+    This file is part of Open Travel Tracker.
 
-    Tiny Travel Tracker is free software: you can redistribute it and/or modify
+    Open Travel Tracker is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    Tiny Travel Tracker is distributed in the hope that it will be useful,
+    Open Travel Tracker is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with Tiny Travel Tracker.  If not, see <http://www.gnu.org/licenses/>.
+    along with Open Travel Tracker.  If not, see <http://www.gnu.org/licenses/>.
 
 */
 package com.igisw.openlocationtracker;
@@ -30,6 +30,7 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
+import com.igisw.openlocationtracker.AndroidPreferenceSet.AndroidPreferences;
 import com.mapzen.tangram.CameraPosition;
 import com.mapzen.tangram.LngLat;
 import com.mapzen.tangram.MapChangeListener;
@@ -38,14 +39,6 @@ import com.mapzen.tangram.MapView;
 import com.mapzen.tangram.TouchInput;
 import com.mapzen.tangram.networking.HttpHandler;
 import com.mapzen.tangram.viewholder.GLViewHolderFactory;
-import com.igisw.openlocationtracker.AndroidPreferenceSet.AndroidPreferences;
-import com.igisw.openlocationtracker.SuperThread;
-import com.igisw.openlocationtracker.Util;
-import com.igisw.openlocationtracker.GTG;
-import com.igisw.openlocationtracker.AreaPanel;
-import com.igisw.openlocationtracker.AreaPanelSpaceTimeBox;
-import com.igisw.openlocationtracker.GpsOverlay;
-import com.igisw.openlocationtracker.MapScaleWidget;
 import com.rareventure.gps2.reviewer.map.MyTouchInput;
 
 import java.io.BufferedReader;
@@ -188,6 +181,7 @@ public class OsmMapView extends MapView implements MapView.MapReadyCallback {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+//		Create(null, null);	// TODO: igor: move here if needed and working
 	}
 
 	/**
@@ -450,7 +444,10 @@ public class OsmMapView extends MapView implements MapView.MapReadyCallback {
 
 	@Override
 	protected void	onMapInitOnUIThread(MapController controller, HttpHandler handler, GLViewHolderFactory viewHolderFactory, MapView.MapReadyCallback callback) {
+//	private void	Create(/*MapController controller,*/ MapView.MapReadyCallback callback, HttpHandler handler/*, GLViewHolderFactory viewHolderFactory, */) {
 		super.onMapInitOnUIThread(controller,handler,viewHolderFactory,callback);
+//		if(! loadNativeLibrary())return;
+//		mapController = this.initMapController(callback, handler);
 		mapController.setMapChangeListener(mapChangeListener);
 		((MyMapController)mapController).setupTouchListener();
 
@@ -574,8 +571,10 @@ public class OsmMapView extends MapView implements MapView.MapReadyCallback {
 
     @Override
 	protected MapController getMapInstance() {
+//	protected MapController getMapInstance(Context context) {
 		//We do this because we want to use our own TouchInput (MyTouchInput) which can handle long
 		// press pans correctly
+//		return new MyMapController(this.getContext());
 		return new MyMapController(this.getContext());
 	}
 

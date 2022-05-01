@@ -59,6 +59,10 @@ public class SasDrawer
         double lat2 = AreaPanel.convertYToLat(y2);
 
         mapData.addPolyline(createPolylineForRect(lon1,lat1,lon2,lat2),null);
+        /*
+        Marker marker = mapController.addMarker();
+        marker.setPolyline((Polyline) createPolylineForRect(lon1,lat1,lon2,lat2));
+        */
 //        createPolylineForRect(lon1,lat1,lon2,lat2);
 //        for(LngLat l : rectList)
 //            mapData.addPoint(l,null);

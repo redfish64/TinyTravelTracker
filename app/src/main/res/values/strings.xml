@@ -5,8 +5,8 @@
     <string name="vector_tiles_key" translatable="false">vector-tiles-fkZ5cDc</string>
     <string name="map">Map</string>
     <string name="mapless">Mapless</string>
-    <string name="app_name">Tiny Travel Tracker</string>
-    <string name="reviewer_app_name">Tiny Travel Tracker</string>
+    <string name="app_name">Open Travel Tracker</string>
+    <string name="reviewer_app_name">Open Travel Tracker</string>
     <string name="delete_named_location">Delete ${item}?</string>
     <string name="welcome_password_title">Before we begin</string>
     <string name="welcome_password_message">Before we begin, would you like to enter a password? A password will encrypt the location data gathered by this application. You can always change your mind in the Settings menu.</string>
@@ -38,11 +38,11 @@
     <string name="begin_no_db">Before we begin…</string>
     <string name="set_database_password">Set database password</string>
     <string name="conclusion">The system will now begin recording your position periodically throughout your day. To see a map view of the data, or to change settings, just start the app. The amount of time the gps is run can be adjusted in the settings menu.</string>
-    <string name="welcome_wizard_text">Welcome to Tiny Travel Tracker! This wizard will lead you through some setup questions.</string>
+    <string name="welcome_wizard_text">Welcome to Open Travel Tracker! This wizard will lead you through some setup questions.</string>
     <string name="wizard_should_have_password_text">Would you like to set a password? A password will be used to encrypt data used by this application. (You can always change your mind later)</string>
     <string name="battery_life_perc_time_gps_used">Please specify the percentage of time you want the GPS used. A greater percentage will result in more readings, but will use more battery life.</string>
     <string name="battery_life_min_battery_life">Please choose a minimum battery life. If the battery life falls below this percentage, the application will stop taking readings until the phone is recharged.</string>
-    <string name="wizard_conclusion_text">"Thank you for using Tiny Travel Tracker. You're now being taken to map view. However, there won't be any history to see until some GPS readings are taken."</string>
+    <string name="wizard_conclusion_text">"Thank you for using Open Travel Tracker. You're now being taken to map view. However, there won't be any history to see until some GPS readings are taken."</string>
     <string name="error_general">An internal error has occurred</string>
     <string name="enter_password">Enter password</string>
     <string name="password_incorrect">Password Incorrect</string>
@@ -69,7 +69,7 @@
     <string name="service_error_internal_error">There was an internal error collecting gps points.</string>
     <string name="service_error_sdcard_not_mounted">The sdcard is not available. GPS points will not be collected</string>
     <string name="service_error_db_problem">Database is corrupt or missing</string>
-    <string name="error_reviewer_sdcard_not_mounted">The sdcard is not available. Tiny Travel Tracker cannot be started. Note that sometimes it can take several minutes for the sdcard to go online</string>
+    <string name="error_reviewer_sdcard_not_mounted">The sdcard is not available. Open Travel Tracker cannot be started. Note that sometimes it can take several minutes for the sdcard to go online</string>
     <string name="title_perc_time_gps_on">Time GPS is on</string>
     <string name="desc_perc_time_gps_on">Percentage of time GPS is turned on. This will affect battery usage.</string>
     <string name="title_min_battery_life_perc">Min Battery Life</string>
@@ -121,11 +121,11 @@
     <string name="no_points_no_collect">There are no GPS points in the database. In order to add GPS points, you need to turn on "Collect GPS Data" in the Settings menu</string>
     <string name="no_points_with_collect">There are no GPS points in the database, yet. Check back later for some GPS data points to be collected</string>
     <string name="exit">Exit</string>
-    <string name="purchase_thank_you">Thank you for purchasing Tiny Travel Tracker. Enjoy!</string>
+    <string name="purchase_thank_you">Thank you for purchasing Open Travel Tracker. Enjoy!</string>
     <string name="error_ttt_server_down">Unable to connect to </string>
     <string name="crash_toast_text">An unexpected error has occurred</string>
     <string name="crash_dialog_title">Unexpected error</string>
-    <string name="crash_dialog_text">An unexpected error occurred forcing Tiny Travel Tracker to stop. Please help us fix this by sending us error data, all you have to do is click \'OK\'.</string>
+    <string name="crash_dialog_text">An unexpected error occurred forcing Open Travel Tracker to stop. Please help us fix this by sending us error data, all you have to do is click \'OK\'.</string>
     <string name="crash_dialog_comment_prompt">You might add your comments about the problem below:</string>
     <string name="crash_dialog_ok_toast">Thank you !</string>
     <string name="accept">Accept</string>
@@ -183,8 +183,8 @@
     <string name="service_gps_must_grant_permission">Permission to use GPS has not been granted.</string>
     <string name="button_prev">Prev</string>
     <string name="button_next">Next</string>
-    <string name="report_problem_question">If a problem occurs, Tiny Travel Tracker may optionally send an anonymous report about the issue to the developer. Would you like to enable this?</string>
-    <string name="report_problem_conclusion">If a problem occurs, Tiny Travel Tracker may optionally send an anonymous report about the issue to the developer.</string>
+    <string name="report_problem_question">If a problem occurs, Open Travel Tracker may optionally send an anonymous report about the issue to the developer. Would you like to enable this?</string>
+    <string name="report_problem_conclusion">If a problem occurs, Open Travel Tracker may optionally send an anonymous report about the issue to the developer.</string>
     <string name="now">now</string>
     <string name="start">\ (start)</string>
     <string name="end">\ (end)</string>

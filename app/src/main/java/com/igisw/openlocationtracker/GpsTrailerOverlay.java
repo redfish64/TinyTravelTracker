@@ -1,20 +1,20 @@
 /**
-    Copyright 2015 Tim Engler, Rareventure LLC
+    Copyright 2022 Igor Calì <igor.cali0@gmail.com>
 
-    This file is part of Tiny Travel Tracker.
+    This file is part of Open Travel Tracker.
 
-    Tiny Travel Tracker is free software: you can redistribute it and/or modify
+    Open Travel Tracker is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    Tiny Travel Tracker is distributed in the hope that it will be useful,
+    Open Travel Tracker is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with Tiny Travel Tracker.  If not, see <http://www.gnu.org/licenses/>.
+    along with Open Travel Tracker.  If not, see <http://www.gnu.org/licenses/>.
 
 */
 package com.igisw.openlocationtracker;
@@ -32,7 +32,6 @@ import com.mapzen.tangram.LngLat;
 import com.mapzen.tangram.MapController;
 import com.mapzen.tangram.MapData;
 import com.rareventure.android.SortedBestOfIntArray;
-import com.igisw.openlocationtracker.SuperThread;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -703,10 +702,16 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 			props.put("color","#ffffff");
 			props.put("size",String.format("%dpx %dpx", 10, 10));
 			mapData.addPoint(tl,props);
+			/*
+			Marker marker = mapController.addMarker();
+			marker.setPoint(tl);
+			*/
 
 			props.put("color","#000000");
 			props.put("size",String.format("%dpx %dpx", 10, 10));
 			mapData.addPoint(br,props);
+//			marker = mapController.addMarker();
+//			marker.setPoint(br);
 
 			while(iter.hasNext()) {
 				ViewNode vn = iter.next();
@@ -746,6 +751,8 @@ public class GpsTrailerOverlay extends SuperThread.Task implements GpsOverlay
 				//tangram-es/core/src/data/clientGeoJsonSource.cpp:
 				//void ClientGeoJsonSource::addPoint(const Properties& _tags, LngLat _point)
 				mapData.addPoint(ll,props);
+//				marker = mapController.addMarker();
+//				marker.setPoint(ll);
 
 				//we need to figure out what timezone to use. We do this by looking for the point
 				//closest to the center of the screen and using the timezone we were in during
