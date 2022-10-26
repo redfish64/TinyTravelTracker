@@ -2,9 +2,9 @@ package com.codeslap.dateslider;
 
 import android.content.Context;
 
-import java.util.Calendar;
+import com.igisw.openlocationtracker.EnterFromDateToToDateActivity;
 
-import com.rareventure.gps2.reviewer.EnterFromDateToToDateActivity;
+import java.util.Calendar;
 
 /**
  * the month labeler  takes care of providing each TimeTextView element in the monthScroller

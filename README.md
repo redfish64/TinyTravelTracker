@@ -1,9 +1,12 @@
-Tiny Travel Tracker could be described as a GPS journal. 
+Open Location Tracker could be described as a GPS journal. 
 
-[<img src="https://f-droid.org/badge/get-it-on.png" alt="Get it on F-Droid" height="60">](https://f-droid.org/app/com.rareventure.gps2)
-<a href="https://play.google.com/store/apps/details?id=com.rareventure.gps2_premium"><img src="https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png" height="60"></a>
+## TODO: add link to F-Droid package  
 
-Tiny Travel Tracker It's different from other GPS trackers because:
+[<img src="https://f-droid.org/badge/get-it-on.png" alt="Get it on F-Droid" height="60">](https://f-droid.org/app/xxx)
+
+Open Location Tracker was forked from [Tiny Travel Tracker](https://github.com/redfish64/TinyTravelTracker) by Tim Engler.
+
+Open Location Tracker is different from other GPS trackers because:
 
 * It can be safely left on all the time. It keeps track of it's own battery usage to prevent excessive battery drain.
 * It can handle hundreds of thousands of points-- years with of data, all at once. No need to worry about trying to categorize and save it yourself. It's all there and always available.
@@ -24,155 +27,25 @@ It also is useful in situations where you don't have internet access. All map ti
 
 _Note to users: If you have an issue you would like to see fixed, please click on the smiley on the right on the issue screen, and select thumbs up (or thumbs down). I'll use this information to decide what to work on next. Thanks_
 
-Changelog: (you can monitor the latest build here: https://f-droid.org/wiki/index.php?title=com.rareventure.gps2/lastbuild&redirect=no)
-
-V 1.1.48 (build 91) - 2019 Sep 10
-
-Attempt to fix #83, where Oreo and later Android versions kill the gps recording service.
-Now schedules a job which will run every 10 min or so to try and restart the service if stopped.
-
-V 1.1.46 (build 89) - 2019 July 13
-
-Fix so that the gps doesn't turn on and off constantly when at 100%. Thanks Kright!
-
-V 1.1.45 (build 88) - 2019 June 22
-
-Small tweak to hopefully prevent TTT service from being randomly shutdown by the OS in Oreo.
-
-V 1.1.44 (build 87) - 2019 May 6
-
-Added map style with large fonts.
-
-V 1.1.43 (build 86) - 2019 May 2
-
-Found nextzen.org which has the original mapzen maps. This allows me to retire my poorly custom made map that ran against tilehosting.
-
-Added the ability to choose from some different map styles.
-
-Upgraded to Tangram 10.1 which fixes some chinese fonts not showing up.
-
-Integrated igor-cali's italian language translation.
-
-V 1.1.38
-
-Now compatible with Android Oreo.
-Fixed problem in error reporting, so I should receive user error messages again.
-
-V 1.1.37
-
-Now compatible with Android M (Marshmallow, Android 6) or above, by fixing
-the permissions system.
-
-V 1.1.36 
-
-Attempted fix of issue 76 which causes some ROMS to crash
-
-V 1.1.35 
-
-Small tweak to make drawing faster
-
-V 1.1.34 
-
-Now uses openmaptiles because mapzen.com shut down Feb 1st.
-
-V 1.1.30
-
-Reverted back to V 1.1.28. Mapzen's LOST is too inaccurate even when specifying "high precision"
-
-V 1.1.29
-
-Now uses mapzen's LOST (https://mapzen.com/blog/lets-get-lost/) library to help with gps tracking.
-
-V 1.1.28
-
-Fixed problem in release binary stripped out too many classes and caused immediate crash on open.
-
-V 1.1.27
-
-Tangram updated their map server to be no longer compatible with the version I was using, so I updated it. However, there was a lot of changes on tangram's side and a few bugs are still present. Better than not having maps though.
-
-Specifically:
-
-* blinking dots whenever moving around map. (I may not be able to fix this completely but I will see)
-* tiles in offline mode are slow to load. 
-
-I'll try to fix this soonish.
-
-V 1.1.22
-
-* Found and fixed another old bug releated to #50. The amount of time to be allocated to the gps wasn't being
-calculated properly. This would manifest itself under the following conditions:
-
-  TTT has been running for a long time uninterrupted
-  A GPS signal was not able to be found, or only sporadically.
-
-V 1.1.21
-
-* Hopefully fixed issue #50, cpu was never allowed to sleep. Added option to log to a separate file
-  when cpu is kept on under settings.
-
-V 1.1.20
-
-* Reverted code from 1.1.17, which was failing to store points and corrupting the cache 
-  in some cases. Added new code which will mark the cache corrupt if an error occurs that 
-  indicates this might be the case, so that the next time the application starts it will
-  automatically regenerate it.
-
-V 1.1.17
-
-* Now stores accuracy information and prints this out to GPX files as "hdop" (Issue #25)
-
-V 1.1.13
-
-* Fixed problem where selecting a item from the selected area set panel (used to view time periods of
-selected points) was not updating screen properly.
-
-V 1.1.11
-
-* Selecting points and long pressing to select point areas works again (it was broken when moving to Mapzen)
-
-V 1.1.9
-
-* Now uses an opengl vector map implementation by Mapzen
-
-V 1.06
-
-* Smooth zooming
-* Pinch to zoom works much better
-* Double tap to zoom
-* Font size of map can be adjusted in settings
-
-V 1.05
-
-* Now uses less battery
-
 ----
 
-You can contact me at engler@gmail.com
 
-Donations:
+    Copyright 2022 Igor Calì <igor.cali0@gmail.com>
 
-Bitcoin: 19bit8J9VFY9DMGbcYNrH4PzkUPdS8Rx1f
+    This file is part of Open Location Tracker.
 
-Patreon: https://www.patreon.com/redfish64
-
-
-    Copyright 2015 Tim Engler, Rareventure LLC
-
-    This file is part of Tiny Travel Tracker.
-
-    Tiny Travel Tracker is free software: you can redistribute it and/or modify
+    Open Location Tracker is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    Tiny Travel Tracker is distributed in the hope that it will be useful,
+    Open Location Tracker is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with Tiny Travel Tracker.  If not, see <http://www.gnu.org/licenses/>.
+    along with Open Location Tracker.  If not, see <http://www.gnu.org/licenses/>.
 
 
 

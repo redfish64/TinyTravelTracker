@@ -5,9 +5,9 @@ import android.graphics.Typeface;
 import android.util.TypedValue;
 import android.view.Gravity;
 
-import java.util.Calendar;
+import com.igisw.openlocationtracker.EnterFromDateToToDateActivity;
 
-import com.rareventure.gps2.reviewer.EnterFromDateToToDateActivity;
+import java.util.Calendar;
 
 /**
  * @author cristian

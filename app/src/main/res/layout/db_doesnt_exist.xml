@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:text="The Tiny Travel Tracker database on the external storage is missing. Press 'Recreate Database' to create a fresh database with no GPS points, or 'Exit' to exit the application"
+        android:text="The Open Travel Tracker database on the external storage is missing. Press 'Recreate Database' to create a fresh database with no GPS points, or 'Exit' to exit the application"
         android:textAppearance="?android:attr/textAppearanceMedium" />
     
     	

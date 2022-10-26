@@ -4,8 +4,8 @@
     -->
     <string name="map">Map</string>
     <string name="mapless">Mapless</string>
-    <string name="app_name">Tiny Travel Tracker</string>
-    <string name="reviewer_app_name">Tiny Travel Tracker</string>
+    <string name="app_name">Diario di Viaggio</string>
+    <string name="reviewer_app_name">Diario di Viaggio</string>
     <string name="delete_named_location">Delete ${item}?</string>
     <string name="welcome_password_title">Before we begin</string>
     <string name="welcome_password_message">Before we begin, would you like to enter a password? A password will encrypt the location data gathered by this application. You can always change your mind in the Settings menu.</string>
@@ -37,11 +37,11 @@
     <string name="begin_no_db">Before we begin…</string>
     <string name="set_database_password">Impostare password archivio</string>
     <string name="conclusion">The system will now begin recording your position periodically throughout your day. To see a map view of the data, or to change settings, just start the app. The amount of time the gps is run can be adjusted in the settings menu.</string>
-    <string name="welcome_wizard_text">Benvenuto in Tiny Travel Tracker! Questa procedura ti guiderà nella configurazione attraverso alcune domande.</string>
+    <string name="welcome_wizard_text">Benvenuto in Diario di Viaggio! Questa procedura ti guiderà nella configurazione attraverso alcune domande.</string>
     <string name="wizard_should_have_password_text">Impostare una password? La password sarà usata per cifrare i dati utilizzati da questa app. (Si può comunque cambiare impostazione successivamente).</string>
     <string name="battery_life_perc_time_gps_used">Impostare la percentuale in tempo per l\'utilizzo del GPS. Una percentuale maggiore risulterà in più rilievi, ma utilizzerà più carica della batteria.</string>
     <string name="battery_life_min_battery_life">Impostare la carica minima della batteria. Se la carica scende al di sotto di questa percentuale, la app interromperà i rilievi fin quando il telefono viene ricaricato.</string>
-    <string name="wizard_conclusion_text">"Grazie per utilizzare Tiny Travel Tracker. Ora verrà visulalizzata la vista della mappa. Comunque, non verrà visualizzata alcuna cronologia finché non vengono eseguiti alcuni rilievi GPS."</string>
+    <string name="wizard_conclusion_text">"Grazie per utilizzare Diario di Viaggio. Ora verrà visulalizzata la vista della mappa. Comunque, non verrà visualizzata alcuna cronologia finché non vengono eseguiti alcuni rilievi GPS."</string>
     <string name="error_general">An internal error has occurred</string>
     <string name="enter_password">Inserire password</string>
     <string name="password_incorrect">Password Incorrect</string>
@@ -68,7 +68,7 @@
     <string name="service_error_internal_error">There was an internal error collecting gps points.</string>
     <string name="service_error_sdcard_not_mounted">The sdcard is not available. GPS points will not be collected</string>
     <string name="service_error_db_problem">Database is corrupt or missing</string>
-    <string name="error_reviewer_sdcard_not_mounted">The sdcard is not available. Tiny Travel Tracker cannot be started. Note that sometimes it can take several minutes for the sdcard to go online</string>
+    <string name="error_reviewer_sdcard_not_mounted">The sdcard is not available. Diario di Viaggio cannot be started. Note that sometimes it can take several minutes for the sdcard to go online</string>
     <string name="title_perc_time_gps_on">Tempo di utilizzo GPS</string>
     <string name="desc_perc_time_gps_on">Percentuale di tempo durante il quale il GPS è attivato. Questo impatterà sull\'utilizzo della batteria.</string>
     <string name="title_min_battery_life_perc">Carica minima della batteria</string>
@@ -105,7 +105,7 @@
     <string name="drawing_points">Drawing Points</string>
     <string name="pan_to_location_button_tooltip">This button centers the display on your current location.</string>
     <string name="autozoom_button_tooltip">This button centers the display on all visible data points for selected time range.</string>
-    <string name="timeview_tooltip">Scorrere da destra a sinistra nella barra inferiore per regolare l\'intervallo di tempo. Scorrere su è giù per regolare l\'intervallo di tempo rappresentato.</string>
+    <string name="timeview_tooltip">Scorrere da destra a sinistra nella barra inferiore per regolare l\'intervallo di tempo. Scorrere su e giù per regolare l\'intervallo di tempo rappresentato.</string>
     <string name="enable_tooltips">Attiva consigli</string>
     <string name="no_points_yet">There aren\'t any GPS points recorded yet, so there is nothing to view</string>
     <string name="free_version_before_expiry">The trial period will expire in %d days. Touch here to buy the full version.</string>
@@ -120,18 +120,18 @@
     <string name="no_points_no_collect">Non ci sono punti GPS nel database. Affinché vengano aggiunti, è necessario attivare  "Raccogli dati GPS" nelle impostazioni</string>
     <string name="no_points_with_collect">There are no GPS points in the database, yet. Check back later for some GPS data points to be collected</string>
     <string name="exit">Exit</string>
-    <string name="purchase_thank_you">Thank you for purchasing Tiny Travel Tracker. Enjoy!</string>
+    <string name="purchase_thank_you">Thank you for purchasing Diario di Viaggio. Enjoy!</string>
     <string name="error_ttt_server_down">Unable to connect to </string>
     <string name="crash_toast_text">An unexpected error has occurred</string>
     <string name="crash_dialog_title">Unexpected error</string>
-    <string name="crash_dialog_text">An unexpected error occurred forcing Tiny Travel Tracker to stop. Please help us fix this by sending us error data, all you have to do is click \'OK\'.</string>
+    <string name="crash_dialog_text">An unexpected error occurred forcing Diario di Viaggio to stop. Please help us fix this by sending us error data, all you have to do is click \'OK\'.</string>
     <string name="crash_dialog_comment_prompt">You might add your comments about the problem below:</string>
     <string name="crash_dialog_ok_toast">Thank you !</string>
     <string name="accept">Accetta</string>
     <string name="decline">Rifiuta</string>
     <string name="moving_trial_data_to_premium_long_task">Transferring points from trial application...</string>
-    <string name="create_gpx_backup_progress_title">Creating backup file</string>
-    <string name="create_gpx_backup_progress_msg">Please wait…</string>
+    <string name="create_gpx_backup_progress_title">Creazione backup file</string>
+    <string name="create_gpx_backup_progress_msg">Attendere prego…</string>
     <string name="create_gpx_backup_error_cant_write_backup">There was an error attempting to write to backup file. Make sure you have an SD Card inserted and are not mounting it on your computer</string>
     <string name="create_backup_pref">Backup/Esporta come GPX</string>
     <string name="create_restore_pref">Ripristina da GPX</string>
@@ -182,8 +182,8 @@
     <string name="service_gps_must_grant_permission">Permission to use GPS has not been granted.</string>
     <string name="button_prev">Prec</string>
     <string name="button_next">Succ</string>
-    <string name="report_problem_question">Se si verifica un problema, Tiny Travel Tracker potrebbe facoltativamente inviare report anonimi del problema allo sviluppatore. Attivare la funzione?</string>
-    <string name="report_problem_conclusion">Se si verifica un problema, Tiny Travel Tracker potrebbe facoltativamente inviare report anonimi del problema allo sviluppatore.</string>
+    <string name="report_problem_question">Se si verifica un problema, Diario di Viaggio potrebbe facoltativamente inviare report anonimi del problema allo sviluppatore. Attivare la funzione?</string>
+    <string name="report_problem_conclusion">Se si verifica un problema, Diario di Viaggio potrebbe facoltativamente inviare report anonimi del problema allo sviluppatore.</string>
     <string name="now">adesso</string>
     <string name="start">\ (inizio)</string>
     <string name="end">\ (fine)</string>
@@ -203,7 +203,7 @@
     <string name="gpx_restore_title">Ripristina da backup GPX</string>
     <string name="gpx_restore_warning">ATTENZIONE: Questo sostituirà TUTTI gli attuali punti GPS!</string>
     <string name="gpx_restore_filename">Nome file (*.gpx, *.zip)</string>
-    <string name="gpx_restore_format">Il file deve essere in formato GPX 1.0 o 1.1. Esso può essere compressoe opzionalmente protetto con password AES 256.</string>
+    <string name="gpx_restore_format">Il file deve essere in formato GPX 1.0 o 1.1. Esso può essere compresso e opzionalmente protetto con password AES 256.</string>
     <string name="gpx_restore_action">Ripristina</string>
     <string name="password_timeout_off">Spento</string>
     <string name="password_timeout_30sec">30 secondi</string>

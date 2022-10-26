@@ -2,4 +2,4 @@
 
 import:
   - ./map_assets/cinnabar-large-style/cinnabar-large-style.yaml
-  - ./ttt_integration.yaml
+  - ./ott_integration.yaml

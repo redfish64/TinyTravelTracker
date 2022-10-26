@@ -1,11 +1,10 @@
 package com.codeslap.dateslider;
 
 import android.content.Context;
-import android.util.Log;
+
+import com.igisw.openlocationtracker.EnterFromDateToToDateActivity;
 
 import java.util.Calendar;
-
-import com.rareventure.gps2.reviewer.EnterFromDateToToDateActivity;
 
 /**
  * Time labeler takes care of providing each TimeTextView element in the time scroller

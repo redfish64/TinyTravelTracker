@@ -24,8 +24,8 @@ import android.view.Gravity;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.rareventure.gps2.reviewer.EnterFromDateToToDateActivity;
-import com.rareventure.gps2.reviewer.EnterFromDateToToDateActivity.TimeObject;
+import com.igisw.openlocationtracker.EnterFromDateToToDateActivity;
+import com.igisw.openlocationtracker.EnterFromDateToToDateActivity.TimeObject;
 
 import java.util.Calendar;
 
@@ -53,7 +53,7 @@ public interface TimeView {
     /**
      * This is a simple implementation of a TimeView which realised through a TextView.
      */
-    class TimeTextView extends android.support.v7.widget.AppCompatTextView implements TimeView {
+    class TimeTextView extends androidx.appcompat.widget.AppCompatTextView implements TimeView {
         private long endTime, startTime;
 
         /**

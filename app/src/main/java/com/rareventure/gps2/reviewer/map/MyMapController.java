@@ -1,17 +1,14 @@
 package com.rareventure.gps2.reviewer.map;
 
 import android.content.Context;
-import android.opengl.GLSurfaceView;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import android.view.MotionEvent;
 
 import com.mapzen.tangram.MapController;
 
 import com.mapzen.tangram.MapView;
-import com.mapzen.tangram.TouchInput;
-import com.mapzen.tangram.networking.HttpHandler;
-import com.mapzen.tangram.viewholder.GLViewHolderFactory;
 
 /**
  * A hack to modify MapController so that we can handle long press + pan

@@ -9,7 +9,7 @@
         android:id="@+id/textView1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Thank you for using Tiny Travel Tracker."
+        android:text="Thank you for using Open Travel Tracker."
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <TextView
